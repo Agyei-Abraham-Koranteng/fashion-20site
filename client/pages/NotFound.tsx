@@ -1,27 +1,26 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import Layout from "@/components/Layout";
 
-const NotFound = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname,
-    );
-  }, [location.pathname]);
-
+export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
+    <Layout>
+      <div className="container-wide py-20">
+        <div className="text-center max-w-md mx-auto">
+          <div className="text-6xl mb-4">404</div>
+          <h1 className="text-3xl font-bold mb-4">Page Not Found</h1>
+          <p className="text-muted-foreground mb-8">
+            The page you're looking for doesn't exist or is still being built.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/" className="btn-primary">
+              Go to Home
+            </Link>
+            <Link to="/shop" className="btn-secondary">
+              Shop Now
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
-};
-
-export default NotFound;
+}
