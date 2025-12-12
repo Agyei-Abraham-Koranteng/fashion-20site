@@ -1,4 +1,5 @@
 import "./global.css";
+import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function SimpleHome() {
@@ -22,6 +23,5 @@ const App = () => (
 // Render app
 const root = document.getElementById("root");
 if (root) {
-  const { createRoot } = await import("react-dom/client");
   createRoot(root).render(<App />);
 }
