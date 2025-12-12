@@ -96,7 +96,9 @@ export default function Footer() {
 
             {/* Social links */}
             <div>
-              <h3 className="text-sm font-semibold tracking-wider mb-3 uppercase">Follow Us</h3>
+              <h3 className="text-sm font-semibold tracking-wider mb-3 uppercase">
+                Follow Us
+              </h3>
               <div className="flex gap-4">
                 <a
                   href="#"
@@ -132,10 +134,16 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/70">
             <p>&copy; 2024 LUXE. All rights reserved.</p>
             <div className="flex gap-6">
-              <a href="#" className="hover:text-primary-foreground transition-colors">
+              <a
+                href="#"
+                className="hover:text-primary-foreground transition-colors"
+              >
                 Accessibility
               </a>
-              <a href="#" className="hover:text-primary-foreground transition-colors">
+              <a
+                href="#"
+                className="hover:text-primary-foreground transition-colors"
+              >
                 Sitemap
               </a>
             </div>

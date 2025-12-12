@@ -47,7 +47,9 @@ export default function Checkout() {
       <Layout>
         <div className="container-wide py-20 text-center">
           <h1 className="text-3xl font-bold mb-4">Your cart is empty</h1>
-          <p className="text-muted-foreground mb-8">Add items to your cart before checking out.</p>
+          <p className="text-muted-foreground mb-8">
+            Add items to your cart before checking out.
+          </p>
           <button onClick={() => navigate("/shop")} className="btn-primary">
             Return to Shop
           </button>
@@ -72,7 +74,9 @@ export default function Checkout() {
           <div className="text-center max-w-md mx-auto">
             <CheckCircle size={64} className="text-accent mx-auto mb-6" />
             <h1 className="text-3xl font-bold mb-4">Order Confirmed!</h1>
-            <p className="text-muted-foreground mb-2">Thank you for your purchase.</p>
+            <p className="text-muted-foreground mb-2">
+              Thank you for your purchase.
+            </p>
             <p className="text-muted-foreground mb-8">
               Order #12345 | You will receive an email confirmation shortly.
             </p>
@@ -93,7 +97,9 @@ export default function Checkout() {
                   <span>
                     $
                     {(
-                      total + (total >= 100 ? 0 : 10) + (total >= 100 ? total : total + 10) * 0.08
+                      total +
+                      (total >= 100 ? 0 : 10) +
+                      (total >= 100 ? total : total + 10) * 0.08
                     ).toFixed(2)}
                   </span>
                 </p>
@@ -101,10 +107,16 @@ export default function Checkout() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <button onClick={() => navigate("/shop")} className="btn-secondary flex-1">
+              <button
+                onClick={() => navigate("/shop")}
+                className="btn-secondary flex-1"
+              >
                 Continue Shopping
               </button>
-              <button onClick={() => navigate("/")} className="btn-primary flex-1">
+              <button
+                onClick={() => navigate("/")}
+                className="btn-primary flex-1"
+              >
                 Back to Home
               </button>
             </div>
@@ -154,7 +166,10 @@ export default function Checkout() {
                     placeholder="First Name*"
                     value={shippingInfo.firstName}
                     onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, firstName: e.target.value })
+                      setShippingInfo({
+                        ...shippingInfo,
+                        firstName: e.target.value,
+                      })
                     }
                     className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                   />
@@ -163,7 +178,10 @@ export default function Checkout() {
                     placeholder="Last Name*"
                     value={shippingInfo.lastName}
                     onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, lastName: e.target.value })
+                      setShippingInfo({
+                        ...shippingInfo,
+                        lastName: e.target.value,
+                      })
                     }
                     className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                   />
@@ -172,7 +190,10 @@ export default function Checkout() {
                     placeholder="Email*"
                     value={shippingInfo.email}
                     onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, email: e.target.value })
+                      setShippingInfo({
+                        ...shippingInfo,
+                        email: e.target.value,
+                      })
                     }
                     className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary md:col-span-2"
                   />
@@ -181,7 +202,10 @@ export default function Checkout() {
                     placeholder="Phone*"
                     value={shippingInfo.phone}
                     onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, phone: e.target.value })
+                      setShippingInfo({
+                        ...shippingInfo,
+                        phone: e.target.value,
+                      })
                     }
                     className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary md:col-span-2"
                   />
@@ -190,7 +214,10 @@ export default function Checkout() {
                     placeholder="Street Address*"
                     value={shippingInfo.address}
                     onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, address: e.target.value })
+                      setShippingInfo({
+                        ...shippingInfo,
+                        address: e.target.value,
+                      })
                     }
                     className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary md:col-span-2"
                   />
@@ -208,7 +235,10 @@ export default function Checkout() {
                     placeholder="State/Province*"
                     value={shippingInfo.state}
                     onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, state: e.target.value })
+                      setShippingInfo({
+                        ...shippingInfo,
+                        state: e.target.value,
+                      })
                     }
                     className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                   />
@@ -217,7 +247,10 @@ export default function Checkout() {
                     placeholder="Zip Code*"
                     value={shippingInfo.zipCode}
                     onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, zipCode: e.target.value })
+                      setShippingInfo({
+                        ...shippingInfo,
+                        zipCode: e.target.value,
+                      })
                     }
                     className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                   />
@@ -226,7 +259,10 @@ export default function Checkout() {
                     placeholder="Country*"
                     value={shippingInfo.country}
                     onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, country: e.target.value })
+                      setShippingInfo({
+                        ...shippingInfo,
+                        country: e.target.value,
+                      })
                     }
                     className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                   />
@@ -268,7 +304,10 @@ export default function Checkout() {
                       placeholder="First Name*"
                       value={billingInfo.firstName}
                       onChange={(e) =>
-                        setBillingInfo({ ...billingInfo, firstName: e.target.value })
+                        setBillingInfo({
+                          ...billingInfo,
+                          firstName: e.target.value,
+                        })
                       }
                       className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                     />
@@ -277,7 +316,10 @@ export default function Checkout() {
                       placeholder="Last Name*"
                       value={billingInfo.lastName}
                       onChange={(e) =>
-                        setBillingInfo({ ...billingInfo, lastName: e.target.value })
+                        setBillingInfo({
+                          ...billingInfo,
+                          lastName: e.target.value,
+                        })
                       }
                       className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                     />
@@ -286,7 +328,10 @@ export default function Checkout() {
                       placeholder="Street Address*"
                       value={billingInfo.address}
                       onChange={(e) =>
-                        setBillingInfo({ ...billingInfo, address: e.target.value })
+                        setBillingInfo({
+                          ...billingInfo,
+                          address: e.target.value,
+                        })
                       }
                       className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary md:col-span-2"
                     />
@@ -304,7 +349,10 @@ export default function Checkout() {
                       placeholder="State/Province*"
                       value={billingInfo.state}
                       onChange={(e) =>
-                        setBillingInfo({ ...billingInfo, state: e.target.value })
+                        setBillingInfo({
+                          ...billingInfo,
+                          state: e.target.value,
+                        })
                       }
                       className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                     />
@@ -339,7 +387,10 @@ export default function Checkout() {
                     placeholder="Cardholder Name*"
                     value={paymentInfo.cardName}
                     onChange={(e) =>
-                      setPaymentInfo({ ...paymentInfo, cardName: e.target.value })
+                      setPaymentInfo({
+                        ...paymentInfo,
+                        cardName: e.target.value,
+                      })
                     }
                     className="w-full px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                   />
@@ -348,7 +399,10 @@ export default function Checkout() {
                     placeholder="Card Number*"
                     value={paymentInfo.cardNumber}
                     onChange={(e) =>
-                      setPaymentInfo({ ...paymentInfo, cardNumber: e.target.value })
+                      setPaymentInfo({
+                        ...paymentInfo,
+                        cardNumber: e.target.value,
+                      })
                     }
                     className="w-full px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                   />
@@ -358,7 +412,10 @@ export default function Checkout() {
                       placeholder="MM/YY*"
                       value={paymentInfo.expiry}
                       onChange={(e) =>
-                        setPaymentInfo({ ...paymentInfo, expiry: e.target.value })
+                        setPaymentInfo({
+                          ...paymentInfo,
+                          expiry: e.target.value,
+                        })
                       }
                       className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                     />
@@ -405,11 +462,17 @@ export default function Checkout() {
                     className="text-sm"
                   >
                     <div className="flex justify-between mb-1">
-                      <span className="text-muted-foreground">{item.product.name}</span>
+                      <span className="text-muted-foreground">
+                        {item.product.name}
+                      </span>
                       <span className="font-medium">x{item.quantity}</span>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      ${((item.product.sale_price || item.product.price) * item.quantity).toFixed(2)}
+                      $
+                      {(
+                        (item.product.sale_price || item.product.price) *
+                        item.quantity
+                      ).toFixed(2)}
                     </div>
                   </div>
                 ))}
@@ -437,7 +500,9 @@ export default function Checkout() {
                 <span>
                   $
                   {(
-                    total + (total >= 100 ? 0 : 10) + (total >= 100 ? total : total + 10) * 0.08
+                    total +
+                    (total >= 100 ? 0 : 10) +
+                    (total >= 100 ? total : total + 10) * 0.08
                   ).toFixed(2)}
                 </span>
               </div>

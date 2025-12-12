@@ -25,7 +25,9 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <div className="text-xl font-bold tracking-wider text-primary">LUXE</div>
+            <div className="text-xl font-bold tracking-wider text-primary">
+              LUXE
+            </div>
           </Link>
 
           {/* Desktop navigation */}
@@ -100,7 +102,10 @@ export default function Navbar() {
                 placeholder="Search products..."
                 className="w-full px-4 py-2 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
               />
-              <Search size={18} className="absolute right-3 top-2.5 text-muted-foreground" />
+              <Search
+                size={18}
+                className="absolute right-3 top-2.5 text-muted-foreground"
+              />
             </div>
           </div>
         )}

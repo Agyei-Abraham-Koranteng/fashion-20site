@@ -49,11 +49,19 @@ export default function ProductListing() {
 
         // Sort products
         if (sortBy === "price-low") {
-          sorted.sort((a, b) => (a.sale_price || a.price) - (b.sale_price || b.price));
+          sorted.sort(
+            (a, b) => (a.sale_price || a.price) - (b.sale_price || b.price),
+          );
         } else if (sortBy === "price-high") {
-          sorted.sort((a, b) => (b.sale_price || b.price) - (a.sale_price || a.price));
+          sorted.sort(
+            (a, b) => (b.sale_price || b.price) - (a.sale_price || a.price),
+          );
         } else if (sortBy === "new") {
-          sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+          sorted.sort(
+            (a, b) =>
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime(),
+          );
         } else if (sortBy === "sale") {
           sorted.sort((a, b) => {
             const aDiscount = a.sale_price ? a.price - a.sale_price : 0;
@@ -80,13 +88,15 @@ export default function ProductListing() {
 
   const handleColorToggle = (colorHex: string) => {
     setSelectedColors((prev) =>
-      prev.includes(colorHex) ? prev.filter((c) => c !== colorHex) : [...prev, colorHex]
+      prev.includes(colorHex)
+        ? prev.filter((c) => c !== colorHex)
+        : [...prev, colorHex],
     );
   };
 
   const handleSizeToggle = (size: string) => {
     setSelectedSizes((prev) =>
-      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
     );
   };
 
@@ -96,7 +106,9 @@ export default function ProductListing() {
       <section className="bg-secondary py-12">
         <div className="container-wide">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            {category ? `${category.charAt(0).toUpperCase() + category.slice(1)}` : "Shop"}
+            {category
+              ? `${category.charAt(0).toUpperCase() + category.slice(1)}`
+              : "Shop"}
           </h1>
           <p className="text-muted-foreground">
             {products.length} products available
@@ -108,7 +120,9 @@ export default function ProductListing() {
       <div className="container-wide py-12">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Filters sidebar */}
-          <div className={`${filtersOpen ? "block" : "hidden"} lg:block lg:w-64 flex-shrink-0`}>
+          <div
+            className={`${filtersOpen ? "block" : "hidden"} lg:block lg:w-64 flex-shrink-0`}
+          >
             <div className="space-y-6">
               {/* Filters header for mobile */}
               <div className="lg:hidden flex items-center justify-between mb-6">
@@ -123,7 +137,9 @@ export default function ProductListing() {
 
               {/* Price filter */}
               <div className="border-b border-border pb-6">
-                <h3 className="text-sm font-semibold tracking-wider uppercase mb-4">Price</h3>
+                <h3 className="text-sm font-semibold tracking-wider uppercase mb-4">
+                  Price
+                </h3>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <input
@@ -155,7 +171,9 @@ export default function ProductListing() {
                     min="0"
                     max="500"
                     value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                    onChange={(e) =>
+                      setPriceRange([priceRange[0], Number(e.target.value)])
+                    }
                     className="w-full"
                   />
                 </div>
@@ -163,7 +181,9 @@ export default function ProductListing() {
 
               {/* Color filter */}
               <div className="border-b border-border pb-6">
-                <h3 className="text-sm font-semibold tracking-wider uppercase mb-4">Color</h3>
+                <h3 className="text-sm font-semibold tracking-wider uppercase mb-4">
+                  Color
+                </h3>
                 <div className="grid grid-cols-3 lg:grid-cols-2 gap-3">
                   {colors.map((color) => (
                     <button
@@ -189,7 +209,9 @@ export default function ProductListing() {
 
               {/* Size filter */}
               <div className="border-b border-border pb-6">
-                <h3 className="text-sm font-semibold tracking-wider uppercase mb-4">Size</h3>
+                <h3 className="text-sm font-semibold tracking-wider uppercase mb-4">
+                  Size
+                </h3>
                 <div className="grid grid-cols-3 lg:grid-cols-2 gap-2">
                   {sizes.map((size) => (
                     <button

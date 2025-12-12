@@ -10,7 +10,12 @@ export const sampleProducts: Product[] = [
     price: 49.99,
     sale_price: 34.99,
     category_id: "women",
-    category: { id: "women", name: "Women", slug: "women", created_at: new Date().toISOString() },
+    category: {
+      id: "women",
+      name: "Women",
+      slug: "women",
+      created_at: new Date().toISOString(),
+    },
     images: [
       {
         id: "img1",
@@ -42,7 +47,12 @@ export const sampleProducts: Product[] = [
     price: 199.99,
     sale_price: 149.99,
     category_id: "women",
-    category: { id: "women", name: "Women", slug: "women", created_at: new Date().toISOString() },
+    category: {
+      id: "women",
+      name: "Women",
+      slug: "women",
+      created_at: new Date().toISOString(),
+    },
     images: [
       {
         id: "img3",
@@ -65,7 +75,12 @@ export const sampleProducts: Product[] = [
     description: "High-quality denim jeans with perfect fit and comfort",
     price: 89.99,
     category_id: "women",
-    category: { id: "women", name: "Women", slug: "women", created_at: new Date().toISOString() },
+    category: {
+      id: "women",
+      name: "Women",
+      slug: "women",
+      created_at: new Date().toISOString(),
+    },
     images: [
       {
         id: "img4",
@@ -89,7 +104,12 @@ export const sampleProducts: Product[] = [
     price: 79.99,
     sale_price: 59.99,
     category_id: "women",
-    category: { id: "women", name: "Women", slug: "women", created_at: new Date().toISOString() },
+    category: {
+      id: "women",
+      name: "Women",
+      slug: "women",
+      created_at: new Date().toISOString(),
+    },
     images: [
       {
         id: "img5",
@@ -112,7 +132,12 @@ export const sampleProducts: Product[] = [
     description: "Comfortable and stylish casual shirt for everyday wear",
     price: 59.99,
     category_id: "men",
-    category: { id: "men", name: "Men", slug: "men", created_at: new Date().toISOString() },
+    category: {
+      id: "men",
+      name: "Men",
+      slug: "men",
+      created_at: new Date().toISOString(),
+    },
     images: [
       {
         id: "img6",
@@ -136,7 +161,12 @@ export const sampleProducts: Product[] = [
     price: 299.99,
     sale_price: 249.99,
     category_id: "accessories",
-    category: { id: "accessories", name: "Accessories", slug: "accessories", created_at: new Date().toISOString() },
+    category: {
+      id: "accessories",
+      name: "Accessories",
+      slug: "accessories",
+      created_at: new Date().toISOString(),
+    },
     images: [
       {
         id: "img7",
@@ -171,17 +201,23 @@ export async function getProducts(filters?: {
     }
 
     if (filters?.minPrice) {
-      products = products.filter((p) => (p.sale_price || p.price) >= filters.minPrice!);
+      products = products.filter(
+        (p) => (p.sale_price || p.price) >= filters.minPrice!,
+      );
     }
 
     if (filters?.maxPrice) {
-      products = products.filter((p) => (p.sale_price || p.price) <= filters.maxPrice!);
+      products = products.filter(
+        (p) => (p.sale_price || p.price) <= filters.maxPrice!,
+      );
     }
 
     if (filters?.search) {
       const search = filters.search.toLowerCase();
       products = products.filter(
-        (p) => p.name.toLowerCase().includes(search) || p.description.toLowerCase().includes(search)
+        (p) =>
+          p.name.toLowerCase().includes(search) ||
+          p.description.toLowerCase().includes(search),
       );
     }
 
@@ -196,7 +232,10 @@ export async function getProductById(id: string) {
   try {
     // Return sample product for now
     const product = sampleProducts.find((p) => p.id === id);
-    return { data: product, error: product ? null : new Error("Product not found") };
+    return {
+      data: product,
+      error: product ? null : new Error("Product not found"),
+    };
   } catch (error) {
     console.error("Error fetching product:", error);
     return { data: null, error };
@@ -209,7 +248,12 @@ export async function getCategories() {
     const categories: Category[] = [
       { id: "women", name: "Women", slug: "women", created_at: now },
       { id: "men", name: "Men", slug: "men", created_at: now },
-      { id: "accessories", name: "Accessories", slug: "accessories", created_at: now },
+      {
+        id: "accessories",
+        name: "Accessories",
+        slug: "accessories",
+        created_at: now,
+      },
     ];
     return { data: categories, error: null };
   } catch (error) {
@@ -241,7 +285,7 @@ export async function createReview(
     rating: number;
     title: string;
     comment: string;
-  }
+  },
 ) {
   try {
     const { data, error } = await supabase
@@ -284,10 +328,13 @@ export async function createOrder(
     }>;
     shipping_address: Address;
     billing_address: Address;
-  }
+  },
 ) {
   try {
-    const totalPrice = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const totalPrice = order.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
 
     const { data: orderData, error: orderError } = await supabase
       .from("orders")
@@ -314,11 +361,14 @@ export async function createOrder(
         order.items.map((item) => ({
           order_id: orderId,
           ...item,
-        }))
+        })),
       )
       .select();
 
-    return { data: { ...orderData[0], order_items: itemsData }, error: itemsError };
+    return {
+      data: { ...orderData[0], order_items: itemsData },
+      error: itemsError,
+    };
   } catch (error) {
     console.error("Error creating order:", error);
     return { data: null, error };

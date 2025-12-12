@@ -41,8 +41,9 @@ export default function Home() {
               Elegance Redefined
             </h1>
             <p className="text-lg md:text-xl mb-8 text-primary-foreground/90">
-              Discover our curated collection of luxury fashion for the modern lifestyle.
-              Timeless pieces, exceptional quality, and uncompromising style.
+              Discover our curated collection of luxury fashion for the modern
+              lifestyle. Timeless pieces, exceptional quality, and
+              uncompromising style.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
@@ -69,7 +70,9 @@ export default function Home() {
         <div className="container-wide">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-2">Featured Collection</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">
+                Featured Collection
+              </h2>
               <p className="text-muted-foreground">
                 Handpicked styles for the season
               </p>
@@ -135,7 +138,9 @@ export default function Home() {
         <div className="container-wide">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-2">Trending Now</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">
+                Trending Now
+              </h2>
               <p className="text-muted-foreground">
                 What everyone is wearing this season
               </p>
@@ -174,8 +179,8 @@ export default function Home() {
         <div className="container-wide text-center">
           <h3 className="text-3xl font-bold mb-4">Join Our Community</h3>
           <p className="text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
-            Get exclusive access to new collections, special sales, and style tips.
-            Subscribe to our newsletter today.
+            Get exclusive access to new collections, special sales, and style
+            tips. Subscribe to our newsletter today.
           </p>
           <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <input
@@ -184,10 +189,7 @@ export default function Home() {
               className="flex-1 px-4 py-3 text-primary bg-primary-foreground rounded-sm focus:outline-none focus:ring-2 focus:ring-accent"
               required
             />
-            <button
-              type="submit"
-              className="btn-accent px-8 py-3 font-medium"
-            >
+            <button type="submit" className="btn-accent px-8 py-3 font-medium">
               Subscribe
             </button>
           </form>

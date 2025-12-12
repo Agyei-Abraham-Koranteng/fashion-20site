@@ -13,7 +13,9 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const mainImage = product.images?.[0];
   const salePrice = product.sale_price;
-  const discount = salePrice ? Math.round(((product.price - salePrice) / product.price) * 100) : 0;
+  const discount = salePrice
+    ? Math.round(((product.price - salePrice) / product.price) * 100)
+    : 0;
 
   return (
     <div className="group cursor-pointer animate-fade-in">
@@ -22,7 +24,10 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Image */}
           <div className="aspect-square overflow-hidden">
             <img
-              src={mainImage?.url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop"}
+              src={
+                mainImage?.url ||
+                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop"
+              }
               alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -47,7 +52,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           >
             <Heart
               size={18}
-              className={wishlisted ? "fill-current text-accent" : "text-primary"}
+              className={
+                wishlisted ? "fill-current text-accent" : "text-primary"
+              }
             />
           </button>
 
@@ -73,13 +80,17 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="flex items-center gap-2">
             {salePrice ? (
               <>
-                <span className="text-sm font-semibold text-primary">${salePrice.toFixed(2)}</span>
+                <span className="text-sm font-semibold text-primary">
+                  ${salePrice.toFixed(2)}
+                </span>
                 <span className="text-xs text-muted-foreground line-through">
                   ${product.price.toFixed(2)}
                 </span>
               </>
             ) : (
-              <span className="text-sm font-semibold text-primary">${product.price.toFixed(2)}</span>
+              <span className="text-sm font-semibold text-primary">
+                ${product.price.toFixed(2)}
+              </span>
             )}
           </div>
 

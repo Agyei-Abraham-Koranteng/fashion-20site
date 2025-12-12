@@ -33,7 +33,8 @@ export default function Cart() {
         <div className="container-wide">
           <h1 className="text-3xl md:text-4xl font-bold">Shopping Cart</h1>
           <p className="text-muted-foreground mt-2">
-            You have {items.length} item{items.length !== 1 ? "s" : ""} in your cart
+            You have {items.length} item{items.length !== 1 ? "s" : ""} in your
+            cart
           </p>
         </div>
       </section>
@@ -79,7 +80,9 @@ export default function Cart() {
                         </p>
                       </div>
                       <button
-                        onClick={() => removeItem(item.product_id, item.size, item.color)}
+                        onClick={() =>
+                          removeItem(item.product_id, item.size, item.color)
+                        }
                         className="p-1 hover:bg-secondary rounded-sm transition-colors flex-shrink-0"
                         aria-label="Remove from cart"
                       >
@@ -96,21 +99,23 @@ export default function Cart() {
                               item.product_id,
                               item.size,
                               item.color,
-                              item.quantity - 1
+                              item.quantity - 1,
                             )
                           }
                           className="px-3 py-1 hover:bg-secondary transition-colors"
                         >
                           −
                         </button>
-                        <span className="px-4 py-1 font-medium text-sm">{item.quantity}</span>
+                        <span className="px-4 py-1 font-medium text-sm">
+                          {item.quantity}
+                        </span>
                         <button
                           onClick={() =>
                             updateQuantity(
                               item.product_id,
                               item.size,
                               item.color,
-                              item.quantity + 1
+                              item.quantity + 1,
                             )
                           }
                           className="px-3 py-1 hover:bg-secondary transition-colors"
@@ -126,7 +131,11 @@ export default function Cart() {
                           </p>
                         )}
                         <p className="text-sm font-semibold">
-                          ${((item.product.sale_price || item.product.price) * item.quantity).toFixed(2)}
+                          $
+                          {(
+                            (item.product.sale_price || item.product.price) *
+                            item.quantity
+                          ).toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -157,7 +166,9 @@ export default function Cart() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span className="font-medium">{total >= 100 ? "FREE" : "$10.00"}</span>
+                  <span className="font-medium">
+                    {total >= 100 ? "FREE" : "$10.00"}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax</span>
@@ -172,7 +183,9 @@ export default function Cart() {
                 <span>
                   $
                   {(
-                    total + (total >= 100 ? 0 : 10) + (total >= 100 ? total : total + 10) * 0.08
+                    total +
+                    (total >= 100 ? 0 : 10) +
+                    (total >= 100 ? total : total + 10) * 0.08
                   ).toFixed(2)}
                 </span>
               </div>

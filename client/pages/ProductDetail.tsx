@@ -19,8 +19,11 @@ export default function ProductDetail() {
   const [addedToCart, setAddedToCart] = useState(false);
 
   const { addItem } = useCart();
-  const { isWishlisted, addItem: addToWishlist, removeItem: removeFromWishlist } =
-    useWishlist();
+  const {
+    isWishlisted,
+    addItem: addToWishlist,
+    removeItem: removeFromWishlist,
+  } = useWishlist();
 
   useEffect(() => {
     async function loadProduct() {
@@ -69,7 +72,9 @@ export default function ProductDetail() {
 
   const wishlisted = isWishlisted(product.id);
   const salePrice = product.sale_price;
-  const discount = salePrice ? Math.round(((product.price - salePrice) / product.price) * 100) : 0;
+  const discount = salePrice
+    ? Math.round(((product.price - salePrice) / product.price) * 100)
+    : 0;
   const displayPrice = salePrice || product.price;
 
   const handleAddToCart = () => {
@@ -124,7 +129,11 @@ export default function ProductDetail() {
                     selectedImage === idx ? "border-primary" : "border-border"
                   }`}
                 >
-                  <img src={image.url} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={image.url}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -139,7 +148,9 @@ export default function ProductDetail() {
                   <p className="text-xs text-muted-foreground tracking-wider uppercase mb-2">
                     {product.category?.name}
                   </p>
-                  <h1 className="text-3xl md:text-4xl font-bold">{product.name}</h1>
+                  <h1 className="text-3xl md:text-4xl font-bold">
+                    {product.name}
+                  </h1>
                 </div>
                 <button
                   onClick={handleWishlist}
@@ -150,13 +161,18 @@ export default function ProductDetail() {
                   }`}
                   aria-label="Add to wishlist"
                 >
-                  <Heart size={20} className={wishlisted ? "fill-current" : ""} />
+                  <Heart
+                    size={20}
+                    className={wishlisted ? "fill-current" : ""}
+                  />
                 </button>
               </div>
 
               {/* Price */}
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-3xl font-bold text-primary">${displayPrice.toFixed(2)}</span>
+                <span className="text-3xl font-bold text-primary">
+                  ${displayPrice.toFixed(2)}
+                </span>
                 {salePrice && (
                   <>
                     <span className="text-lg text-muted-foreground line-through">
@@ -173,14 +189,22 @@ export default function ProductDetail() {
               <div className="flex items-center gap-2 mb-6">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} className="fill-primary text-primary" />
+                    <Star
+                      key={i}
+                      size={16}
+                      className="fill-primary text-primary"
+                    />
                   ))}
                 </div>
-                <span className="text-sm text-muted-foreground">(127 reviews)</span>
+                <span className="text-sm text-muted-foreground">
+                  (127 reviews)
+                </span>
               </div>
 
               {/* Description */}
-              <p className="text-muted-foreground mb-8">{product.description}</p>
+              <p className="text-muted-foreground mb-8">
+                {product.description}
+              </p>
             </div>
 
             {/* Size selector */}
@@ -216,7 +240,9 @@ export default function ProductDetail() {
                     key={color}
                     onClick={() => setSelectedColor(color)}
                     className={`w-10 h-10 rounded-full border-2 transition-all ${
-                      selectedColor === color ? "border-primary ring-2 ring-primary" : "border-border"
+                      selectedColor === color
+                        ? "border-primary ring-2 ring-primary"
+                        : "border-border"
                     }`}
                     style={{ backgroundColor: color || "#ccc" }}
                     title={color}
@@ -258,25 +284,33 @@ export default function ProductDetail() {
                 <ShoppingBag size={18} />
                 {addedToCart ? "Added to Cart!" : "Add to Cart"}
               </button>
-              <button className="btn-outline">
-                Buy Now
-              </button>
+              <button className="btn-outline">Buy Now</button>
             </div>
 
             {/* Info boxes */}
             <div className="space-y-3 border-t border-border pt-8">
               <div className="flex items-start gap-3">
-                <Truck size={20} className="text-primary flex-shrink-0 mt-0.5" />
+                <Truck
+                  size={20}
+                  className="text-primary flex-shrink-0 mt-0.5"
+                />
                 <div>
                   <p className="text-sm font-semibold">Free Shipping</p>
-                  <p className="text-xs text-muted-foreground">On orders over $100</p>
+                  <p className="text-xs text-muted-foreground">
+                    On orders over $100
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <RotateCcw size={20} className="text-primary flex-shrink-0 mt-0.5" />
+                <RotateCcw
+                  size={20}
+                  className="text-primary flex-shrink-0 mt-0.5"
+                />
                 <div>
                   <p className="text-sm font-semibold">Easy Returns</p>
-                  <p className="text-xs text-muted-foreground">30-day return policy</p>
+                  <p className="text-xs text-muted-foreground">
+                    30-day return policy
+                  </p>
                 </div>
               </div>
             </div>
@@ -293,14 +327,16 @@ export default function ProductDetail() {
               <h3 className="font-semibold mb-4">How to Measure</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <strong className="text-primary">Chest:</strong> Measure around the fullest part
-                  of your chest
+                  <strong className="text-primary">Chest:</strong> Measure
+                  around the fullest part of your chest
                 </li>
                 <li>
-                  <strong className="text-primary">Waist:</strong> Measure at your natural waistline
+                  <strong className="text-primary">Waist:</strong> Measure at
+                  your natural waistline
                 </li>
                 <li>
-                  <strong className="text-primary">Length:</strong> Measure from shoulder to hem
+                  <strong className="text-primary">Length:</strong> Measure from
+                  shoulder to hem
                 </li>
               </ul>
             </div>
@@ -344,15 +380,22 @@ export default function ProductDetail() {
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex gap-1">
                         {[...Array(5)].map((_, j) => (
-                          <Star key={j} size={14} className="fill-primary text-primary" />
+                          <Star
+                            key={j}
+                            size={14}
+                            className="fill-primary text-primary"
+                          />
                         ))}
                       </div>
-                      <span className="text-xs text-muted-foreground">by Customer</span>
+                      <span className="text-xs text-muted-foreground">
+                        by Customer
+                      </span>
                     </div>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Love this product! Excellent quality and fast shipping. Highly recommend.
+                  Love this product! Excellent quality and fast shipping. Highly
+                  recommend.
                 </p>
                 <p className="text-xs text-muted-foreground">2 weeks ago</p>
               </div>
