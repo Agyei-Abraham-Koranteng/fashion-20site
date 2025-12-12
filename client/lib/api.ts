@@ -10,7 +10,7 @@ export const sampleProducts: Product[] = [
     price: 49.99,
     sale_price: 34.99,
     category_id: "women",
-    category: { id: "women", name: "Women", slug: "women" },
+    category: { id: "women", name: "Women", slug: "women", created_at: new Date().toISOString() },
     images: [
       {
         id: "img1",
@@ -42,7 +42,7 @@ export const sampleProducts: Product[] = [
     price: 199.99,
     sale_price: 149.99,
     category_id: "women",
-    category: { id: "women", name: "Women", slug: "women" },
+    category: { id: "women", name: "Women", slug: "women", created_at: new Date().toISOString() },
     images: [
       {
         id: "img3",
@@ -65,7 +65,7 @@ export const sampleProducts: Product[] = [
     description: "High-quality denim jeans with perfect fit and comfort",
     price: 89.99,
     category_id: "women",
-    category: { id: "women", name: "Women", slug: "women" },
+    category: { id: "women", name: "Women", slug: "women", created_at: new Date().toISOString() },
     images: [
       {
         id: "img4",
@@ -89,7 +89,7 @@ export const sampleProducts: Product[] = [
     price: 79.99,
     sale_price: 59.99,
     category_id: "women",
-    category: { id: "women", name: "Women", slug: "women" },
+    category: { id: "women", name: "Women", slug: "women", created_at: new Date().toISOString() },
     images: [
       {
         id: "img5",
@@ -112,7 +112,7 @@ export const sampleProducts: Product[] = [
     description: "Comfortable and stylish casual shirt for everyday wear",
     price: 59.99,
     category_id: "men",
-    category: { id: "men", name: "Men", slug: "men" },
+    category: { id: "men", name: "Men", slug: "men", created_at: new Date().toISOString() },
     images: [
       {
         id: "img6",
@@ -136,7 +136,7 @@ export const sampleProducts: Product[] = [
     price: 299.99,
     sale_price: 249.99,
     category_id: "accessories",
-    category: { id: "accessories", name: "Accessories", slug: "accessories" },
+    category: { id: "accessories", name: "Accessories", slug: "accessories", created_at: new Date().toISOString() },
     images: [
       {
         id: "img7",
@@ -205,10 +205,11 @@ export async function getProductById(id: string) {
 
 export async function getCategories() {
   try {
+    const now = new Date().toISOString();
     const categories: Category[] = [
-      { id: "women", name: "Women", slug: "women" },
-      { id: "men", name: "Men", slug: "men" },
-      { id: "accessories", name: "Accessories", slug: "accessories" },
+      { id: "women", name: "Women", slug: "women", created_at: now },
+      { id: "men", name: "Men", slug: "men", created_at: now },
+      { id: "accessories", name: "Accessories", slug: "accessories", created_at: now },
     ];
     return { data: categories, error: null };
   } catch (error) {
