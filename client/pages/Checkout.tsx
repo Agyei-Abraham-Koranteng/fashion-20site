@@ -2,13 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useCart } from "@/context/CartContext";
-import { ChevronRight, CheckCircle } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { createOrder } from "@/lib/api";
+import { ChevronRight, CheckCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Checkout() {
   const navigate = useNavigate();
   const { items, total, clearCart } = useCart();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form states
   const [shippingInfo, setShippingInfo] = useState({
@@ -58,13 +63,48 @@ export default function Checkout() {
     );
   }
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!shippingInfo.firstName || !shippingInfo.address) {
-      alert("Please fill in all required fields");
+      toast.error("Please fill in all required shipping fields");
       return;
     }
-    setOrderPlaced(true);
-    clearCart();
+
+    if (!user) {
+      toast.error("You must be logged in to place an order");
+      navigate("/login?redirect=/checkout");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const orderData = {
+        items: items.map(item => ({
+          product_id: Number(item.product.id),
+          quantity: item.quantity,
+          price: (item.product.sale_price || item.product.price),
+          size: item.size,
+          color: item.color
+        })),
+        shipping_address: shippingInfo,
+        billing_address: sameAsBilling ? shippingInfo : billingInfo
+      };
+
+      const { error } = await createOrder(user.id, orderData);
+
+      if (error) {
+        throw error;
+      }
+
+      setOrderPlaced(true);
+      clearCart();
+      toast.success("Order placed successfully!");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Failed to place order. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (orderPlaced) {
@@ -137,19 +177,17 @@ export default function Checkout() {
               {[1, 2, 3].map((s) => (
                 <div key={s} className="flex items-center">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                      s <= step
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-muted-foreground"
-                    }`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${s <= step
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-muted-foreground"
+                      }`}
                   >
                     {s}
                   </div>
                   {s < 3 && (
                     <div
-                      className={`h-1 flex-1 mx-2 ${
-                        s < step ? "bg-primary" : "bg-secondary"
-                      }`}
+                      className={`h-1 flex-1 mx-2 ${s < step ? "bg-primary" : "bg-secondary"
+                        }`}
                     />
                   )}
                 </div>
@@ -440,10 +478,20 @@ export default function Checkout() {
                   </button>
                   <button
                     onClick={handlePlaceOrder}
-                    className="btn-primary flex-1 flex items-center justify-center gap-2"
+                    disabled={isSubmitting}
+                    className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Place Order
-                    <ChevronRight size={18} />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="animate-spin" size={18} />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        Place Order
+                        <ChevronRight size={18} />
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

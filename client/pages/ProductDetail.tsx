@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import Layout from "@/components/Layout";
 import { getProductById } from "@/lib/api";
 import { Product } from "@/lib/types";
@@ -26,18 +27,41 @@ export default function ProductDetail() {
   } = useWishlist();
 
   useEffect(() => {
-    async function loadProduct() {
+    async function loadProduct(silent = false) {
       if (!id) return;
+      if (!silent) setLoading(true);
       const { data } = await getProductById(id);
-      setProduct(data || null);
+
       if (data) {
-        setSelectedColor(data.colors?.[0] || "");
-        setSelectedSize(data.sizes?.[0] || "");
+        setProduct(data);
+        // Only set defaults on initial load (not silent update)
+        if (!silent) {
+          setSelectedColor(data.colors?.[0] || "");
+          setSelectedSize(data.sizes?.[0] || "");
+        }
+      } else {
+        setProduct(null);
       }
-      setLoading(false);
+
+      if (!silent) setLoading(false);
     }
 
     loadProduct();
+
+    const subscription = supabase
+      .channel(`product:${id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products', filter: `id=eq.${id}` },
+        () => {
+          loadProduct(true);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [id]);
 
   if (loading) {
@@ -111,11 +135,11 @@ export default function ProductDetail() {
           {/* Image gallery */}
           <div>
             {/* Main image */}
-            <div className="bg-secondary aspect-square rounded-sm overflow-hidden mb-4">
+            <div className="bg-secondary aspect-square rounded-sm overflow-hidden mb-4 group cursor-zoom-in">
               <img
                 src={product.images[selectedImage]?.url}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
             </div>
 
@@ -125,9 +149,8 @@ export default function ProductDetail() {
                 <button
                   key={idx}
                   onClick={() => setSelectedImage(idx)}
-                  className={`w-20 h-20 rounded-sm overflow-hidden border-2 transition-colors ${
-                    selectedImage === idx ? "border-primary" : "border-border"
-                  }`}
+                  className={`w-20 h-20 rounded-sm overflow-hidden border-2 transition-colors ${selectedImage === idx ? "border-primary" : "border-border"
+                    }`}
                 >
                   <img
                     src={image.url}
@@ -154,11 +177,10 @@ export default function ProductDetail() {
                 </div>
                 <button
                   onClick={handleWishlist}
-                  className={`p-2 rounded-sm transition-colors ${
-                    wishlisted
-                      ? "bg-accent/10 text-accent"
-                      : "bg-secondary text-primary hover:bg-secondary/80"
-                  }`}
+                  className={`p-2 rounded-sm transition-colors ${wishlisted
+                    ? "bg-accent/10 text-accent"
+                    : "bg-secondary text-primary hover:bg-secondary/80"
+                    }`}
                   aria-label="Add to wishlist"
                 >
                   <Heart
@@ -217,11 +239,10 @@ export default function ProductDetail() {
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`py-3 px-2 rounded-sm border-2 font-medium text-sm transition-colors ${
-                      selectedSize === size
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background border-border hover:border-primary"
-                    }`}
+                    className={`py-3 px-2 rounded-sm border-2 font-medium text-sm transition-colors ${selectedSize === size
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background border-border hover:border-primary"
+                      }`}
                   >
                     {size}
                   </button>
@@ -239,11 +260,10 @@ export default function ProductDetail() {
                   <button
                     key={color}
                     onClick={() => setSelectedColor(color)}
-                    className={`w-10 h-10 rounded-full border-2 transition-all ${
-                      selectedColor === color
-                        ? "border-primary ring-2 ring-primary"
-                        : "border-border"
-                    }`}
+                    className={`w-10 h-10 rounded-full border-2 transition-all ${selectedColor === color
+                      ? "border-primary ring-2 ring-primary"
+                      : "border-border"
+                      }`}
                     style={{ backgroundColor: color || "#ccc" }}
                     title={color}
                   />
@@ -277,9 +297,8 @@ export default function ProductDetail() {
             <div className="flex flex-col gap-3 mb-8">
               <button
                 onClick={handleAddToCart}
-                className={`btn-primary flex items-center justify-center gap-2 transition-all ${
-                  addedToCart ? "bg-green-600" : ""
-                }`}
+                className={`btn-primary flex items-center justify-center gap-2 transition-all ${addedToCart ? "bg-green-600" : ""
+                  }`}
               >
                 <ShoppingBag size={18} />
                 {addedToCart ? "Added to Cart!" : "Add to Cart"}

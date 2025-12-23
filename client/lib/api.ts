@@ -1,189 +1,34 @@
-import { supabase } from "./supabaseClient";
-import { Product, Category, Review, Order, Address } from "./types";
+import { supabase } from "./supabase";
+import { Product, Category, Review, Order, Address, ProductImage } from "./types";
 
-// Sample products data (for now, before Supabase is set up)
-export const sampleProducts: Product[] = [
-  {
-    id: "1",
-    name: "Classic White T-Shirt",
-    description: "Premium quality white t-shirt made from 100% organic cotton",
-    price: 49.99,
-    sale_price: 34.99,
-    category_id: "women",
-    category: {
-      id: "women",
-      name: "Women",
-      slug: "women",
-      created_at: new Date().toISOString(),
-    },
-    images: [
+// Helper to transform Supabase product row (shared/schema.ts) to UI Product type
+const transformProduct = (data: any): Product => ({
+  id: String(data.id),
+  name: data.name,
+  description: data.description ?? "",
+  price: Number(data.price),
+  sale_price: undefined,
+  category_id: data.category_id ?? "",
+  category: data.category_id
+    ? { id: data.category_id, name: data.category_id, slug: data.category_id, created_at: data.created_at ?? "" }
+    : undefined,
+  images: data.image_url
+    ? [
       {
-        id: "img1",
-        product_id: "1",
-        url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
-        alt_text: "White t-shirt front",
-        order: 1,
-        created_at: new Date().toISOString(),
+        id: `image-${data.id}`,
+        product_id: String(data.id),
+        url: data.image_url,
+        order: 0,
+        created_at: String(data.created_at || new Date().toISOString()),
       },
-      {
-        id: "img2",
-        product_id: "1",
-        url: "https://images.unsplash.com/photo-1505503185646-a42bb3bcb253?w=500&h=500&fit=crop",
-        alt_text: "White t-shirt back",
-        order: 2,
-        created_at: new Date().toISOString(),
-      },
-    ],
-    sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-    colors: ["#ffffff", "#000000", "#e8e8e8"],
-    stock: 150,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    name: "Designer Black Blazer",
-    description: "Elegant black blazer perfect for any occasion",
-    price: 199.99,
-    sale_price: 149.99,
-    category_id: "women",
-    category: {
-      id: "women",
-      name: "Women",
-      slug: "women",
-      created_at: new Date().toISOString(),
-    },
-    images: [
-      {
-        id: "img3",
-        product_id: "2",
-        url: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=500&h=500&fit=crop",
-        alt_text: "Black blazer",
-        order: 1,
-        created_at: new Date().toISOString(),
-      },
-    ],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["#000000", "#2d2d2d"],
-    stock: 45,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "3",
-    name: "Premium Denim Jeans",
-    description: "High-quality denim jeans with perfect fit and comfort",
-    price: 89.99,
-    category_id: "women",
-    category: {
-      id: "women",
-      name: "Women",
-      slug: "women",
-      created_at: new Date().toISOString(),
-    },
-    images: [
-      {
-        id: "img4",
-        product_id: "3",
-        url: "https://images.unsplash.com/photo-1542272604-787c62d465d1?w=500&h=500&fit=crop",
-        alt_text: "Premium denim jeans",
-        order: 1,
-        created_at: new Date().toISOString(),
-      },
-    ],
-    sizes: ["24", "25", "26", "27", "28", "29", "30", "31", "32"],
-    colors: ["#1a3a52", "#4a4a4a", "#2d5a7b"],
-    stock: 200,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "4",
-    name: "Silk Camisole",
-    description: "Luxurious silk camisole for elegant styling",
-    price: 79.99,
-    sale_price: 59.99,
-    category_id: "women",
-    category: {
-      id: "women",
-      name: "Women",
-      slug: "women",
-      created_at: new Date().toISOString(),
-    },
-    images: [
-      {
-        id: "img5",
-        product_id: "4",
-        url: "https://images.unsplash.com/photo-1544623634-c0ee0b51e0f1?w=500&h=500&fit=crop",
-        alt_text: "Silk camisole",
-        order: 1,
-        created_at: new Date().toISOString(),
-      },
-    ],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    colors: ["#ff69b4", "#000000", "#ffffff"],
-    stock: 80,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "5",
-    name: "Mens Casual Shirt",
-    description: "Comfortable and stylish casual shirt for everyday wear",
-    price: 59.99,
-    category_id: "men",
-    category: {
-      id: "men",
-      name: "Men",
-      slug: "men",
-      created_at: new Date().toISOString(),
-    },
-    images: [
-      {
-        id: "img6",
-        product_id: "5",
-        url: "https://images.unsplash.com/photo-1551028719-00167b16ebc5?w=500&h=500&fit=crop",
-        alt_text: "Casual mens shirt",
-        order: 1,
-        created_at: new Date().toISOString(),
-      },
-    ],
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["#1a1a1a", "#3366cc", "#ff6b6b"],
-    stock: 120,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "6",
-    name: "Designer Handbag",
-    description: "Premium leather handbag with elegant design",
-    price: 299.99,
-    sale_price: 249.99,
-    category_id: "accessories",
-    category: {
-      id: "accessories",
-      name: "Accessories",
-      slug: "accessories",
-      created_at: new Date().toISOString(),
-    },
-    images: [
-      {
-        id: "img7",
-        product_id: "6",
-        url: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500&h=500&fit=crop",
-        alt_text: "Designer handbag",
-        order: 1,
-        created_at: new Date().toISOString(),
-      },
-    ],
-    sizes: ["One Size"],
-    colors: ["#8B4513", "#000000", "#A0826D"],
-    stock: 35,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
+    ]
+    : [],
+  sizes: [],
+  colors: [],
+  stock: Number(data.stock) ?? 0,
+  created_at: data.created_at ?? "",
+  updated_at: data.updated_at ?? "",
+});
 
 // Product queries
 export async function getProducts(filters?: {
@@ -193,34 +38,35 @@ export async function getProducts(filters?: {
   search?: string;
 }) {
   try {
-    // Return sample products for now - replace with Supabase query when backend is ready
-    let products = [...sampleProducts];
+    let query = supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (filters?.category) {
-      products = products.filter((p) => p.category?.slug === filters.category);
+      // In shared schema, category_id is a string field on products
+      query = query.eq("category_id", filters.category);
     }
 
     if (filters?.minPrice) {
-      products = products.filter(
-        (p) => (p.sale_price || p.price) >= filters.minPrice!,
-      );
+      // Check both price and sale_price. This is harder in simple query, 
+      // easiest is to filter for price >= minPrice usually
+      query = query.gte("price", filters.minPrice);
     }
 
     if (filters?.maxPrice) {
-      products = products.filter(
-        (p) => (p.sale_price || p.price) <= filters.maxPrice!,
-      );
+      query = query.lte("price", filters.maxPrice);
     }
 
     if (filters?.search) {
-      const search = filters.search.toLowerCase();
-      products = products.filter(
-        (p) =>
-          p.name.toLowerCase().includes(search) ||
-          p.description.toLowerCase().includes(search),
-      );
+      query = query.ilike("name", `%${filters.search}%`);
     }
 
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    const products = data?.map(transformProduct) || [];
     return { data: products, error: null };
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -230,11 +76,17 @@ export async function getProducts(filters?: {
 
 export async function getProductById(id: string) {
   try {
-    // Return sample product for now
-    const product = sampleProducts.find((p) => p.id === id);
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) throw error;
+
     return {
-      data: product,
-      error: product ? null : new Error("Product not found"),
+      data: data ? transformProduct(data) : null,
+      error: null,
     };
   } catch (error) {
     console.error("Error fetching product:", error);
@@ -244,18 +96,12 @@ export async function getProductById(id: string) {
 
 export async function getCategories() {
   try {
-    const now = new Date().toISOString();
-    const categories: Category[] = [
-      { id: "women", name: "Women", slug: "women", created_at: now },
-      { id: "men", name: "Men", slug: "men", created_at: now },
-      {
-        id: "accessories",
-        name: "Accessories",
-        slug: "accessories",
-        created_at: now,
-      },
-    ];
-    return { data: categories, error: null };
+    const { data, error } = await supabase
+      .from("categories")
+      .select("*")
+      .order("name");
+
+    return { data: data as Category[] | null, error };
   } catch (error) {
     console.error("Error fetching categories:", error);
     return { data: null, error };
@@ -290,7 +136,7 @@ export async function createReview(
   try {
     const { data, error } = await supabase
       .from("reviews")
-      .insert([{ product_id: productId, user_id: userId, ...review }])
+      .insert([{ product_id: Number(productId), user_id: userId, ...review }])
       .select();
 
     return { data: data as Review[] | null, error };
@@ -305,13 +151,31 @@ export async function getOrders(userId: string) {
   try {
     const { data, error } = await supabase
       .from("orders")
-      .select("*, order_items(*)")
+      .select("*, items:order_items(*, product:products(*))") // Fetch items and nested products
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
-    return { data: data as Order[] | null, error };
+    return { data: data as any[] | null, error };
   } catch (error) {
     console.error("Error fetching orders:", error);
+    return { data: null, error };
+  }
+}
+
+export async function getAllOrders() {
+  try {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*, items:order_items(*, product:products(*))")
+      .order("created_at", { ascending: false });
+
+    // Fetch user emails for these orders (since we can't join auth.users easily)
+    // Or we could rely on profiles if we had them linked.
+    // For now, return what we have. API might need to fetch profiles if we want customer names.
+
+    return { data: data as any[] | null, error };
+  } catch (error) {
+    console.error("Error fetching all orders:", error);
     return { data: null, error };
   }
 }
@@ -320,7 +184,7 @@ export async function createOrder(
   userId: string,
   order: {
     items: Array<{
-      product_id: string;
+      product_id: number; // Changed to number to match schema
       quantity: number;
       price: number;
       size: string;
@@ -347,30 +211,221 @@ export async function createOrder(
           billing_address: order.billing_address,
         },
       ])
-      .select();
+      .select()
+      .single();
 
     if (orderError || !orderData) {
-      return { data: null, error: orderError };
+      throw orderError;
     }
 
-    const orderId = orderData[0].id;
+    const orderId = orderData.id;
 
     const { data: itemsData, error: itemsError } = await supabase
       .from("order_items")
       .insert(
         order.items.map((item) => ({
-          order_id: orderId,
-          ...item,
+          order_id: Number(orderId),
+          product_id: Number(item.product_id),
+          quantity: item.quantity,
+          price: item.price,
+          size: item.size,
+          color: item.color
         })),
       )
       .select();
 
+    if (itemsError) throw itemsError;
+
     return {
-      data: { ...orderData[0], order_items: itemsData },
-      error: itemsError,
+      data: { ...orderData, items: itemsData },
+      error: null,
     };
   } catch (error) {
     console.error("Error creating order:", error);
+    return { data: null, error };
+  }
+}
+
+// Admin API Functions
+
+export async function createProduct(product: {
+  name: string;
+  description?: string | null;
+  price: number;
+  category_id: string; // maps to 'category' column in DB
+  stock: number;
+  image_url?: string | null; // Main image URL
+}) {
+  try {
+    const payload = {
+      name: product.name,
+      description: product.description ?? null,
+      price: product.price,
+      image_url: product.image_url ?? null,
+      category_id: product.category_id, // map to DB column
+      stock: product.stock,
+    };
+    const { data, error } = await supabase
+      .from("products")
+      .insert([payload])
+      .select()
+      .single();
+
+    return { data, error };
+  } catch (error) {
+    console.error("Error creating product:", error);
+    return { data: null, error };
+  }
+}
+
+export async function updateProduct(
+  id: string,
+  updates: Partial<{
+    name: string;
+    description?: string | null;
+    price: number;
+    category_id: string; // maps to 'category'
+    stock: number;
+    image_url?: string | null;
+  }>
+) {
+  try {
+    const payload: any = {};
+    if (updates.name !== undefined) payload.name = updates.name;
+    if (updates.description !== undefined) payload.description = updates.description;
+    if (updates.price !== undefined) payload.price = updates.price;
+    if (updates.category_id !== undefined) payload.category_id = updates.category_id;
+    if (updates.stock !== undefined) payload.stock = updates.stock;
+    if (updates.image_url !== undefined) payload.image_url = updates.image_url;
+
+    const { data, error } = await supabase
+      .from("products")
+      .update(payload)
+      .eq("id", Number(id))
+      .select()
+      .single();
+
+    return { data, error };
+  } catch (error) {
+    console.error("Error updating product:", error);
+    return { data: null, error };
+  }
+}
+
+export async function deleteProduct(id: string) {
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", id)
+      .select();
+
+    return { data, error };
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    return { data: null, error };
+  }
+}
+
+export async function getCustomers() {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('updated_at', { ascending: false });
+
+    return { data, error };
+  } catch (error) {
+    console.error("Error fetching customers:", error);
+    return { data: null, error };
+  }
+}
+
+export async function updateOrderStatus(orderId: string, status: string) {
+  try {
+    const { data, error } = await supabase
+      .from("orders")
+      .update({ status })
+      .eq("id", Number(orderId))
+      .select()
+      .single();
+
+    return { data, error };
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    return { data: null, error };
+  }
+}
+
+export async function getAdminStats() {
+  try {
+    // Basic stats aggregation
+    const { count: productsCount } = await supabase
+      .from('products')
+      .select('*', { count: 'exact', head: true });
+
+    const { count: ordersCount } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true });
+
+    const { data: orders } = await supabase
+      .from('orders')
+      .select('total_price');
+
+    const totalRevenue = orders?.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0) || 0;
+
+    const { count: customersCount } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true });
+
+    return {
+      data: {
+        totalRevenue,
+        totalOrders: ordersCount || 0,
+        totalProducts: productsCount || 0,
+        activeCustomers: customersCount || 0,
+      },
+      error: null,
+    };
+  } catch (error) {
+    console.error("Error fetching admin stats:", error);
+    return { data: null, error };
+  }
+}
+
+// CMS Functions
+export async function getCmsContent(key: string) {
+  try {
+    const { data, error } = await supabase
+      .from("cms_content")
+      .select("*")
+      .eq("key", key)
+      .maybeSingle();
+
+    return { data, error };
+  } catch (error) {
+    console.error(`Error fetching CMS content for ${key}:`, error);
+    return { data: null, error };
+  }
+}
+
+export async function updateCmsContent(key: string, content: any) {
+  try {
+    console.log(`Payload for ${key}:`, content);
+    const { data, error } = await supabase
+      .from("cms_content")
+      .upsert({ key, content, updated_at: new Date().toISOString() }, { onConflict: "key" })
+      .select()
+      .single();
+
+    if (error) {
+      console.error(`Supabase error updating CMS content for ${key}:`, error);
+    } else {
+      console.log(`Success updating CMS content for ${key}:`, data);
+    }
+    return { data, error };
+  } catch (error) {
+    console.error(`Caught error updating CMS content for ${key}:`, error);
     return { data: null, error };
   }
 }

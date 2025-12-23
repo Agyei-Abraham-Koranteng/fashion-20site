@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
@@ -34,9 +36,9 @@ export default function ProductListing() {
   // Size options
   const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
 
-  useEffect(() => {
-    async function loadProducts() {
-      setLoading(true);
+  const loadProducts = async (silent = false) => {
+    try {
+      if (!silent) setLoading(true);
       const { data } = await getProducts({
         category: category || undefined,
         minPrice: priceRange[0],
@@ -72,11 +74,27 @@ export default function ProductListing() {
 
         setProducts(sorted);
       }
-
-      setLoading(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (!silent) setLoading(false);
     }
+  };
 
+  useEffect(() => {
     loadProducts();
+
+    // Subscribe to real-time changes
+    const subscription = supabase
+      .channel('public:products')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
+        loadProducts(true);
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [category, searchQuery, priceRange, sortBy]);
 
   const handleSortChange = (value: string) => {
@@ -102,17 +120,39 @@ export default function ProductListing() {
 
   return (
     <Layout>
-      {/* Header */}
-      <section className="bg-secondary py-12">
-        <div className="container-wide">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            {category
-              ? `${category.charAt(0).toUpperCase() + category.slice(1)}`
-              : "Shop"}
-          </h1>
-          <p className="text-muted-foreground">
-            {products.length} products available
-          </p>
+      {/* Modern Hero Section */}
+      <section className="relative h-[40vh] md:h-[50vh] overflow-hidden flex items-center">
+        {/* Background Animation/Image Placeholder */}
+        <div className="absolute inset-0 bg-neutral-900">
+          <motion.div
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 0.4 }}
+            transition={{ duration: 1.5 }}
+            className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
+        </div>
+
+        <div className="container-wide relative z-10">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="max-w-2xl"
+          >
+            <h1 className="text-4xl md:text-6xl font-serif font-bold mb-4 tracking-tight">
+              {category
+                ? `${category.charAt(0).toUpperCase() + category.slice(1)}`
+                : "The Collection"}
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground font-light leading-relaxed mb-6">
+              Discover our curated selection of premium pieces, designed for those who appreciate the finer details of modern elegance.
+            </p>
+            <div className="flex items-center gap-2 text-sm font-medium tracking-widest uppercase text-primary/60">
+              <span className="w-8 h-px bg-primary/40" />
+              <span>{products.length} Exquisite Pieces</span>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -189,11 +229,10 @@ export default function ProductListing() {
                     <button
                       key={color.hex}
                       onClick={() => handleColorToggle(color.hex)}
-                      className={`relative w-12 h-12 rounded-sm border-2 transition-all ${
-                        selectedColors.includes(color.hex)
-                          ? "border-primary"
-                          : "border-border"
-                      }`}
+                      className={`relative w-12 h-12 rounded-sm border-2 transition-all ${selectedColors.includes(color.hex)
+                        ? "border-primary"
+                        : "border-border"
+                        }`}
                       style={{ backgroundColor: color.hex }}
                       title={color.name}
                     >
@@ -217,11 +256,10 @@ export default function ProductListing() {
                     <button
                       key={size}
                       onClick={() => handleSizeToggle(size)}
-                      className={`py-2 px-3 text-sm font-medium rounded-sm border transition-colors ${
-                        selectedSizes.includes(size)
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-secondary border-border hover:border-primary"
-                      }`}
+                      className={`py-2 px-3 text-sm font-medium rounded-sm border transition-colors ${selectedSizes.includes(size)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-secondary border-border hover:border-primary"
+                        }`}
                     >
                       {size}
                     </button>

@@ -1,5 +1,5 @@
 /** @import must precede all other statements */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -76,12 +76,17 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
     font-feature-settings: "kern" 1;
   }
 
-  :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
+  :where(p, span, li, a, button, label, td, th) {
     overflow-wrap: anywhere;
     word-break: break-word;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
   }
 
   pre,
@@ -91,19 +96,19 @@
   }
 
   h1 {
-    @apply text-3xl md:text-4xl font-bold tracking-wide;
+    @apply text-4xl md:text-5xl font-bold tracking-tight;
   }
 
   h2 {
-    @apply text-2xl md:text-3xl font-semibold tracking-wide;
+    @apply text-3xl md:text-4xl font-semibold tracking-tight;
   }
 
   h3 {
-    @apply text-xl md:text-2xl font-semibold tracking-wide;
+    @apply text-2xl md:text-3xl font-semibold tracking-tight;
   }
 
   h4 {
-    @apply text-lg font-semibold tracking-wide;
+    @apply text-xl font-semibold tracking-tight;
   }
 
   p {
@@ -134,19 +139,19 @@
   }
 
   .btn-primary {
-    @apply px-6 py-3 bg-primary text-primary-foreground font-medium tracking-wide rounded-sm hover:bg-primary/90 transition-colors duration-200;
+    @apply px-6 py-3 bg-primary text-primary-foreground font-medium tracking-wide rounded-sm hover:bg-primary/90 transition-all duration-300 shadow-sm hover:shadow-md;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 bg-secondary text-secondary-foreground font-medium tracking-wide rounded-sm border border-border hover:bg-secondary/80 transition-colors duration-200;
+    @apply px-6 py-3 bg-secondary text-secondary-foreground font-medium tracking-wide rounded-sm border border-border hover:bg-secondary/80 transition-all duration-300;
   }
 
   .btn-outline {
-    @apply px-6 py-3 border border-primary text-primary font-medium tracking-wide rounded-sm hover:bg-primary hover:text-primary-foreground transition-colors duration-200;
+    @apply px-6 py-3 border border-primary text-primary font-medium tracking-wide rounded-sm hover:bg-primary hover:text-primary-foreground transition-all duration-300;
   }
 
   .btn-accent {
-    @apply px-6 py-3 bg-accent text-accent-foreground font-medium tracking-wide rounded-sm hover:bg-accent/90 transition-colors duration-200;
+    @apply px-6 py-3 bg-accent text-accent-foreground font-medium tracking-wide rounded-sm hover:bg-accent/90 transition-all duration-300 shadow-sm hover:shadow-md;
   }
 
   .text-subtle {
@@ -155,6 +160,14 @@
 
   .section-padding {
     @apply py-16 md:py-24;
+  }
+
+  .glass-panel {
+    @apply bg-background/80 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+
+  .input-modern {
+    @apply flex h-11 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .fade-in {

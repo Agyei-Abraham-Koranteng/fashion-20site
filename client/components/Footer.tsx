@@ -132,7 +132,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="border-t border-primary-foreground/20 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/70">
-            <p>&copy; 2024 LUXE. All rights reserved.</p>
+            <p>&copy; 2024 MadeInFashion. All rights reserved.</p>
             <div className="flex gap-6">
               <a
                 href="#"
