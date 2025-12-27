@@ -38,6 +38,7 @@ import ProductFormAdmin from "./pages/admin/ProductForm";
 import OrdersListAdmin from "./pages/admin/OrdersList";
 import CustomersAdmin from "./pages/admin/Customers";
 import SettingsAdmin from "./pages/admin/Settings";
+import NewsletterAdmin from "./pages/admin/Newsletter";
 import ContentManager from "./pages/admin/ContentManager";
 
 // Lazy-loaded pages
@@ -76,6 +77,7 @@ const App = () => (
                     <Route path="products/:id/edit" element={<ProductFormAdmin />} />
                     <Route path="orders" element={<OrdersListAdmin />} />
                     <Route path="customers" element={<CustomersAdmin />} />
+                    <Route path="newsletter" element={<NewsletterAdmin />} />
                     <Route path="content" element={<ContentManager />} />
                     <Route path="settings" element={<SettingsAdmin />} />
                   </Route>
