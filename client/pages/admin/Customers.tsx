@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 import { getCustomers } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,7 +20,10 @@ export default function CustomersAdmin() {
 
   const loadCustomers = async (silent = false) => {
     if (!silent) setLoading(true);
-    const { data } = await getCustomers();
+    const { data, error } = await getCustomers();
+    if (error) {
+      toast.error("Failed to load customers");
+    }
     if (data) {
       setCustomers(data);
     }

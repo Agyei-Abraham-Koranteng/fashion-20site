@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
+import { toast } from "sonner";
 
 export default function Login() {
   const { login, register, user, loading } = useAuth();
@@ -14,13 +15,9 @@ export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setMessage(null);
     try {
       if (isLogin) {
         const cleanEmail = email.trim().toLowerCase();
@@ -28,20 +25,34 @@ export default function Login() {
         // Post-login redirect is handled by the effect based on user role and any redirect param.
       } else {
         await register(email, password);
-        setMessage("Registration successful! Please check your email for confirmation or login if confirmed.");
+        toast.success("Registration successful! Please check your email for confirmation or login if confirmed.");
         setIsLogin(true); // Switch back to login
       }
     } catch (err: any) {
-      setError(err.message || (isLogin ? "Login failed" : "Registration failed"));
+      toast.error(err.message || (isLogin ? "Login failed" : "Registration failed"));
     }
   };
 
   useEffect(() => {
-    if (!loading && user) {
+    // Wait for auth loading to complete
+    if (loading) return;
+
+    if (user) {
+      // Check for redirect param
       const redirectParam = params.get("redirect");
-      if (redirectParam && redirectParam !== "/") {
-        navigate(redirectParam, { replace: true });
-      } else if (user.role === "admin") {
+
+      if (redirectParam) {
+        // Decode and navigate
+        const target = decodeURIComponent(redirectParam);
+        // Prevent redirect loops if target is login
+        if (target !== "/login" && target !== "/") {
+          navigate(target, { replace: true });
+          return;
+        }
+      }
+
+      // Default redirects based on role
+      if (user.role === "admin") {
         navigate("/admin", { replace: true });
       } else {
         navigate("/", { replace: true });
@@ -81,8 +92,6 @@ export default function Login() {
                   minLength={6}
                 />
               </div>
-              {error && <p className="text-sm text-red-600">{error}</p>}
-              {message && <p className="text-sm text-green-600">{message}</p>}
 
               <Button type="submit" className="w-full">
                 {isLogin ? "Sign in" : "Sign up"}
@@ -96,8 +105,6 @@ export default function Login() {
                   type="button"
                   onClick={() => {
                     setIsLogin(!isLogin);
-                    setError(null);
-                    setMessage(null);
                   }}
                   className="text-primary hover:underline font-medium"
                 >

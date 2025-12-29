@@ -4,6 +4,7 @@ import { ArrowRight, Star, ShoppingBag, Truck, Shield, ChevronLeft, ChevronRight
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { getProducts, getCmsContent } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
 import ProductCard from "@/components/ProductCard";
 import { Product } from "@/lib/types";
@@ -12,7 +13,7 @@ import Layout from "@/components/Layout";
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const { data: products } = useQuery<Product[]>({
+  const { data: products, refetch: refetchProducts } = useQuery<Product[]>({
     queryKey: ["products", "featured"],
     queryFn: async () => {
       const { data } = await getProducts();
@@ -40,6 +41,20 @@ export default function Home() {
   ];
 
   useEffect(() => {
+    // Subscribe to real-time changes for products
+    const subscription = supabase
+      .channel('public:products:home')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
+        refetchProducts();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [refetchProducts]);
+
+  useEffect(() => {
     if (slides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -50,11 +65,7 @@ export default function Home() {
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
-  const featuredProducts = products?.filter(p =>
-    !p.name.toLowerCase().includes("test") &&
-    !p.name.toLowerCase().includes("verification") &&
-    !p.name.includes("Agyei")
-  ).slice(0, 4) || [];
+  const featuredProducts = products?.slice(0, 4) || [];
 
   return (
     <Layout>
@@ -234,7 +245,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-border/60">
             {[
               { icon: Star, title: "Premium Quality", desc: "Crafted with the finest materials." },
-              { icon: Truck, title: "Fast Shipping", desc: "Free delivery on orders over $150." },
+              { icon: Truck, title: "Fast Shipping", desc: "Free delivery on orders over ₵150." },
               { icon: Shield, title: "Secure Payment", desc: "100% secure checkout process." },
               { icon: ShoppingBag, title: "30-Day Returns", desc: "Easy returns if you change your mind." },
             ].map((feat, idx) => (
@@ -247,25 +258,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Newsletter */}
-        <section className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
-          <div className="container-wide relative z-10 text-center max-w-2xl mx-auto">
-            <h2 className="text-4xl font-serif mb-6">Join Our Newsletter</h2>
-            <p className="text-primary-foreground/80 mb-10 text-lg">
-              Subscribe to receive updates, access to exclusive deals, and more.
-            </p>
-            <form className="flex flex-col sm:flex-row gap-4" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="flex-1 h-12 px-4 rounded-sm bg-white/10 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-accent"
-              />
-              <Button className="h-12 px-8 bg-white text-primary hover:bg-white/90 font-semibold border-none rounded-none">
-                Subscribe
-              </Button>
-            </form>
-          </div>
-        </section>
       </div>
     </Layout>
   );

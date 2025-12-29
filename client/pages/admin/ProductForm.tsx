@@ -12,10 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Upload, X, Image as ImageIcon } from "lucide-react";
 import { getProductById, getCategories, createProduct, updateProduct } from "@/lib/api";
 import { Product, Category } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export default function ProductFormAdmin() {
   const { id } = useParams();
@@ -106,18 +107,19 @@ export default function ProductFormAdmin() {
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/(^-|-$)/g, "");
         const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}-${imageFile.name}`;
-        try {
-          const { error: uploadError } = await supabase
-            .storage
-            .from("products")
-            .upload(path, imageFile, { upsert: false });
-          if (uploadError) throw uploadError;
-          const { data: pub } = supabase.storage.from("products").getPublicUrl(path);
-          finalImageUrl = pub.publicUrl;
-        } catch (uploadErr) {
-          console.warn("Image upload failed, falling back to URL field:", uploadErr);
-          // Continue without uploaded image; rely on pasted URL if provided
+
+        const { error: uploadError } = await supabase
+          .storage
+          .from("products")
+          .upload(path, imageFile, { upsert: false });
+
+        if (uploadError) {
+          toast.error("Image upload failed. Please try again.");
+          throw uploadError;
         }
+
+        const { data: pub } = supabase.storage.from("products").getPublicUrl(path);
+        finalImageUrl = pub.publicUrl;
       }
 
       // 2) Prepare payload aligned with DB schema (shared/schema.ts)
@@ -125,8 +127,11 @@ export default function ProductFormAdmin() {
         name: formData.name,
         description: formData.description || null,
         price: Number(formData.price),
+        sale_price: formData.sale_price ? Number(formData.sale_price) : null,
         category_id: formData.category_id, // maps to 'category' column
         stock: Number(formData.stock),
+        sizes: formData.sizes ? formData.sizes.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        colors: formData.colors ? formData.colors.split(",").map((c) => c.trim()).filter(Boolean) : [],
         image_url: finalImageUrl,
       };
 
@@ -140,11 +145,12 @@ export default function ProductFormAdmin() {
       }
 
       // 4) Navigate back to list; realtime subscription will refresh list
+      toast.success(isEdit ? "Product updated successfully" : "Product created successfully");
       navigate("/admin/products");
     } catch (err: any) {
       console.error("Failed to save product:", err);
       const msg = err?.message || err?.error_description || JSON.stringify(err);
-      alert(`Failed to save product: ${msg}`);
+      toast.error(`Failed to save product: ${msg}`);
     } finally {
       setSaving(false);
     }
@@ -272,35 +278,69 @@ export default function ProductFormAdmin() {
                 <CardTitle>Product Image</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="image_url">Image URL</Label>
-                  <Input
-                    id="image_url"
-                    type="url"
-                    value={formData.image_url}
-                    onChange={(e) =>
-                      setFormData({ ...formData, image_url: e.target.value })
-                    }
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="image_file">Upload Image</Label>
-                  <Input id="image_file" type="file" accept="image/*" onChange={handleImageFileChange} />
-                  <p className="text-xs text-muted-foreground">Choose an image; a preview will appear below.</p>
-                </div>
-                {(imagePreviewUrl || formData.image_url) && (
-                  <div className="rounded-lg border p-4">
-                    <img
-                      src={imagePreviewUrl || formData.image_url}
-                      alt="Preview"
-                      className="h-48 w-full rounded object-cover"
-                    />
-                    <div className="mt-3">
-                      <Button type="button" variant="outline" onClick={handleRemoveImage}>Remove image</Button>
+                <div className="flex flex-col gap-4">
+                  {/* Enhanced Preview Section */}
+                  <div className="relative aspect-video w-full overflow-hidden rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50 transition-colors hover:border-muted-foreground/40">
+                    {imagePreviewUrl || formData.image_url ? (
+                      <>
+                        <img
+                          src={imagePreviewUrl || formData.image_url}
+                          alt="Layout preview"
+                          className="h-full w-full object-contain"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleRemoveImage}
+                          className="absolute right-2 top-2 rounded-full bg-destructive p-1.5 text-destructive-foreground shadow-sm transition-transform hover:scale-110"
+                          title="Remove image"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </>
+                    ) : (
+                      <div className="flex h-full flex-col items-center justify-center space-y-2 text-muted-foreground">
+                        <ImageIcon className="h-10 w-10 opacity-20" />
+                        <p className="text-sm">No image selected</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="image_file" className="text-sm font-medium">Upload Local File</Label>
+                      <div className="relative">
+                        <Input
+                          id="image_file"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageFileChange}
+                          className="cursor-pointer pr-10"
+                        />
+                        <Upload className="absolute right-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="image_url" className="text-sm font-medium">Or Paste Image URL</Label>
+                      <Input
+                        id="image_url"
+                        type="url"
+                        value={formData.image_url}
+                        onChange={(e) => {
+                          const url = e.target.value;
+                          setFormData({ ...formData, image_url: url });
+                          if (url) {
+                            setImageFile(null); // Clear file if URL is pasted
+                            if (imagePreviewUrl?.startsWith("blob:")) URL.revokeObjectURL(imagePreviewUrl);
+                            setImagePreviewUrl(null);
+                          }
+                        }}
+                        placeholder="https://..."
+                        className="bg-background"
+                      />
                     </div>
                   </div>
-                )}
+                </div>
               </CardContent>
             </Card>
           </div>

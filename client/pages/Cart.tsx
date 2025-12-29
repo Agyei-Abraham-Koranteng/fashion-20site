@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useCart } from "@/context/CartContext";
 import { Trash2, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Cart() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart();
@@ -80,9 +81,10 @@ export default function Cart() {
                         </p>
                       </div>
                       <button
-                        onClick={() =>
-                          removeItem(item.product_id, item.size, item.color)
-                        }
+                        onClick={() => {
+                          removeItem(item.product_id, item.size, item.color);
+                          toast.success("Item removed from cart");
+                        }}
                         className="p-1 hover:bg-secondary rounded-sm transition-colors flex-shrink-0"
                         aria-label="Remove from cart"
                       >
@@ -127,11 +129,11 @@ export default function Cart() {
                       <div className="text-right">
                         {item.product.sale_price && (
                           <p className="text-xs text-muted-foreground line-through">
-                            ${(item.product.price * item.quantity).toFixed(2)}
+                            ₵{(item.product.price * item.quantity).toFixed(2)}
                           </p>
                         )}
                         <p className="text-sm font-semibold">
-                          $
+                          ₵
                           {(
                             (item.product.sale_price || item.product.price) *
                             item.quantity
@@ -148,7 +150,10 @@ export default function Cart() {
               <Link to="/shop" className="btn-secondary flex-1">
                 Continue Shopping
               </Link>
-              <button onClick={clearCart} className="btn-outline flex-1">
+              <button onClick={() => {
+                clearCart();
+                toast.success("Cart cleared");
+              }} className="btn-outline flex-1">
                 Clear Cart
               </button>
             </div>
@@ -162,18 +167,18 @@ export default function Cart() {
               <div className="space-y-4 mb-6 pb-6 border-b border-border">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium">${total.toFixed(2)}</span>
+                  <span className="font-medium">₵{total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
                   <span className="font-medium">
-                    {total >= 100 ? "FREE" : "$10.00"}
+                    {total >= 100 ? "FREE" : "₵10.00"}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax</span>
                   <span className="font-medium">
-                    ${((total >= 100 ? total : total + 10) * 0.08).toFixed(2)}
+                    ₵{((total >= 100 ? total : total + 10) * 0.08).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -181,7 +186,7 @@ export default function Cart() {
               <div className="flex justify-between text-lg font-bold mb-6">
                 <span>Total</span>
                 <span>
-                  $
+                  ₵
                   {(
                     total +
                     (total >= 100 ? 0 : 10) +
@@ -199,7 +204,7 @@ export default function Cart() {
               </button>
 
               <p className="text-xs text-center text-muted-foreground">
-                Free shipping on orders over $100
+                Free shipping on orders over ₵100
               </p>
             </div>
           </div>

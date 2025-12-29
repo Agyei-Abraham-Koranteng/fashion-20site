@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,26 +13,62 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Edit, Trash2 } from "lucide-react";
-import { getProducts } from "@/lib/api";
+import { Plus, Search, Edit, Trash2, Image as ImageIcon } from "lucide-react";
+import { getProducts, deleteProduct } from "@/lib/api";
+import { toast } from "sonner";
 import { Product } from "@/lib/types";
 
 export default function ProductsListAdmin() {
-  const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    loadProducts();
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
+  const { data: products = [], isLoading: loading, refetch } = useQuery<Product[]>({
+    queryKey: ["products", "admin"],
+    queryFn: async () => {
+      // Create a timeout promise
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out")), 10000)
+      );
+
+      // Race the fetch against the timeout
+      const response = await Promise.race([
+        getProducts(),
+        timeoutPromise
+      ]) as any;
+
+      const { data, error } = response;
+      if (error) throw error;
+      return data || [];
+    }
+  });
+
+  useEffect(() => {
     const subscription = supabase
       .channel("public:products-admin")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "products" },
-        (payload) => {
-          loadProducts(true);
+        () => {
+          refetch();
         }
       )
       .subscribe();
@@ -39,27 +76,25 @@ export default function ProductsListAdmin() {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
-
-  const loadProducts = async (silent = false) => {
-    if (!silent) setLoading(true);
-    const { data } = await getProducts();
-    if (data) {
-      setProducts(data);
-    }
-    if (!silent) setLoading(false);
-  };
+  }, [refetch]);
 
   const filteredProducts = products.filter(
     (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.category?.name.toLowerCase().includes(search.toLowerCase())
+      p.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      p.category?.name.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      // TODO: Implement delete API call
-      setProducts(products.filter((p) => p.id !== id));
+    try {
+      const { error } = await deleteProduct(id);
+      if (error) throw error;
+      refetch();
+      toast.success("Product deleted successfully");
+    } catch (err: any) {
+      console.error("Failed to delete product:", err);
+      toast.error(`Failed to delete product: ${err.message || "Unknown error"}`);
+    } finally {
+      setProductToDelete(null);
     }
   };
 
@@ -120,12 +155,16 @@ export default function ProductsListAdmin() {
                       <TableRow key={product.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            {product.images?.[0] && (
+                            {product.images?.[0] ? (
                               <img
                                 src={product.images[0].url}
                                 alt={product.name}
-                                className="h-10 w-10 rounded object-cover"
+                                className="h-10 w-10 rounded object-cover shadow-sm"
                               />
+                            ) : (
+                              <div className="flex h-10 w-10 items-center justify-center rounded bg-secondary text-muted-foreground">
+                                <ImageIcon className="h-5 w-5 opacity-40" />
+                              </div>
                             )}
                             <div>
                               <div className="font-medium">{product.name}</div>
@@ -139,11 +178,11 @@ export default function ProductsListAdmin() {
                         <TableCell>
                           <div className="flex flex-col">
                             <span className="font-medium">
-                              ${product.sale_price || product.price}
+                              ₵{product.sale_price || product.price}
                             </span>
                             {product.sale_price && (
                               <span className="text-sm text-muted-foreground line-through">
-                                ${product.price}
+                                ₵{product.price}
                               </span>
                             )}
                           </div>
@@ -170,7 +209,7 @@ export default function ProductsListAdmin() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleDelete(product.id)}
+                              onClick={() => setProductToDelete(product.id)}
                             >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
@@ -198,7 +237,7 @@ export default function ProductsListAdmin() {
                         <div className="flex justify-between items-start">
                           <h4 className="font-bold text-gray-900 truncate pr-4">{product.name}</h4>
                           <span className="font-bold text-blue-600">
-                            ${product.sale_price || product.price}
+                            ₵{product.sale_price || product.price}
                           </span>
                         </div>
                         <p className="text-sm text-gray-500 line-clamp-2 mt-1">
@@ -227,7 +266,7 @@ export default function ProductsListAdmin() {
                         variant="outline"
                         size="sm"
                         className="flex-1 text-destructive hover:text-destructive hover:bg-destructive/5"
-                        onClick={() => handleDelete(product.id)}
+                        onClick={() => setProductToDelete(product.id)}
                       >
                         <Trash2 className="h-4 w-4 mr-2" /> Delete
                       </Button>
@@ -239,6 +278,23 @@ export default function ProductsListAdmin() {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the product from the catalog.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => productToDelete && handleDelete(productToDelete)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

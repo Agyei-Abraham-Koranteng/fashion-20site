@@ -6,6 +6,7 @@ import { Mail, Phone, MapPin } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useQuery } from "@tanstack/react-query";
 import { getCmsContent } from "@/lib/api";
+import { toast } from "sonner";
 
 export default function Contact() {
     const { data: cmsData } = useQuery({
@@ -26,7 +27,7 @@ export default function Contact() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // Simulate form submission
-        alert("Thank you for your message! We will get back to you shortly.");
+        toast.success("Thank you for your message! We will get back to you shortly.");
     };
 
     return (

@@ -38,11 +38,8 @@ export default function Checkout() {
     country: "",
   });
 
-  const [paymentInfo, setPaymentInfo] = useState({
-    cardName: "",
-    cardNumber: "",
-    expiry: "",
-    cvv: "",
+  const [reservationInfo, setReservationInfo] = useState({
+    note: "",
   });
 
   const [sameAsBilling, setSameAsBilling] = useState(true);
@@ -87,7 +84,8 @@ export default function Checkout() {
           color: item.color
         })),
         shipping_address: shippingInfo,
-        billing_address: sameAsBilling ? shippingInfo : billingInfo
+        billing_address: sameAsBilling ? shippingInfo : billingInfo,
+        notes: reservationInfo.note
       };
 
       const { error } = await createOrder(user.id, orderData);
@@ -98,7 +96,7 @@ export default function Checkout() {
 
       setOrderPlaced(true);
       clearCart();
-      toast.success("Order placed successfully!");
+      toast.success("Reservation placed successfully!");
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Failed to place order. Please try again.");
@@ -113,29 +111,37 @@ export default function Checkout() {
         <div className="container-wide py-20">
           <div className="text-center max-w-md mx-auto">
             <CheckCircle size={64} className="text-accent mx-auto mb-6" />
-            <h1 className="text-3xl font-bold mb-4">Order Confirmed!</h1>
+            <h1 className="text-3xl font-bold mb-4">Reservation Confirmed!</h1>
             <p className="text-muted-foreground mb-2">
-              Thank you for your purchase.
+              Thank you for reserving your items.
             </p>
             <p className="text-muted-foreground mb-8">
-              Order #12345 | You will receive an email confirmation shortly.
+              Order #12345 | You will receive an email confirmation shortly with further instructions.
             </p>
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-8 text-left text-sm text-blue-800">
+              <p className="font-semibold mb-1">Next Steps:</p>
+              <ol className="list-decimal pl-5 space-y-1">
+                <li>We will review your reservation request.</li>
+                <li>Our team will contact you to confirm availability and discuss payment options.</li>
+                <li>Once confirmed, we will ship your items!</li>
+              </ol>
+            </div>
 
             <div className="bg-secondary rounded-sm p-6 mb-8 text-left">
               <h3 className="font-semibold mb-4">Order Details</h3>
               <div className="space-y-2 text-sm mb-4">
                 <p className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>₵{total.toFixed(2)}</span>
                 </p>
                 <p className="flex justify-between">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span>{total >= 100 ? "FREE" : "$10.00"}</span>
+                  <span>{total >= 100 ? "FREE" : "₵10.00"}</span>
                 </p>
                 <p className="flex justify-between border-t border-border pt-2 font-semibold">
                   <span>Total</span>
                   <span>
-                    $
+                    ₵
                     {(
                       total +
                       (total >= 100 ? 0 : 10) +
@@ -408,64 +414,35 @@ export default function Checkout() {
                     onClick={() => setStep(3)}
                     className="btn-primary flex-1 flex items-center justify-center gap-2"
                   >
-                    Continue to Payment
+                    Continue to Confirmation
                     <ChevronRight size={18} />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Step 3: Payment */}
+            {/* Step 3: Reservation Confirmation */}
             {step === 3 && (
               <div>
-                <h2 className="text-2xl font-bold mb-6">Payment Method</h2>
-                <div className="space-y-4 mb-6">
-                  <input
-                    type="text"
-                    placeholder="Cardholder Name*"
-                    value={paymentInfo.cardName}
-                    onChange={(e) =>
-                      setPaymentInfo({
-                        ...paymentInfo,
-                        cardName: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Card Number*"
-                    value={paymentInfo.cardNumber}
-                    onChange={(e) =>
-                      setPaymentInfo({
-                        ...paymentInfo,
-                        cardNumber: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
-                  <div className="grid grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="MM/YY*"
-                      value={paymentInfo.expiry}
-                      onChange={(e) =>
-                        setPaymentInfo({
-                          ...paymentInfo,
-                          expiry: e.target.value,
-                        })
-                      }
-                      className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                    />
-                    <input
-                      type="text"
-                      placeholder="CVV*"
-                      value={paymentInfo.cvv}
-                      onChange={(e) =>
-                        setPaymentInfo({ ...paymentInfo, cvv: e.target.value })
-                      }
-                      className="px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                    />
+                <h2 className="text-2xl font-bold mb-6">Confirm Reservation</h2>
+                <div className="bg-secondary/50 p-6 rounded-lg mb-6">
+                  <h3 className="font-semibold mb-4">Reservation Details</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Please note that this is a <strong>reservation only</strong>. No payment is required at this stage.
+                  </p>
+                  <p className="text-muted-foreground mb-4">
+                    By clicking "Reserve Order", you are placing a hold on these items. We will contact you shortly via email or phone to arrange payment and delivery.
+                  </p>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Add a Note (Optional)</label>
+                      <textarea
+                        className="w-full min-h-[100px] px-4 py-3 border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary bg-background"
+                        placeholder="Special instructions or questions..."
+                        value={reservationInfo.note}
+                        onChange={(e) => setReservationInfo({ ...reservationInfo, note: e.target.value })}
+                      ></textarea>
+                    </div>
                   </div>
                 </div>
 
@@ -488,8 +465,8 @@ export default function Checkout() {
                       </>
                     ) : (
                       <>
-                        Place Order
-                        <ChevronRight size={18} />
+                        Reserve Order
+                        <CheckCircle size={18} />
                       </>
                     )}
                   </button>
@@ -516,7 +493,7 @@ export default function Checkout() {
                       <span className="font-medium">x{item.quantity}</span>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      $
+                      ₵
                       {(
                         (item.product.sale_price || item.product.price) *
                         item.quantity
@@ -529,16 +506,16 @@ export default function Checkout() {
               <div className="space-y-2 mb-6 pb-6 border-b border-border">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>₵{total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span>{total >= 100 ? "FREE" : "$10.00"}</span>
+                  <span>{total >= 100 ? "FREE" : "₵10.00"}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax</span>
                   <span>
-                    ${((total >= 100 ? total : total + 10) * 0.08).toFixed(2)}
+                    ₵{((total >= 100 ? total : total + 10) * 0.08).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -546,7 +523,7 @@ export default function Checkout() {
               <div className="flex justify-between text-lg font-bold">
                 <span>Total</span>
                 <span>
-                  $
+                  ₵
                   {(
                     total +
                     (total >= 100 ? 0 : 10) +

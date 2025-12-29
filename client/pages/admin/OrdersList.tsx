@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 import { getAllOrders, updateOrderStatus } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -46,7 +47,10 @@ export default function OrdersListAdmin() {
 
   const loadOrders = async (silent = false) => {
     if (!silent) setLoading(true);
-    const { data } = await getAllOrders();
+    const { data, error } = await getAllOrders();
+    if (error) {
+      toast.error("Failed to load orders");
+    }
     if (data) {
       setOrders(data);
     }
@@ -304,12 +308,12 @@ export default function OrdersListAdmin() {
                           <p className="text-xs text-muted-foreground">{item.size} / {item.color} x {item.quantity}</p>
                         </div>
                       </div>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      <span>₵{(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                   <div className="flex justify-between pt-4 font-semibold text-lg">
                     <span>Total</span>
-                    <span>${Number(selectedOrder.total_price).toFixed(2)}</span>
+                    <span>₵{Number(selectedOrder.total_price).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

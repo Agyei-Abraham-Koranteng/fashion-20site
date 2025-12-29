@@ -11,6 +11,16 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
 interface Subscriber {
@@ -22,6 +32,7 @@ interface Subscriber {
 export default function NewsletterAdmin() {
     const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
     const [loading, setLoading] = useState(true);
+    const [subscriberToDelete, setSubscriberToDelete] = useState<{ id: string; email: string } | null>(null);
 
     useEffect(() => {
         fetchSubscribers();
@@ -44,9 +55,7 @@ export default function NewsletterAdmin() {
         }
     };
 
-    const handleDelete = async (id: string, email: string) => {
-        if (!window.confirm(`Are you sure you want to remove ${email}?`)) return;
-
+    const handleDelete = async (id: string) => {
         try {
             const { error } = await supabase
                 .from("newsletter_subscribers")
@@ -60,6 +69,8 @@ export default function NewsletterAdmin() {
         } catch (error) {
             console.error("Error deleting subscriber:", error);
             toast.error("Failed to remove subscriber.");
+        } finally {
+            setSubscriberToDelete(null);
         }
     };
 
@@ -120,7 +131,7 @@ export default function NewsletterAdmin() {
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            onClick={() => handleDelete(subscriber.id, subscriber.email)}
+                                            onClick={() => setSubscriberToDelete({ id: subscriber.id, email: subscriber.email })}
                                             className="text-red-500 hover:text-red-600 hover:bg-red-50"
                                         >
                                             <Trash2 className="h-4 w-4" />
@@ -132,6 +143,23 @@ export default function NewsletterAdmin() {
                     </TableBody>
                 </Table>
             </div>
+
+            <AlertDialog open={!!subscriberToDelete} onOpenChange={(open) => !open && setSubscriberToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Remove Subscriber?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to remove <strong>{subscriberToDelete?.email}</strong> from the newsletter list?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => subscriberToDelete && handleDelete(subscriberToDelete.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            Remove
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

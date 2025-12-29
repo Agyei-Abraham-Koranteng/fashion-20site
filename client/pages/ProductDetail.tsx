@@ -2,17 +2,20 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import Layout from "@/components/Layout";
-import { getProductById } from "@/lib/api";
+import { getProductById, getProductReviews } from "@/lib/api";
 import { Product } from "@/lib/types";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { Heart, ShoppingBag, Truck, RotateCcw, Star } from "lucide-react";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+
+const DEFAULT_SIZES = ["S", "M", "L", "XL"];
+const DEFAULT_COLORS = ["#000000", "#FFFFFF", "#1a3a52", "#808080"];
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedColor, setSelectedColor] = useState<string>("");
@@ -26,35 +29,49 @@ export default function ProductDetail() {
     removeItem: removeFromWishlist,
   } = useWishlist();
 
-  useEffect(() => {
-    async function loadProduct(silent = false) {
-      if (!id) return;
-      if (!silent) setLoading(true);
+  const { data: product, isLoading: loading, refetch } = useQuery<Product | null>({
+    queryKey: ["product", id],
+    queryFn: async () => {
+      if (!id) return null;
       const { data } = await getProductById(id);
+      return data;
+    },
+  });
 
-      if (data) {
-        setProduct(data);
-        // Only set defaults on initial load (not silent update)
-        if (!silent) {
-          setSelectedColor(data.colors?.[0] || "");
-          setSelectedSize(data.sizes?.[0] || "");
-        }
-      } else {
-        setProduct(null);
+  const { data: reviews = [] } = useQuery({
+    queryKey: ["reviews", id],
+    queryFn: async () => {
+      if (!id) return [];
+      const { data } = await getProductReviews(id);
+      return data || [];
+    },
+    enabled: !!id,
+  });
+
+  // Effective sizes/colors with fallbacks
+  const availableSizes = product?.sizes && product.sizes.length > 0 ? product.sizes : DEFAULT_SIZES;
+  const availableColors = product?.colors && product.colors.length > 0 ? product.colors : DEFAULT_COLORS;
+
+  useEffect(() => {
+    if (product) {
+      if (!selectedColor && availableColors.length > 0) {
+        setSelectedColor(availableColors[0]);
       }
-
-      if (!silent) setLoading(false);
+      if (!selectedSize && availableSizes.length > 0) {
+        setSelectedSize(availableSizes[0]);
+      }
     }
+  }, [product, selectedColor, selectedSize, availableColors, availableSizes]);
 
-    loadProduct();
-
+  useEffect(() => {
+    if (!id) return;
     const subscription = supabase
       .channel(`product:${id}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'products', filter: `id=eq.${id}` },
         () => {
-          loadProduct(true);
+          refetch();
         }
       )
       .subscribe();
@@ -62,7 +79,7 @@ export default function ProductDetail() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [id]);
+  }, [id, refetch]);
 
   if (loading) {
     return (
@@ -103,20 +120,34 @@ export default function ProductDetail() {
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) {
-      alert("Please select a size and color");
+      toast.warning("Please select a size and color");
       return;
     }
 
     addItem(product, quantity, selectedSize, selectedColor);
+    toast.success(`${product.name} added to cart`);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
 
+  const handleBuyNow = () => {
+    if (!selectedSize || !selectedColor) {
+      toast.warning("Please select a size and color");
+      return;
+    }
+
+    addItem(product, quantity, selectedSize, selectedColor);
+    navigate("/cart");
+  };
+
   const handleWishlist = () => {
+    if (!product) return;
     if (wishlisted) {
       removeFromWishlist(product.id);
+      toast.info("Removed from wishlist");
     } else {
       addToWishlist(product);
+      toast.success("Added to wishlist");
     }
   };
 
@@ -193,12 +224,12 @@ export default function ProductDetail() {
               {/* Price */}
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-3xl font-bold text-primary">
-                  ${displayPrice.toFixed(2)}
+                  ₵{displayPrice.toFixed(2)}
                 </span>
                 {salePrice && (
                   <>
                     <span className="text-lg text-muted-foreground line-through">
-                      ${product.price.toFixed(2)}
+                      ₵{product.price.toFixed(2)}
                     </span>
                     <span className="bg-accent text-accent-foreground text-xs font-bold px-2 py-1">
                       -{discount}%
@@ -235,7 +266,7 @@ export default function ProductDetail() {
                 Size
               </label>
               <div className="grid grid-cols-4 gap-2">
-                {product.sizes.map((size) => (
+                {availableSizes.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
@@ -256,7 +287,7 @@ export default function ProductDetail() {
                 Color
               </label>
               <div className="flex gap-3">
-                {product.colors.map((color) => (
+                {availableColors.map((color) => (
                   <button
                     key={color}
                     onClick={() => setSelectedColor(color)}
@@ -303,7 +334,7 @@ export default function ProductDetail() {
                 <ShoppingBag size={18} />
                 {addedToCart ? "Added to Cart!" : "Add to Cart"}
               </button>
-              <button className="btn-outline">Buy Now</button>
+              <button onClick={handleBuyNow} className="btn-outline">Buy Now</button>
             </div>
 
             {/* Info boxes */}
@@ -316,7 +347,7 @@ export default function ProductDetail() {
                 <div>
                   <p className="text-sm font-semibold">Free Shipping</p>
                   <p className="text-xs text-muted-foreground">
-                    On orders over $100
+                    On orders over ₵100
                   </p>
                 </div>
               </div>
@@ -391,34 +422,36 @@ export default function ProductDetail() {
         <div className="container-wide">
           <h2 className="text-2xl font-bold mb-8">Customer Reviews</h2>
           <div className="space-y-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="border-b border-border pb-6">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <p className="font-semibold">Great Quality!</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex gap-1">
-                        {[...Array(5)].map((_, j) => (
-                          <Star
-                            key={j}
-                            size={14}
-                            className="fill-primary text-primary"
-                          />
-                        ))}
+            {reviews.length > 0 ? (
+              reviews.map((review) => (
+                <div key={review.id} className="border-b border-border pb-6">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="font-semibold">{review.title}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex gap-1">
+                          {[...Array(5)].map((_, j) => (
+                            <Star
+                              key={j}
+                              size={14}
+                              className={j < review.rating ? "fill-primary text-primary" : "text-muted"}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(review.created_at).toLocaleDateString()}
+                        </span>
                       </div>
-                      <span className="text-xs text-muted-foreground">
-                        by Customer
-                      </span>
                     </div>
                   </div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {review.comment}
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Love this product! Excellent quality and fast shipping. Highly
-                  recommend.
-                </p>
-                <p className="text-xs text-muted-foreground">2 weeks ago</p>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-muted-foreground italic">No reviews yet for this product. Be the first to review!</p>
+            )}
           </div>
         </div>
       </section>

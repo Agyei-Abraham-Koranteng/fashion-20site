@@ -1,32 +1,46 @@
 import { useAuth } from "@/context/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { getOrders } from "@/lib/api";
+import { getOrders, getUserReviews } from "@/lib/api";
+import { useWishlist } from "@/context/WishlistContext";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Heart, User, Settings, Package, ChevronRight } from "lucide-react";
+import { ShoppingBag, Heart, User, Settings, Package, ChevronRight, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function UserDashboard() {
     const { user } = useAuth();
+    const { items: wishlistItems } = useWishlist();
 
-    const { data: orders, isLoading } = useQuery({
+    const { data: orders, isLoading: ordersLoading } = useQuery({
         queryKey: ["user-orders", user?.id],
         queryFn: async () => {
-            const { data } = await getOrders();
-            // In a real app, we'd filter by user_id on the server, but for now we'll filter here
-            return (data || []).filter((o: any) => o.user_id === user?.id);
+            if (!user?.id) return [];
+            const { data } = await getOrders(user.id);
+            return data || [];
+        },
+        enabled: !!user?.id,
+    });
+
+    const { data: reviews } = useQuery({
+        queryKey: ["user-reviews", user?.id],
+        queryFn: async () => {
+            if (!user?.id) return [];
+            const { data } = await getUserReviews(user.id);
+            return data || [];
         },
         enabled: !!user?.id,
     });
 
     const stats = [
         { name: "Orders", value: orders?.length || 0, icon: ShoppingBag, color: "text-blue-600", bg: "bg-blue-50" },
-        { name: "Wishlist", value: 0, icon: Heart, color: "text-rose-600", bg: "bg-rose-50" },
-        { name: "Reviews", value: 0, icon: Star, color: "text-amber-600", bg: "bg-amber-50" },
+        { name: "Wishlist", value: wishlistItems?.length || 0, icon: Heart, color: "text-rose-600", bg: "bg-rose-50" },
+        { name: "Reviews", value: reviews?.length || 0, icon: Star, color: "text-amber-600", bg: "bg-amber-50" },
     ];
+
+    const isLoading = ordersLoading;
 
     const statusColors = {
         pending: "bg-amber-100 text-amber-700",
@@ -90,7 +104,7 @@ export default function UserDashboard() {
                                                             <Package className="h-6 w-6 text-gray-400" />
                                                         </div>
                                                         <div>
-                                                            <p className="font-bold text-gray-900">Order #{order.id.substring(0, 8)}</p>
+                                                            <p className="font-bold text-gray-900">Order #{String(order.id).substring(0, 8)}</p>
                                                             <p className="text-xs text-gray-500 mt-0.5">
                                                                 {new Date(order.created_at).toLocaleDateString()}
                                                             </p>

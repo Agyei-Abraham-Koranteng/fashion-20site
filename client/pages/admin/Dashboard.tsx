@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 import { getAdminStats, getAllOrders } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
@@ -29,74 +30,88 @@ export default function AdminDashboard() {
 
   const loadData = async (silent = false) => {
     if (!silent) setLoading(true);
-    const [statsRes, ordersRes] = await Promise.all([
-      getAdminStats(),
-      getAllOrders(),
-    ]);
+    // Timeout promise
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Request timed out")), 10000)
+    );
 
-    if (statsRes.data) {
-      setStatsData(statsRes.data);
-    }
+    try {
+      const [statsRes, ordersRes] = await Promise.race([
+        Promise.all([
+          getAdminStats(),
+          getAllOrders(),
+        ]),
+        timeoutPromise
+      ]) as any;
 
-    if (ordersRes.data) {
-      const allOrders = ordersRes.data;
-      setRecentOrders(allOrders.slice(0, 5));
-
-      // 1. Calculate Revenue Overview (Past 6 months)
-      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const revenueMap: Record<string, number> = {};
-
-      // Initialize last 6 months with 0
-      const now = new Date();
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        revenueMap[monthNames[d.getMonth()]] = 0;
+      if (statsRes.data) {
+        setStatsData(statsRes.data);
       }
 
-      allOrders.forEach(order => {
-        const date = new Date(order.created_at);
-        const month = monthNames[date.getMonth()];
-        if (revenueMap[month] !== undefined) {
-          revenueMap[month] += Number(order.total_price);
+      if (ordersRes.data) {
+        const allOrders = ordersRes.data;
+        setRecentOrders(allOrders.slice(0, 5));
+
+        // 1. Calculate Revenue Overview (Past 6 months)
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const revenueMap: Record<string, number> = {};
+
+        // Initialize last 6 months with 0
+        const now = new Date();
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          revenueMap[monthNames[d.getMonth()]] = 0;
         }
-      });
 
-      setRevenueData(Object.entries(revenueMap).map(([month, revenue]) => ({ month, revenue })));
+        allOrders.forEach(order => {
+          const date = new Date(order.created_at);
+          const month = monthNames[date.getMonth()];
+          if (revenueMap[month] !== undefined) {
+            revenueMap[month] += Number(order.total_price);
+          }
+        });
 
-      // 2. Calculate Orders This Week (Past 7 days)
-      const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-      const ordersMap: Record<string, number> = {};
+        setRevenueData(Object.entries(revenueMap).map(([month, revenue]) => ({ month, revenue })));
 
-      // Initialize past 7 days
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        ordersMap[dayNames[d.getDay()]] = 0;
-      }
+        // 2. Calculate Orders This Week (Past 7 days)
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const ordersMap: Record<string, number> = {};
 
-      allOrders.forEach(order => {
-        const date = new Date(order.created_at);
-        const day = dayNames[date.getDay()];
-        // Only count if within last 7 days
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        if (date >= sevenDaysAgo && ordersMap[day] !== undefined) {
-          ordersMap[day] += 1;
+        // Initialize past 7 days
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          ordersMap[dayNames[d.getDay()]] = 0;
         }
-      });
 
-      // Special case: if we have very little data, include the days anyway in correct order
-      const daysOrder = [];
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        daysOrder.push(dayNames[d.getDay()]);
+        allOrders.forEach(order => {
+          const date = new Date(order.created_at);
+          const day = dayNames[date.getDay()];
+          // Only count if within last 7 days
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          if (date >= sevenDaysAgo && ordersMap[day] !== undefined) {
+            ordersMap[day] += 1;
+          }
+        });
+
+        // Special case: if we have very little data, include the days anyway in correct order
+        const daysOrder = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          daysOrder.push(dayNames[d.getDay()]);
+        }
+
+        setOrdersData(daysOrder.map(day => ({ day, orders: ordersMap[day] })));
       }
 
-      setOrdersData(daysOrder.map(day => ({ day, orders: ordersMap[day] })));
+      if (!silent) setLoading(false);
+    } catch (error) {
+      console.error("Dashboard load failed:", error);
+      toast.error("Failed to load dashboard data");
+      if (!silent) setLoading(false);
     }
-
-    if (!silent) setLoading(false);
   };
 
   useEffect(() => {
@@ -130,7 +145,7 @@ export default function AdminDashboard() {
   const stats = [
     {
       name: "Total Revenue",
-      value: `$${statsData.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: `₵${statsData.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       change: "Live Database",
       icon: DollarSign,
     },
@@ -247,7 +262,7 @@ export default function AdminDashboard() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">${Number(order.total_price).toFixed(2)}</p>
+                    <p className="font-medium">₵{Number(order.total_price).toFixed(2)}</p>
                     <p className="text-sm text-muted-foreground">
                       {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                     </p>

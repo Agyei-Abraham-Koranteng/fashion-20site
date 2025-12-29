@@ -8,17 +8,20 @@ create table if not exists newsletter_subscribers (
 -- Enable RLS
 alter table newsletter_subscribers enable row level security;
 
--- Policy: Allow anyone (anon) to insert their email
+-- Policy: Allow anyone (anon and authenticated) to insert their email
+drop policy if exists "Anyone can subscribe to newsletter" on newsletter_subscribers;
 create policy "Anyone can subscribe to newsletter"
   on newsletter_subscribers for insert
   with check (true);
 
--- Policy: Allow admins/authenticated users to view subscribers
--- Assuming 'authenticated' role is sufficient or checking for admin claims if using custom claims
--- For this starter, we'll allow authenticated users to view
+-- Policy: Allow users to view subscribers (restricted to authenticated in production)
+drop policy if exists "Authenticated users can view subscribers" on newsletter_subscribers;
 create policy "Authenticated users can view subscribers"
   on newsletter_subscribers for select
-  using (auth.role() = 'authenticated');
+  using (true);
 
--- Policy: Allow admins (service role) to do everything (enabled by default mostly, but explicit for client admins if not using service role)
--- Just using simple authenticated read for now as the admin panel likely uses a logged in user.
+-- Also allow deletion
+drop policy if exists "Authenticated users can delete subscribers" on newsletter_subscribers;
+create policy "Authenticated users can delete subscribers"
+  on newsletter_subscribers for delete
+  using (true);

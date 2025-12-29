@@ -3,32 +3,53 @@ import { Product, Category, Review, Order, Address, ProductImage } from "./types
 
 // Helper to transform Supabase product row (shared/schema.ts) to UI Product type
 const transformProduct = (data: any): Product => ({
-  id: String(data.id),
-  name: data.name,
+  id: String(data.id || ""),
+  name: data.name || "Unnamed Product",
   description: data.description ?? "",
-  price: Number(data.price),
-  sale_price: undefined,
-  category_id: data.category_id ?? "",
+  price: Number(data.price || 0),
+  sale_price: data.sale_price ? Number(data.sale_price) : undefined,
+  category_id: String(data.category_id ?? ""),
   category: data.category_id
-    ? { id: data.category_id, name: data.category_id, slug: data.category_id, created_at: data.created_at ?? "" }
+    ? {
+      id: String(data.category_id),
+      name: String(data.category_id),
+      slug: String(data.category_id),
+      created_at: String(data.created_at ?? "")
+    }
     : undefined,
-  images: data.image_url
+  images: (data.image_url || data.image)
     ? [
       {
         id: `image-${data.id}`,
         product_id: String(data.id),
-        url: data.image_url,
+        url: data.image_url || data.image || "",
         order: 0,
         created_at: String(data.created_at || new Date().toISOString()),
       },
     ]
     : [],
-  sizes: [],
-  colors: [],
-  stock: Number(data.stock) ?? 0,
+  sizes: Array.isArray(data.sizes) ? data.sizes.map(String) : [],
+  colors: Array.isArray(data.colors) ? data.colors.map(String) : [],
+  stock: Number(data.stock ?? 0),
   created_at: data.created_at ?? "",
   updated_at: data.updated_at ?? "",
 });
+
+// Helper to timeout a promise
+const withTimeout = <T>(promise: PromiseLike<T>, timeoutMs = 10000): Promise<T> => {
+  let timeoutId: any;
+  const timeoutPromise = new Promise<T>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error("Request timed out")), timeoutMs);
+  });
+
+  return Promise.race([
+    Promise.resolve(promise).then((res) => {
+      clearTimeout(timeoutId);
+      return res;
+    }),
+    timeoutPromise
+  ]);
+};
 
 // Product queries
 export async function getProducts(filters?: {
@@ -45,7 +66,7 @@ export async function getProducts(filters?: {
 
     if (filters?.category) {
       // In shared schema, category_id is a string field on products
-      query = query.eq("category_id", filters.category);
+      query = query.ilike("category_id", filters.category);
     }
 
     if (filters?.minPrice) {
@@ -62,7 +83,7 @@ export async function getProducts(filters?: {
       query = query.ilike("name", `%${filters.search}%`);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await withTimeout(query);
 
     if (error) throw error;
 
@@ -79,7 +100,7 @@ export async function getProductById(id: string) {
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .eq("id", id)
+      .eq("id", Number(id))
       .single();
 
     if (error) throw error;
@@ -134,14 +155,29 @@ export async function createReview(
   },
 ) {
   try {
-    const { data, error } = await supabase
-      .from("reviews")
+    const { data, error } = await (supabase
+      .from("reviews") as any)
       .insert([{ product_id: Number(productId), user_id: userId, ...review }])
       .select();
 
     return { data: data as Review[] | null, error };
   } catch (error) {
     console.error("Error creating review:", error);
+    return { data: null, error };
+  }
+}
+
+export async function getUserReviews(userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    return { data, error };
+  } catch (error) {
+    console.error("Error fetching user reviews:", error);
     return { data: null, error };
   }
 }
@@ -190,8 +226,9 @@ export async function createOrder(
       size: string;
       color: string;
     }>;
-    shipping_address: Address;
-    billing_address: Address;
+    shipping_address: Address | any;
+    billing_address: Address | any;
+    notes?: string;
   },
 ) {
   try {
@@ -200,15 +237,16 @@ export async function createOrder(
       0,
     );
 
-    const { data: orderData, error: orderError } = await supabase
-      .from("orders")
+    const { data: orderData, error: orderError } = await (supabase
+      .from("orders") as any)
       .insert([
         {
           user_id: userId,
-          status: "pending",
+          status: "pending", // "pending" orders are now reservations
           total_price: totalPrice,
           shipping_address: order.shipping_address,
           billing_address: order.billing_address,
+          notes: order.notes,
         },
       ])
       .select()
@@ -220,8 +258,8 @@ export async function createOrder(
 
     const orderId = orderData.id;
 
-    const { data: itemsData, error: itemsError } = await supabase
-      .from("order_items")
+    const { data: itemsData, error: itemsError } = await (supabase
+      .from("order_items") as any)
       .insert(
         order.items.map((item) => ({
           order_id: Number(orderId),
@@ -254,6 +292,8 @@ export async function createProduct(product: {
   price: number;
   category_id: string; // maps to 'category' column in DB
   stock: number;
+  sizes?: string[];
+  colors?: string[];
   image_url?: string | null; // Main image URL
 }) {
   try {
@@ -264,9 +304,12 @@ export async function createProduct(product: {
       image_url: product.image_url ?? null,
       category_id: product.category_id, // map to DB column
       stock: product.stock,
+      sizes: product.sizes ?? [],
+      colors: product.colors ?? [],
+      sale_price: product.sale_price ?? null,
     };
-    const { data, error } = await supabase
-      .from("products")
+    const { data, error } = await (supabase
+      .from("products") as any)
       .insert([payload])
       .select()
       .single();
@@ -284,8 +327,11 @@ export async function updateProduct(
     name: string;
     description?: string | null;
     price: number;
+    sale_price: number | null;
     category_id: string; // maps to 'category'
     stock: number;
+    sizes?: string[];
+    colors?: string[];
     image_url?: string | null;
   }>
 ) {
@@ -294,12 +340,15 @@ export async function updateProduct(
     if (updates.name !== undefined) payload.name = updates.name;
     if (updates.description !== undefined) payload.description = updates.description;
     if (updates.price !== undefined) payload.price = updates.price;
+    if (updates.sale_price !== undefined) payload.sale_price = updates.sale_price;
     if (updates.category_id !== undefined) payload.category_id = updates.category_id;
     if (updates.stock !== undefined) payload.stock = updates.stock;
+    if (updates.sizes !== undefined) payload.sizes = updates.sizes;
+    if (updates.colors !== undefined) payload.colors = updates.colors;
     if (updates.image_url !== undefined) payload.image_url = updates.image_url;
 
-    const { data, error } = await supabase
-      .from("products")
+    const { data, error } = await (supabase
+      .from("products") as any)
       .update(payload)
       .eq("id", Number(id))
       .select()
@@ -317,7 +366,7 @@ export async function deleteProduct(id: string) {
     const { data, error } = await supabase
       .from("products")
       .delete()
-      .eq("id", id)
+      .eq("id", Number(id))
       .select();
 
     return { data, error };
@@ -329,10 +378,10 @@ export async function deleteProduct(id: string) {
 
 export async function getCustomers() {
   try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('updated_at', { ascending: false });
+    const { data, error } = await withTimeout(supabase
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false }));
 
     return { data, error };
   } catch (error) {
@@ -341,10 +390,25 @@ export async function getCustomers() {
   }
 }
 
-export async function updateOrderStatus(orderId: string, status: string) {
+export async function getUserProfile(userId: string) {
   try {
     const { data, error } = await supabase
-      .from("orders")
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle();
+
+    return { data, error };
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    return { data: null, error };
+  }
+}
+
+export async function updateOrderStatus(orderId: string, status: string) {
+  try {
+    const { data, error } = await (supabase
+      .from("orders") as any)
       .update({ status })
       .eq("id", Number(orderId))
       .select()
@@ -360,23 +424,23 @@ export async function updateOrderStatus(orderId: string, status: string) {
 export async function getAdminStats() {
   try {
     // Basic stats aggregation
-    const { count: productsCount } = await supabase
+    const { count: productsCount } = await withTimeout(supabase
       .from('products')
-      .select('*', { count: 'exact', head: true });
+      .select('*', { count: 'exact', head: true }));
 
-    const { count: ordersCount } = await supabase
+    const { count: ordersCount } = await withTimeout(supabase
       .from('orders')
-      .select('*', { count: 'exact', head: true });
+      .select('*', { count: 'exact', head: true }));
 
-    const { data: orders } = await supabase
+    const { data: orders } = await withTimeout(supabase
       .from('orders')
-      .select('total_price');
+      .select('total_price'));
 
-    const totalRevenue = orders?.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0) || 0;
+    const totalRevenue = (orders as any[])?.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0) || 0;
 
-    const { count: customersCount } = await supabase
+    const { count: customersCount } = await withTimeout(supabase
       .from('profiles')
-      .select('*', { count: 'exact', head: true });
+      .select('*', { count: 'exact', head: true }));
 
     return {
       data: {
@@ -412,8 +476,8 @@ export async function getCmsContent(key: string) {
 export async function updateCmsContent(key: string, content: any) {
   try {
     console.log(`Payload for ${key}:`, content);
-    const { data, error } = await supabase
-      .from("cms_content")
+    const { data, error } = await (supabase
+      .from("cms_content") as any)
       .upsert({ key, content, updated_at: new Date().toISOString() }, { onConflict: "key" })
       .select()
       .single();

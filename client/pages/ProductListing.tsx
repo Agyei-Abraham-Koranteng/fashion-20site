@@ -7,15 +7,14 @@ import ProductCard from "@/components/ProductCard";
 import { getProducts } from "@/lib/api";
 import { Product } from "@/lib/types";
 import { ChevronDown, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 export default function ProductListing() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Filter states
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
 
@@ -36,70 +35,68 @@ export default function ProductListing() {
   // Size options
   const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
 
-  const loadProducts = async (silent = false) => {
-    try {
-      if (!silent) setLoading(true);
-      const { data } = await getProducts({
-        category: category || undefined,
-        minPrice: priceRange[0],
-        maxPrice: priceRange[1],
-        search: searchQuery || undefined,
-      });
+  // Local Debounce for Price Range
+  const [debouncedPriceRange, setDebouncedPriceRange] = useState(priceRange);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedPriceRange(priceRange);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [priceRange]);
 
-      if (data) {
-        let sorted = data.filter(p =>
-          !p.name.toLowerCase().includes("test") &&
-          !p.name.toLowerCase().includes("verification") &&
-          !p.name.includes("Agyei")
-        );
+  const { data: products = [], isLoading, isError, error, refetch } = useQuery<Product[]>({
+    queryKey: ["products", category, searchQuery, debouncedPriceRange, sortBy],
+    queryFn: async () => {
+      // Create a timeout promise
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out")), 10000)
+      );
 
-        // Sort products
-        if (sortBy === "price-low") {
-          sorted.sort(
-            (a, b) => (a.sale_price || a.price) - (b.sale_price || b.price),
-          );
-        } else if (sortBy === "price-high") {
-          sorted.sort(
-            (a, b) => (b.sale_price || b.price) - (a.sale_price || a.price),
-          );
-        } else if (sortBy === "new") {
-          sorted.sort(
-            (a, b) =>
-              new Date(b.created_at).getTime() -
-              new Date(a.created_at).getTime(),
-          );
-        } else if (sortBy === "sale") {
-          sorted.sort((a, b) => {
-            const aDiscount = a.sale_price ? a.price - a.sale_price : 0;
-            const bDiscount = b.sale_price ? b.price - b.sale_price : 0;
-            return bDiscount - aDiscount;
-          });
-        }
+      // Race the fetch against the timeout
+      const response = await Promise.race([
+        getProducts({
+          category: category || undefined,
+          minPrice: debouncedPriceRange[0],
+          maxPrice: debouncedPriceRange[1],
+          search: searchQuery || undefined,
+        }),
+        timeoutPromise
+      ]) as any;
 
-        setProducts(sorted);
+      const { data, error } = response;
+      if (error) throw error;
+
+      let sorted = data ? [...data] : [];
+
+      if (sortBy === "price-low") {
+        sorted.sort((a, b) => (a.sale_price || a.price) - (b.sale_price || b.price));
+      } else if (sortBy === "price-high") {
+        sorted.sort((a, b) => (b.sale_price || b.price) - (a.sale_price || a.price));
+      } else if (sortBy === "new") {
+        sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      } else if (sortBy === "sale") {
+        sorted.sort((a, b) => {
+          const aDiscount = a.sale_price ? a.price - a.sale_price : 0;
+          const bDiscount = b.sale_price ? b.price - b.sale_price : 0;
+          return bDiscount - aDiscount;
+        });
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      if (!silent) setLoading(false);
-    }
-  };
+      return sorted;
+    },
+  });
 
   useEffect(() => {
-    loadProducts();
-
-    // Subscribe to real-time changes
     const subscription = supabase
-      .channel('public:products')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
-        loadProducts(true);
+      .channel('public:products:listing')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
+        refetch();
       })
       .subscribe();
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [category, searchQuery, priceRange, sortBy]);
+  }, [refetch]);
 
   const handleSortChange = (value: string) => {
     setSearchParams((prev) => {
@@ -189,7 +186,7 @@ export default function ProductListing() {
                     <input
                       type="number"
                       min="0"
-                      max="500"
+                      max="5000"
                       value={priceRange[0]}
                       onChange={(e) =>
                         setPriceRange([Number(e.target.value), priceRange[1]])
@@ -201,7 +198,7 @@ export default function ProductListing() {
                     <input
                       type="number"
                       min="0"
-                      max="500"
+                      max="5000"
                       value={priceRange[1]}
                       onChange={(e) =>
                         setPriceRange([priceRange[0], Number(e.target.value)])
@@ -213,7 +210,7 @@ export default function ProductListing() {
                   <input
                     type="range"
                     min="0"
-                    max="500"
+                    max="5000"
                     value={priceRange[1]}
                     onChange={(e) =>
                       setPriceRange([priceRange[0], Number(e.target.value)])
@@ -299,7 +296,7 @@ export default function ProductListing() {
             </div>
 
             {/* Products */}
-            {loading ? (
+            {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="animate-pulse">
@@ -314,6 +311,15 @@ export default function ProductListing() {
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
+              </div>
+            ) : isError ? (
+              <div className="text-center py-12">
+                <p className="text-red-500 text-lg mb-4">
+                  Failed to load products. {(error as any)?.message || "Please try again later."}
+                </p>
+                <button onClick={() => refetch()} className="btn-secondary">
+                  Try Again
+                </button>
               </div>
             ) : (
               <div className="text-center py-12">

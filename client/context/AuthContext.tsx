@@ -18,6 +18,9 @@ export type AuthUser = {
   id: string;
   email: string;
   role?: "admin" | "customer";
+  full_name?: string | null;
+  username?: string | null;
+  avatar_url?: string | null;
 };
 
 type AuthContextType = {
@@ -41,19 +44,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (session?.user) {
             const email = session.user.email || "";
 
-            // Fetch profile to check is_admin flag
+            // Fetch profile for additional data and admin check
             const { data: profile } = await supabase
               .from("profiles")
-              .select("is_admin")
+              .select("is_admin, full_name, username, avatar_url")
               .eq("id", session.user.id)
-              .maybeSingle();
+              .maybeSingle<any>();
 
-            const isAdmin = isAdminEmail(email) || !!profile?.is_admin;
+            const isAdmin = isAdminEmail(email) || (profile ? !!profile.is_admin : false);
 
             const newUser: AuthUser = {
               id: session.user.id,
               email,
               role: isAdmin ? "admin" : "customer",
+              full_name: profile?.full_name || null,
+              username: profile?.username || null,
+              avatar_url: profile?.avatar_url || null,
             };
             setUser(newUser);
           } else {

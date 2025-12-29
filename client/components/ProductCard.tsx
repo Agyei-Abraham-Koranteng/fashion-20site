@@ -29,6 +29,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop"
               }
               alt={product.name}
+              loading="lazy"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
@@ -80,15 +81,15 @@ export default function ProductCard({ product }: ProductCardProps) {
             {salePrice ? (
               <>
                 <span className="text-sm font-semibold text-primary">
-                  ${salePrice.toFixed(2)}
+                  ₵{salePrice.toFixed(2)}
                 </span>
                 <span className="text-xs text-muted-foreground line-through">
-                  ${product.price.toFixed(2)}
+                  ₵{product.price.toFixed(2)}
                 </span>
               </>
             ) : (
               <span className="text-sm font-semibold text-primary">
-                ${product.price.toFixed(2)}
+                ₵{product.price.toFixed(2)}
               </span>
             )}
           </div>
