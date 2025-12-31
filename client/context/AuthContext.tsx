@@ -40,21 +40,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // --- BYPASS AUTHENTICATION FOR DEVELOPMENT ---
-    console.log("[Auth] Development Mode: Authentication Bypassed");
+    if (!supabaseConfigured) {
+      setLoading(false);
+      return;
+    }
 
-    // Set a mock admin user immediately
-    setUser({
-      id: "f95b1f1b-5a3a-481f-92ba-4415c09248e6",
-      email: "admin@example.com",
-      role: "admin",
-      full_name: "Dev Admin",
-      username: "admin",
-      avatar_url: null
-    });
-    setLoading(false);
+    // Initial session check
+    const initSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const role = isAdminEmail(session.user.email || "") ? "admin" : "customer";
+          setUser({
+            id: session.user.id,
+            email: session.user.email || "",
+            role: role,
+            full_name: session.user.user_metadata?.full_name || null,
+          });
+        }
+      } catch (err) {
+        console.error("[Auth] Initial session check failed:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log("[Auth] Auth state changed:", event);
+        if (session?.user) {
+          const role = isAdminEmail(session.user.email || "") ? "admin" : "customer";
+          setUser({
+            id: session.user.id,
+            email: session.user.email || "",
+            role: role,
+            full_name: session.user.user_metadata?.full_name || null,
+          });
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
 
     return () => {
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -63,38 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log("[Auth] Attempting login for:", email);
     try {
       if (supabaseConfigured) {
-        console.log("[Auth] Supabase URL:", (import.meta as any).env.VITE_SUPABASE_URL?.substring(0, 15) + "...");
-        const anonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY;
-        console.log("[Auth] Anon Key present:", !!anonKey, "Length:", anonKey?.length);
-
-        // Force cleanup of any stale session state
-        console.log("[Auth] Cleaning up stale session...");
-        try {
-          // Best effort signOut with short timeout
-          await Promise.race([
-            supabase.auth.signOut(),
-            new Promise((resolve) => setTimeout(resolve, 1000))
-          ]);
-        } catch (e) {
-          console.warn("[Auth] signOut failed/timed out, forcing local cleanup");
-        }
-
-        // Manual cleanup of Supabase token removed to prevent race conditions
-        // try {
-        //   const key = `sb-${new URL((import.meta as any).env.VITE_SUPABASE_URL).hostname.split('.')[0]}-auth-token`;
-        //   localStorage.removeItem(key);
-        // } catch (e) { /* ignore */ }
-
-        console.log("[Auth] Session cleanup complete.");
-
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Login verification timed out.")), 30000)
-        );
-
-        const { error } = await Promise.race([
-          supabase.auth.signInWithPassword({ email, password }),
-          timeoutPromise
-        ]) as { error: any };
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
 
         if (error) {
           console.error("[Auth] Login error:", error);
