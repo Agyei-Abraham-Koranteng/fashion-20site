@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { useCart } from "@/context/CartContext";
 import { Trash2, ChevronRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
