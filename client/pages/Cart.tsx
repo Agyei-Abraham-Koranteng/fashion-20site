@@ -1,12 +1,22 @@
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { useCart } from "@/context/CartContext";
 import { Trash2, ChevronRight } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 
 export default function Cart() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    if (!user) {
+      toast.info("Please sign in to proceed to checkout");
+      navigate("/login?redirect=/checkout");
+      return;
+    }
+    navigate("/checkout");
+  };
 
   if (items.length === 0) {
     return (
@@ -196,7 +206,7 @@ export default function Cart() {
               </div>
 
               <button
-                onClick={() => navigate("/checkout")}
+                onClick={handleCheckout}
                 className="btn-primary w-full flex items-center justify-center gap-2 mb-3"
               >
                 Proceed to Checkout

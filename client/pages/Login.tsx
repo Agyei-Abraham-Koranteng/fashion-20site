@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function Login() {
   const { login, user, loading: authLoading } = useAuth();
@@ -21,7 +21,6 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  // Validate form
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
 
@@ -43,26 +42,12 @@ export default function Login() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     setIsSubmitting(true);
     try {
       await login(email.trim().toLowerCase(), password);
-      toast.custom((t) => (
-        <motion.div
-          initial={{ opacity: 0, y: -50, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="flex items-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-5 py-3 rounded-xl shadow-xl"
-        >
-          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <span className="font-medium">Welcome back!</span>
-        </motion.div>
-      ), { duration: 3000 });
+      toast.success("Welcome back!");
     } catch (err: any) {
       toast.error(err.message || "Invalid email or password");
     } finally {
@@ -70,7 +55,6 @@ export default function Login() {
     }
   };
 
-  // Redirect if already logged in
   useEffect(() => {
     if (authLoading) return;
     if (user) {
@@ -86,33 +70,38 @@ export default function Login() {
   }, [user, authLoading, navigate, params]);
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
-        >
-          {/* Logo/Brand */}
-          <Link to="/" className="inline-block mb-8">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">MadeInFashion</h1>
-          </Link>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 sm:p-12">
+      {/* Brand Logo */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <Link to="/" className="text-3xl font-serif font-bold tracking-tight text-gray-900 hover:opacity-80 transition-opacity">
+          MadeInFashion
+        </Link>
+      </motion.div>
 
+      {/* Login Card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className="w-full max-w-[450px] bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden"
+      >
+        <div className="p-8 sm:p-10">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h2>
-            <p className="text-gray-600">Enter your credentials to access your account</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign in</h2>
+            <p className="text-gray-500 text-sm">Access your exclusive fashion profile</p>
           </div>
 
-          <form onSubmit={onSubmit} className="space-y-5">
-            {/* Email Field */}
+          <form onSubmit={onSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-gray-500">
                 Email Address
               </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <div className="relative group">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-gray-900 transition-colors" />
                 <Input
                   id="email"
                   type="email"
@@ -122,35 +111,23 @@ export default function Login() {
                     if (errors.email) setErrors({ ...errors, email: undefined });
                   }}
                   placeholder="you@example.com"
-                  className={`pl-10 h-12 ${errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  className={`pl-10 h-12 bg-gray-50/50 border-gray-200 focus:bg-white transition-all ${errors.email ? "border-red-500 ring-red-100" : ""}`}
                 />
               </div>
-              {errors.email && (
-                <motion.p
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-sm text-red-500"
-                >
-                  {errors.email}
-                </motion.p>
-              )}
+              {errors.email && <p className="text-xs text-red-500 mt-1 font-medium">{errors.email}</p>}
             </div>
 
-            {/* Password Field */}
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-gray-500">
                   Password
                 </Label>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-primary hover:underline font-medium"
-                >
-                  Forgot password?
+                <Link to="/forgot-password" title="Recover account" className="text-xs font-bold text-gray-900 hover:underline">
+                  Forgot?
                 </Link>
               </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <div className="relative group">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-gray-900 transition-colors" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -160,105 +137,66 @@ export default function Login() {
                     if (errors.password) setErrors({ ...errors, password: undefined });
                   }}
                   placeholder="••••••••"
-                  className={`pl-10 pr-10 h-12 ${errors.password ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  className={`pl-10 pr-10 h-12 bg-gray-50/50 border-gray-200 focus:bg-white transition-all ${errors.password ? "border-red-500 ring-red-100" : ""}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors px-1"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password && (
-                <motion.p
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-sm text-red-500"
-                >
-                  {errors.password}
-                </motion.p>
-              )}
+              {errors.password && <p className="text-xs text-red-500 mt-1 font-medium">{errors.password}</p>}
             </div>
 
-            {/* Remember Me */}
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="remember"
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                className="border-gray-300 rounded-sm"
               />
-              <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer">
-                Remember me for 30 days
+              <label htmlFor="remember" className="text-sm text-gray-500 cursor-pointer select-none">
+                Stay signed in
               </label>
             </div>
 
-            {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full h-12 text-base font-semibold bg-gray-900 hover:bg-gray-800"
+              className="w-full h-12 text-sm font-bold bg-gray-900 hover:bg-black text-white rounded-xl transition-all active:scale-[0.98]"
               disabled={isSubmitting}
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                <>
-                  Sign in
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </>
-              )}
+              {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Continue"}
             </Button>
           </form>
 
-          {/* Sign Up Link */}
-          <p className="mt-8 text-center text-gray-600">
-            Don't have an account?{" "}
-            <Link to="/signup" className="font-semibold text-primary hover:underline">
-              Create an account
-            </Link>
-          </p>
-        </motion.div>
-      </div>
-
-      {/* Right Side - Image/Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200')] bg-cover bg-center opacity-30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
-
-        <div className="relative z-10 flex flex-col justify-end p-12 text-white">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-          >
-            <h2 className="text-4xl font-bold mb-4">
-              Elevate Your Style
-            </h2>
-            <p className="text-lg text-gray-300 max-w-md">
-              Discover curated collections that define modern elegance. Join thousands of fashion enthusiasts who trust us for premium quality.
+          <div className="mt-8 pt-8 border-t border-gray-100 text-center">
+            <p className="text-sm text-gray-500">
+              New to MadeInFashion?{" "}
+              <Link to="/signup" className="font-bold text-gray-900 hover:underline">
+                Create an account
+              </Link>
             </p>
-            <div className="flex items-center gap-6 mt-8">
-              <div className="text-center">
-                <p className="text-3xl font-bold">10K+</p>
-                <p className="text-sm text-gray-400">Happy Customers</p>
-              </div>
-              <div className="w-px h-12 bg-gray-700" />
-              <div className="text-center">
-                <p className="text-3xl font-bold">500+</p>
-                <p className="text-sm text-gray-400">Premium Products</p>
-              </div>
-              <div className="w-px h-12 bg-gray-700" />
-              <div className="text-center">
-                <p className="text-3xl font-bold">4.9★</p>
-                <p className="text-sm text-gray-400">Customer Rating</p>
-              </div>
-            </div>
-          </motion.div>
+          </div>
         </div>
+
+        {/* Footer info in card */}
+        <div className="bg-gray-50 p-6 border-t border-gray-100 flex items-center justify-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+          <ShieldCheck className="h-3 w-3" />
+          Secure Fashion Checkout
+        </div>
+      </motion.div>
+
+      {/* Bottom Legal Links */}
+      <div className="mt-12 flex gap-6 text-xs text-gray-400">
+        <Link to="/terms" className="hover:text-gray-900 transition-colors">Terms of Use</Link>
+        <Link to="/privacy" className="hover:text-gray-900 transition-colors">Privacy Notice</Link>
+        <Link to="/faq" className="hover:text-gray-900 transition-colors">Help</Link>
       </div>
+      <p className="mt-4 text-[10px] text-gray-300 uppercase tracking-widest font-bold">
+        © 2025 MadeInFashion. All Rights Reserved.
+      </p>
     </div>
   );
 }

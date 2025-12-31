@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Eye, EyeOff, Loader2, Mail, Lock, User, ArrowRight, Check, X } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, User, ArrowRight, Check, X, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function SignUp() {
@@ -26,7 +26,6 @@ export default function SignUp() {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [success, setSuccess] = useState(false);
 
-    // Password strength check
     const getPasswordStrength = (password: string) => {
         let strength = 0;
         if (password.length >= 6) strength++;
@@ -88,7 +87,6 @@ export default function SignUp() {
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
         if (!validateForm()) return;
 
         setIsSubmitting(true);
@@ -102,7 +100,6 @@ export default function SignUp() {
         }
     };
 
-    // Redirect if already logged in
     useEffect(() => {
         if (authLoading) return;
         if (user) {
@@ -110,33 +107,29 @@ export default function SignUp() {
         }
     }, [user, authLoading, navigate]);
 
-    // Success state
     if (success) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="bg-white rounded-2xl shadow-xl p-10 max-w-md w-full text-center"
+                    className="bg-white rounded-2xl shadow-xl p-10 max-w-md w-full text-center border border-gray-100"
                 >
                     <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                        className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
+                        className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6"
                     >
                         <Check className="w-10 h-10 text-green-600" />
                     </motion.div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-3">Account Created!</h2>
-                    <p className="text-gray-600 mb-6">
-                        Welcome to MadeInFashion! Your account has been created successfully.
-                    </p>
-                    <p className="text-sm text-gray-500 mb-8">
-                        You can now sign in with your email and password.
+                    <h2 className="text-2xl font-bold text-gray-900 mb-3 font-serif">Account Created!</h2>
+                    <p className="text-gray-500 mb-8">
+                        Welcome to MadeInFashion. Your exclusive style journey begins now.
                     </p>
                     <Link to="/login">
-                        <Button className="w-full h-12 bg-gray-900 hover:bg-gray-800">
-                            Back to Sign In
+                        <Button className="w-full h-12 bg-gray-900 hover:bg-black font-bold rounded-xl transition-all">
+                            Sign in to your account
                         </Button>
                     </Link>
                 </motion.div>
@@ -145,138 +138,93 @@ export default function SignUp() {
     }
 
     return (
-        <div className="min-h-screen flex">
-            {/* Left Side - Image/Branding */}
-            <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-primary/90 to-primary/80 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200')] bg-cover bg-center opacity-20" />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent" />
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 sm:p-12">
+            {/* Brand Logo */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-8"
+            >
+                <Link to="/" className="text-3xl font-serif font-bold tracking-tight text-gray-900 hover:opacity-80 transition-opacity">
+                    MadeInFashion
+                </Link>
+            </motion.div>
 
-                <div className="relative z-10 flex flex-col justify-center p-12 text-white">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3, duration: 0.6 }}
-                    >
-                        <h2 className="text-4xl font-bold mb-4">
-                            Join Our Community
-                        </h2>
-                        <p className="text-lg text-white/80 max-w-md mb-8">
-                            Create an account to unlock exclusive benefits, track your orders, and stay updated with the latest collections.
-                        </p>
-
-                        <div className="space-y-4">
-                            {[
-                                "Exclusive member discounts",
-                                "Early access to new arrivals",
-                                "Order tracking & history",
-                                "Personalized recommendations",
-                            ].map((benefit, i) => (
-                                <motion.div
-                                    key={benefit}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.5 + i * 0.1 }}
-                                    className="flex items-center gap-3"
-                                >
-                                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                                        <Check className="w-4 h-4" />
-                                    </div>
-                                    <span>{benefit}</span>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </motion.div>
-                </div>
-            </div>
-
-            {/* Right Side - Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-8 bg-white overflow-y-auto">
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="w-full max-w-md"
-                >
-                    {/* Logo/Brand */}
-                    <Link to="/" className="inline-block mb-6">
-                        <h1 className="text-2xl font-bold tracking-tight text-gray-900">MadeInFashion</h1>
-                    </Link>
-
-                    <div className="mb-6">
-                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Create your account</h2>
-                        <p className="text-gray-600">Start your fashion journey today</p>
+            {/* Signup Card */}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4 }}
+                className="w-full max-w-[500px] bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden"
+            >
+                <div className="p-8 sm:p-10">
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h2>
+                        <p className="text-gray-500 text-sm">Join the elite fashion community</p>
                     </div>
 
-                    <form onSubmit={onSubmit} className="space-y-4">
-                        {/* Full Name */}
-                        <div className="space-y-1.5">
-                            <Label htmlFor="fullName" className="text-sm font-medium text-gray-700">
+                    <form onSubmit={onSubmit} className="space-y-5">
+                        <div className="space-y-2">
+                            <Label htmlFor="fullName" className="text-xs font-bold uppercase tracking-wider text-gray-500">
                                 Full Name
                             </Label>
-                            <div className="relative">
-                                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                            <div className="relative group">
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-gray-900 transition-colors" />
                                 <Input
                                     id="fullName"
                                     type="text"
                                     value={formData.fullName}
                                     onChange={(e) => handleChange("fullName", e.target.value)}
                                     placeholder="John Doe"
-                                    className={cn("pl-10 h-11", errors.fullName && "border-red-500")}
+                                    className={cn("pl-10 h-11 bg-gray-50/50 border-gray-200 focus:bg-white transition-all", errors.fullName && "border-red-500 ring-red-100")}
                                 />
                             </div>
-                            {errors.fullName && (
-                                <p className="text-sm text-red-500">{errors.fullName}</p>
-                            )}
+                            {errors.fullName && <p className="text-xs text-red-500 mt-1 font-medium">{errors.fullName}</p>}
                         </div>
 
-                        {/* Email */}
-                        <div className="space-y-1.5">
-                            <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                        <div className="space-y-2">
+                            <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-gray-500">
                                 Email Address
                             </Label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                            <div className="relative group">
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-gray-900 transition-colors" />
                                 <Input
                                     id="email"
                                     type="email"
                                     value={formData.email}
                                     onChange={(e) => handleChange("email", e.target.value)}
                                     placeholder="you@example.com"
-                                    className={cn("pl-10 h-11", errors.email && "border-red-500")}
+                                    className={cn("pl-10 h-11 bg-gray-50/50 border-gray-200 focus:bg-white transition-all", errors.email && "border-red-500 ring-red-100")}
                                 />
                             </div>
-                            {errors.email && (
-                                <p className="text-sm text-red-500">{errors.email}</p>
-                            )}
+                            {errors.email && <p className="text-xs text-red-500 mt-1 font-medium">{errors.email}</p>}
                         </div>
 
-                        {/* Password */}
-                        <div className="space-y-1.5">
-                            <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                        <div className="space-y-2">
+                            <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-gray-500">
                                 Password
                             </Label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                            <div className="relative group">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-gray-900 transition-colors" />
                                 <Input
                                     id="password"
                                     type={showPassword ? "text" : "password"}
                                     value={formData.password}
                                     onChange={(e) => handleChange("password", e.target.value)}
                                     placeholder="••••••••"
-                                    className={cn("pl-10 pr-10 h-11", errors.password && "border-red-500")}
+                                    className={cn("pl-10 pr-10 h-11 bg-gray-50/50 border-gray-200 focus:bg-white transition-all", errors.password && "border-red-500 ring-red-100")}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors px-1"
                                 >
-                                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
                             </div>
 
-                            {/* Password Strength */}
                             {formData.password && (
-                                <div className="space-y-2 mt-2">
+                                <div className="space-y-3 mt-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
                                     <div className="flex gap-1">
                                         {[...Array(5)].map((_, i) => (
                                             <div
@@ -288,13 +236,12 @@ export default function SignUp() {
                                             />
                                         ))}
                                     </div>
-                                    <p className={cn("text-xs", passwordStrength >= 4 ? "text-green-600" : "text-gray-500")}>
-                                        {strengthLabels[passwordStrength - 1] || "Enter password"}
+                                    <p className={cn("text-[10px] font-bold uppercase tracking-widest", passwordStrength >= 4 ? "text-green-600" : "text-gray-400")}>
+                                        Strength: {strengthLabels[passwordStrength - 1] || "None"}
                                     </p>
-
-                                    <div className="grid grid-cols-2 gap-1 text-xs">
+                                    <div className="grid grid-cols-2 gap-2 text-[10px] uppercase font-bold tracking-tight">
                                         {passwordRequirements.map((req) => (
-                                            <div key={req.label} className={cn("flex items-center gap-1", req.met ? "text-green-600" : "text-gray-400")}>
+                                            <div key={req.label} className={cn("flex items-center gap-1.5", req.met ? "text-green-600" : "text-gray-400")}>
                                                 {req.met ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                                                 {req.label}
                                             </div>
@@ -302,34 +249,28 @@ export default function SignUp() {
                                     </div>
                                 </div>
                             )}
-                            {errors.password && (
-                                <p className="text-sm text-red-500">{errors.password}</p>
-                            )}
+                            {errors.password && <p className="text-xs text-red-500 mt-1 font-medium">{errors.password}</p>}
                         </div>
 
-                        {/* Confirm Password */}
-                        <div className="space-y-1.5">
-                            <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+                        <div className="space-y-2">
+                            <Label htmlFor="confirmPassword" className="text-xs font-bold uppercase tracking-wider text-gray-500">
                                 Confirm Password
                             </Label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                            <div className="relative group">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-gray-900 transition-colors" />
                                 <Input
                                     id="confirmPassword"
                                     type={showPassword ? "text" : "password"}
                                     value={formData.confirmPassword}
                                     onChange={(e) => handleChange("confirmPassword", e.target.value)}
                                     placeholder="••••••••"
-                                    className={cn("pl-10 h-11", errors.confirmPassword && "border-red-500")}
+                                    className={cn("pl-10 h-11 bg-gray-50/50 border-gray-200 focus:bg-white transition-all", errors.confirmPassword && "border-red-500 ring-red-100")}
                                 />
                             </div>
-                            {errors.confirmPassword && (
-                                <p className="text-sm text-red-500">{errors.confirmPassword}</p>
-                            )}
+                            {errors.confirmPassword && <p className="text-xs text-red-500 mt-1 font-medium">{errors.confirmPassword}</p>}
                         </div>
 
-                        {/* Terms */}
-                        <div className="flex items-start space-x-2">
+                        <div className="flex items-start space-x-2 pt-2">
                             <Checkbox
                                 id="terms"
                                 checked={agreedToTerms}
@@ -337,48 +278,49 @@ export default function SignUp() {
                                     setAgreedToTerms(checked as boolean);
                                     if (errors.terms) setErrors({ ...errors, terms: "" });
                                 }}
-                                className="mt-1"
+                                className="mt-0.5 border-gray-300 rounded-sm"
                             />
-                            <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
-                                I agree to the{" "}
-                                <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
-                                {" "}and{" "}
-                                <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                            <label htmlFor="terms" className="text-xs text-gray-500 cursor-pointer leading-relaxed">
+                                I agree to the <Link to="/terms" className="text-gray-900 font-bold hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-gray-900 font-bold hover:underline">Privacy Policy</Link>
                             </label>
                         </div>
-                        {errors.terms && (
-                            <p className="text-sm text-red-500">{errors.terms}</p>
-                        )}
+                        {errors.terms && <p className="text-xs text-red-500 mt-1 font-medium text-center">{errors.terms}</p>}
 
-                        {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="w-full h-12 text-base font-semibold bg-gray-900 hover:bg-gray-800"
+                            className="w-full h-12 text-sm font-bold bg-gray-900 hover:bg-black text-white rounded-xl transition-all active:scale-[0.98] mt-4"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                    Creating account...
-                                </>
-                            ) : (
-                                <>
-                                    Create Account
-                                    <ArrowRight className="ml-2 h-5 w-5" />
-                                </>
-                            )}
+                            {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Create Account"}
                         </Button>
                     </form>
 
-                    {/* Login Link */}
-                    <p className="mt-6 text-center text-gray-600">
-                        Already have an account?{" "}
-                        <Link to="/login" className="font-semibold text-primary hover:underline">
-                            Sign in
-                        </Link>
-                    </p>
-                </motion.div>
+                    <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                        <p className="text-sm text-gray-500">
+                            Already have an account?{" "}
+                            <Link to="/login" className="font-bold text-gray-900 hover:underline">
+                                Sign in
+                            </Link>
+                        </p>
+                    </div>
+                </div>
+
+                {/* Footer info in card */}
+                <div className="bg-gray-50 p-6 border-t border-gray-100 flex items-center justify-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                    <ShieldCheck className="h-3 w-3" />
+                    Secure Member Registration
+                </div>
+            </motion.div>
+
+            {/* Bottom Legal Links */}
+            <div className="mt-12 flex gap-6 text-xs text-gray-400">
+                <Link to="/terms" className="hover:text-gray-900 transition-colors">Terms of Use</Link>
+                <Link to="/privacy" className="hover:text-gray-900 transition-colors">Privacy Notice</Link>
+                <Link to="/faq" className="hover:text-gray-900 transition-colors">Help</Link>
             </div>
+            <p className="mt-4 text-[10px] text-gray-300 uppercase tracking-widest font-bold">
+                © 2025 MadeInFashion. All Rights Reserved.
+            </p>
         </div>
     );
 }
