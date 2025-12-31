@@ -20,7 +20,7 @@ import {
   Store
 } from "lucide-react";
 import { useState } from "react";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "../context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
