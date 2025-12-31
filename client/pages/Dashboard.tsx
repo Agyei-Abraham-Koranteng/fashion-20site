@@ -164,7 +164,7 @@ export default function UserDashboard() {
                                     <h3 className="font-serif text-2xl font-bold leading-tight">Need help with an order?</h3>
                                     <p className="text-gray-400 mt-3 text-sm leading-relaxed">Our fashion consultants are available 24/7 to assist you with sizing and styling.</p>
                                     <Link to="/contact">
-                                        <Button variant="outline" className="mt-6 border-white/20 hover:bg-white hover:text-black rounded-full transition-all">
+                                        <Button className="mt-6 bg-white text-black hover:bg-gray-100 rounded-full transition-all border-none font-bold">
                                             Contact Concierge
                                         </Button>
                                     </Link>

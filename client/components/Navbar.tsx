@@ -42,10 +42,6 @@ const categories = [
 
 const brandLinks = [
   { name: "About Us", href: "/about", desc: "Our story and mission", icon: User },
-  { name: "Sustainability", href: "/sustainability", desc: "Our commitment to the planet", icon: Leaf },
-  { name: "Blog", href: "/blog", desc: "Latest news and style tips", icon: MessageSquare },
-  { name: "Careers", href: "/careers", desc: "Join our growing team", icon: Briefcase },
-  { name: "Press", href: "/press", desc: "Media and announcements", icon: Newspaper },
 ];
 
 const supportLinks = [
@@ -369,7 +365,7 @@ export default function Navbar() {
                   <Sparkles size={16} className="text-accent" />
                   <span>PREMIUM FASHION EXPERIENCE</span>
                 </div>
-                <p className="text-xs text-muted-foreground tracking-widest uppercase">© 2024 LUXE ATELIER</p>
+                <p className="text-xs text-muted-foreground tracking-widest uppercase">© 2025 LUXE ATELIER</p>
               </motion.div>
             </div>
           </motion.div>

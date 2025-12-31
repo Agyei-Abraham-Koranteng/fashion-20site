@@ -28,10 +28,6 @@ const footerSections = [
     title: "About",
     links: [
       { name: "About Us", href: "/about" },
-      { name: "Careers", href: "#" },
-      { name: "Press", href: "#" },
-      { name: "Blog", href: "#" },
-      { name: "Sustainability", href: "#" },
     ],
   },
   {
@@ -39,7 +35,7 @@ const footerSections = [
     links: [
       { name: "Privacy Policy", href: "/privacy" },
       { name: "Terms of Service", href: "/terms" },
-      { name: "Cookie Policy", href: "#" },
+      { name: "Cookie Policy", href: "/cookies" },
     ],
   },
 ];
@@ -171,20 +167,8 @@ export default function Footer() {
         {/* Copyright */}
         <div className="border-t border-primary-foreground/20 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/70">
-            <p>&copy; 2024 MadeInFashion. All rights reserved.</p>
+            <p>&copy; 2025 MadeInFashion. All rights reserved.</p>
             <div className="flex gap-6">
-              <a
-                href="#"
-                className="hover:text-primary-foreground transition-colors"
-              >
-                Accessibility
-              </a>
-              <a
-                href="#"
-                className="hover:text-primary-foreground transition-colors"
-              >
-                Sitemap
-              </a>
             </div>
           </div>
         </div>
