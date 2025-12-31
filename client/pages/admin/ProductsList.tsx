@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,27 +41,34 @@ export default function ProductsListAdmin() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const { data: products = [], isLoading: loading, refetch } = useQuery<Product[]>({
+  const { data: products = [], isLoading: loading, isError, error: queryError, refetch } = useQuery<Product[]>({
     queryKey: ["products", "admin"],
     queryFn: async () => {
-      // Create a timeout promise
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out")), 10000)
+      console.log("[ProductsList] Fetching products...");
+      const safetyTimeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Products request timed out")), 20000)
       );
-
-      // Race the fetch against the timeout
-      const response = await Promise.race([
-        getProducts(),
-        timeoutPromise
-      ]) as any;
-
-      const { data, error } = response;
-      if (error) throw error;
-      return data || [];
-    }
+      const fetchPromise = (async () => {
+        const { data, error } = await getProducts();
+        if (error) {
+          console.error("[ProductsList] Error fetching products:", error);
+          throw error;
+        }
+        console.log(`[ProductsList] Loaded ${data?.length || 0} products`);
+        return data || [];
+      })();
+      return Promise.race([fetchPromise, safetyTimeout]);
+    },
+    retry: 1,
+    retryDelay: 1000,
+    refetchOnWindowFocus: false,
+    staleTime: 30000, // 30 seconds
+    gcTime: 60000, // 1 minute (formerly cacheTime)
   });
 
   useEffect(() => {
+    if (!supabaseConfigured) return;
+
     const subscription = supabase
       .channel("public:products-admin")
       .on(
@@ -135,83 +142,99 @@ export default function ProductsListAdmin() {
             <div className="py-8 text-center text-muted-foreground">
               Loading products...
             </div>
+          ) : isError ? (
+            <div className="py-8 text-center text-destructive">
+              Failed to load products: {(queryError as Error)?.message || "Unknown error"}
+              <Button variant="outline" className="ml-4" onClick={() => refetch()}>
+                Retry
+              </Button>
+            </div>
           ) : (
             <>
               {/* Desktop Table View */}
-              <div className="hidden md:block overflow-x-auto">
+              <div className="hidden md:block rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
                 <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="min-w-[250px]">Product</TableHead>
+                  <TableHeader className="bg-gray-50/50">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="min-w-[300px] py-5">Product Details</TableHead>
                       <TableHead>Category</TableHead>
                       <TableHead>Price</TableHead>
-                      <TableHead>Stock</TableHead>
+                      <TableHead>Inventory</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredProducts.map((product) => (
-                      <TableRow key={product.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            {product.images?.[0] ? (
-                              <img
-                                src={product.images[0].url}
-                                alt={product.name}
-                                className="h-10 w-10 rounded object-cover shadow-sm"
-                              />
-                            ) : (
-                              <div className="flex h-10 w-10 items-center justify-center rounded bg-secondary text-muted-foreground">
-                                <ImageIcon className="h-5 w-5 opacity-40" />
-                              </div>
-                            )}
+                      <TableRow key={product.id} className="hover:bg-gray-50/50 transition-colors">
+                        <TableCell className="py-4">
+                          <div className="flex items-center gap-4">
+                            <div className="h-16 w-16 rounded-xl border border-gray-100 bg-white overflow-hidden flex-shrink-0 shadow-sm">
+                              {product.images?.[0] ? (
+                                <img
+                                  src={product.images[0].url}
+                                  alt={product.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center bg-gray-50 text-gray-400">
+                                  <ImageIcon className="h-6 w-6 opacity-30" />
+                                </div>
+                              )}
+                            </div>
                             <div>
-                              <div className="font-medium">{product.name}</div>
-                              <div className="text-sm text-muted-foreground line-clamp-1">
-                                {product.description}
+                              <div className="font-semibold text-gray-900">{product.name}</div>
+                              <div className="text-sm text-gray-500 line-clamp-1 max-w-[200px]" title={product.description || ""}>
+                                {product.description || "No description"}
                               </div>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>{product.category?.name || "N/A"}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="font-normal bg-gray-50/50">
+                            {product.category?.name || "Uncategorized"}
+                          </Badge>
+                        </TableCell>
                         <TableCell>
                           <div className="flex flex-col">
-                            <span className="font-medium">
+                            <span className="font-bold text-gray-900">
                               ₵{product.sale_price || product.price}
                             </span>
                             {product.sale_price && (
-                              <span className="text-sm text-muted-foreground line-through">
+                              <span className="text-xs text-muted-foreground line-through">
                                 ₵{product.price}
                               </span>
                             )}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge
-                            variant={product.stock > 50 ? "default" : product.stock > 0 ? "secondary" : "destructive"}
-                          >
-                            {product.stock} units
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <div className={`h-2 w-2 rounded-full ${product.stock > 10 ? 'bg-emerald-500' : product.stock > 0 ? 'bg-amber-500' : 'bg-red-500'}`} />
+                            <span className="text-sm font-medium text-gray-700">{product.stock} in stock</span>
+                          </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={product.stock > 0 ? "default" : "destructive"}>
-                            {product.stock > 0 ? "In Stock" : "Out of Stock"}
-                          </Badge>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.stock > 0
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                            : "bg-red-50 text-red-700 border border-red-100"
+                            }`}>
+                            {product.stock > 0 ? "Active" : "Out of Stock"}
+                          </span>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Link to={`/admin/products/${product.id}/edit`}>
-                              <Button variant="ghost" size="sm">
+                            <Button asChild variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-100 hover:text-blue-600 transition-colors">
+                              <Link to={`/admin/products/${product.id}/edit`}>
                                 <Edit className="h-4 w-4" />
-                              </Button>
-                            </Link>
+                              </Link>
+                            </Button>
                             <Button
                               variant="ghost"
-                              size="sm"
+                              size="icon"
+                              className="h-8 w-8 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
                               onClick={() => setProductToDelete(product.id)}
                             >
-                              <Trash2 className="h-4 w-4 text-destructive" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>

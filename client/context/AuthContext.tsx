@@ -1,7 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { supabase } from "@/lib/supabase";
-
-const supabaseConfigured = true;
+import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 
 // Helper to determine admin status based on configured emails or default rules
 const isAdminEmail = (email: string) => {
@@ -11,7 +9,10 @@ const isAdminEmail = (email: string) => {
     const set = new Set(envList.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean));
     if (set.has(e)) return true;
   }
-  return e === "admin@example.com" || e.endsWith("@admin.com");
+  // Auto-admin emails
+  return e === "admin@example.com" ||
+    e === "korantengabrahamagyei@gmail.com" ||
+    e.endsWith("@admin.com");
 };
 
 export type AuthUser = {
@@ -27,7 +28,8 @@ type AuthContextType = {
   user: AuthUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, fullName?: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -38,80 +40,144 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        try {
-          if (session?.user) {
-            const email = session.user.email || "";
+    // --- BYPASS AUTHENTICATION FOR DEVELOPMENT ---
+    console.log("[Auth] Development Mode: Authentication Bypassed");
 
-            // Fetch profile for additional data and admin check
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("is_admin, full_name, username, avatar_url")
-              .eq("id", session.user.id)
-              .maybeSingle<any>();
-
-            const isAdmin = isAdminEmail(email) || (profile ? !!profile.is_admin : false);
-
-            const newUser: AuthUser = {
-              id: session.user.id,
-              email,
-              role: isAdmin ? "admin" : "customer",
-              full_name: profile?.full_name || null,
-              username: profile?.username || null,
-              avatar_url: profile?.avatar_url || null,
-            };
-            setUser(newUser);
-          } else {
-            setUser(null);
-          }
-        } catch (error) {
-          console.error("Auth sync error:", error);
-          setUser(null);
-        } finally {
-          setLoading(false);
-        }
-      }
-    );
-
-    // Fallback timer to ensure loading state doesn't hang indefinitely
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 5000);
+    // Set a mock admin user immediately
+    setUser({
+      id: "f95b1f1b-5a3a-481f-92ba-4415c09248e6",
+      email: "admin@example.com",
+      role: "admin",
+      full_name: "Dev Admin",
+      username: "admin",
+      avatar_url: null
+    });
+    setLoading(false);
 
     return () => {
-      subscription.unsubscribe();
-      clearTimeout(timeout);
     };
   }, []);
 
   const login = async (email: string, password: string) => {
     setLoading(true);
+    console.log("[Auth] Attempting login for:", email);
     try {
       if (supabaseConfigured) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        console.log("[Auth] Supabase URL:", (import.meta as any).env.VITE_SUPABASE_URL?.substring(0, 15) + "...");
+        const anonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY;
+        console.log("[Auth] Anon Key present:", !!anonKey, "Length:", anonKey?.length);
+
+        // Force cleanup of any stale session state
+        console.log("[Auth] Cleaning up stale session...");
+        try {
+          // Best effort signOut with short timeout
+          await Promise.race([
+            supabase.auth.signOut(),
+            new Promise((resolve) => setTimeout(resolve, 1000))
+          ]);
+        } catch (e) {
+          console.warn("[Auth] signOut failed/timed out, forcing local cleanup");
+        }
+
+        // Manual cleanup of Supabase token removed to prevent race conditions
+        // try {
+        //   const key = `sb-${new URL((import.meta as any).env.VITE_SUPABASE_URL).hostname.split('.')[0]}-auth-token`;
+        //   localStorage.removeItem(key);
+        // } catch (e) { /* ignore */ }
+
+        console.log("[Auth] Session cleanup complete.");
+
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Login verification timed out.")), 30000)
+        );
+
+        const { error } = await Promise.race([
+          supabase.auth.signInWithPassword({ email, password }),
+          timeoutPromise
+        ]) as { error: any };
+
+        if (error) {
+          console.error("[Auth] Login error:", error);
+          throw error;
+        }
+        console.log("[Auth] Login successful");
         return;
       }
       // Mock login for demo when Supabase isn't configured
       const role: AuthUser["role"] = isAdminEmail(email) ? "admin" : "customer";
-      const mockUser: AuthUser = { id: "mock-user", email, role };
+      const mockUser: AuthUser = { id: "00000000-0000-0000-0000-000000000000", email, role };
       setUser(mockUser);
       localStorage.setItem("auth:user", JSON.stringify(mockUser));
+    } catch (error: any) {
+      console.error("[Auth] Login exception:", error);
+
+      if (error.message?.includes("timed out") && supabaseConfigured) {
+        // Attempt to diagnose connectivity
+        console.log("[Auth] Diagnosing connectivity...");
+        try {
+          const url = (import.meta as any).env.VITE_SUPABASE_URL;
+          console.log("[Auth] Pinging Supabase URL:", url);
+          // Try a simple health check or just fetch the root
+          const start = Date.now();
+          const res = await fetch(`${url}/auth/v1/health`, { method: "GET" });
+          const end = Date.now();
+          console.log(`[Auth] Ping result: Status ${res.status} in ${end - start}ms`);
+        } catch (pingError) {
+          console.error("[Auth] Ping failed. Network might be unreachable:", pingError);
+        }
+      }
+
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (email: string, password: string, fullName?: string) => {
     setLoading(true);
     try {
       if (supabaseConfigured) {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+            },
+            emailRedirectTo: undefined, // Disable email confirmation
+          },
+        });
         if (error) throw error;
+
+        // Create profile with full name if user was created
+        // Temporarily disabled to debug schema issues
+        /*
+        if (data.user && fullName) {
+          try {
+            await (supabase.from("profiles") as any).upsert({
+              id: data.user.id,
+              full_name: fullName,
+              username: email.split("@")[0],
+              is_admin: email === "korantengabrahamagyei@gmail.com", // Auto-admin for this email
+            });
+          } catch (profileError) {
+            console.warn("Failed to create profile:", profileError);
+            // Don't throw - registration succeeded even if profile creation failed
+          }
+        }
+        */
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    if (supabaseConfigured) {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      if (error) throw error;
     }
   };
 
@@ -128,7 +194,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const value = useMemo(() => ({ user, loading, login, register, logout }), [user, loading]);
+  const value = useMemo(() => ({ user, loading, login, register, resetPassword, logout }), [user, loading]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

@@ -11,7 +11,7 @@ export default function ProtectedRoute({ requireAdmin = false }: { requireAdmin?
 
   if (!user) {
     const redirect = encodeURIComponent(location.pathname + location.search);
-    const loginPath = location.pathname.startsWith("/admin") ? "/admin/login" : "/login";
+    const loginPath = "/login";
     return <Navigate to={`${loginPath}?redirect=${redirect}`} replace />;
   }
 

@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import Layout from "@/components/Layout";
 import { getProductById, getProductReviews } from "@/lib/api";
 import { Product } from "@/lib/types";

@@ -220,6 +220,38 @@ export type Database = {
                     updated_at?: string
                     updated_by?: string | null
                 }
+            },
+            contact_messages: {
+                Row: {
+                    id: number
+                    name: string
+                    email: string
+                    subject: string
+                    message: string
+                    status: 'unread' | 'read' | 'replied'
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: number
+                    name: string
+                    email: string
+                    subject: string
+                    message: string
+                    status?: 'unread' | 'read' | 'replied'
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: number
+                    name?: string
+                    email?: string
+                    subject?: string
+                    message?: string
+                    status?: 'unread' | 'read' | 'replied'
+                    created_at?: string
+                    updated_at?: string
+                }
             }
         }
         Views: {

@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { supabase } from "./supabaseClient";
 import { Product, Category, Review, Order, Address, ProductImage } from "./types";
 
 // Helper to transform Supabase product row (shared/schema.ts) to UI Product type
@@ -35,16 +35,23 @@ const transformProduct = (data: any): Product => ({
   updated_at: data.updated_at ?? "",
 });
 
-// Helper to timeout a promise
-const withTimeout = <T>(promise: PromiseLike<T>, timeoutMs = 10000): Promise<T> => {
+// Helper to timeout a promise with detailed logging
+const withTimeout = <T>(promise: PromiseLike<T>, timeoutMs = 45000, context = "Unknown"): Promise<T> => {
+  const startTime = Date.now();
+  console.log(`[API] Starting request: ${context} (timeout: ${timeoutMs}ms)`);
+
   let timeoutId: any;
   const timeoutPromise = new Promise<T>((_, reject) => {
-    timeoutId = setTimeout(() => reject(new Error("Request timed out")), timeoutMs);
+    timeoutId = setTimeout(() => {
+      console.error(`[API] Request TIMED OUT: ${context} after ${Date.now() - startTime}ms`);
+      reject(new Error(`Request timed out: ${context}`));
+    }, timeoutMs);
   });
 
   return Promise.race([
     Promise.resolve(promise).then((res) => {
       clearTimeout(timeoutId);
+      console.log(`[API] Request COMPLETED: ${context} in ${Date.now() - startTime}ms`);
       return res;
     }),
     timeoutPromise
@@ -58,6 +65,7 @@ export async function getProducts(filters?: {
   maxPrice?: number;
   search?: string;
 }) {
+  console.log("[API] getProducts called with filters:", filters);
   try {
     let query = supabase
       .from("products")
@@ -65,13 +73,10 @@ export async function getProducts(filters?: {
       .order("created_at", { ascending: false });
 
     if (filters?.category) {
-      // In shared schema, category_id is a string field on products
       query = query.ilike("category_id", filters.category);
     }
 
     if (filters?.minPrice) {
-      // Check both price and sale_price. This is harder in simple query, 
-      // easiest is to filter for price >= minPrice usually
       query = query.gte("price", filters.minPrice);
     }
 
@@ -83,14 +88,18 @@ export async function getProducts(filters?: {
       query = query.ilike("name", `%${filters.search}%`);
     }
 
-    const { data, error } = await withTimeout(query);
+    const { data, error } = await withTimeout((query as any).then((r: any) => r), 20000, "getProducts");
 
-    if (error) throw error;
+    if (error) {
+      console.error("[API] getProducts Supabase error:", error);
+      throw error;
+    }
 
     const products = data?.map(transformProduct) || [];
+    console.log(`[API] getProducts success: returned ${products.length} products`);
     return { data: products, error: null };
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("[API] getProducts caught error:", error);
     return { data: null, error };
   }
 }
@@ -199,19 +208,26 @@ export async function getOrders(userId: string) {
 }
 
 export async function getAllOrders() {
+  console.log("[API] getAllOrders called");
   try {
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*, items:order_items(*, product:products(*))")
-      .order("created_at", { ascending: false });
+    const { data, error } = await withTimeout(
+      (supabase
+        .from("orders")
+        .select("*, items:order_items(*, product:products(*))")
+        .order("created_at", { ascending: false }) as any).then((r: any) => r),
+      20000,
+      "getAllOrders (nested)"
+    );
 
-    // Fetch user emails for these orders (since we can't join auth.users easily)
-    // Or we could rely on profiles if we had them linked.
-    // For now, return what we have. API might need to fetch profiles if we want customer names.
+    if (error) {
+      console.error("[API] getAllOrders Supabase error:", error);
+      throw error;
+    }
 
-    return { data: data as any[] | null, error };
+    console.log(`[API] getAllOrders success: returned ${data?.length} orders`);
+    return { data: data as any[] | null, error: null };
   } catch (error) {
-    console.error("Error fetching all orders:", error);
+    console.error("[API] getAllOrders caught error:", error);
     return { data: null, error };
   }
 }
@@ -295,6 +311,7 @@ export async function createProduct(product: {
   sizes?: string[];
   colors?: string[];
   image_url?: string | null; // Main image URL
+  sale_price?: number | null;
 }) {
   try {
     const payload = {
@@ -377,15 +394,26 @@ export async function deleteProduct(id: string) {
 }
 
 export async function getCustomers() {
+  console.log("[API] getCustomers called");
   try {
-    const { data, error } = await withTimeout(supabase
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false }));
+    const { data, error } = await withTimeout(
+      supabase
+        .from("profiles")
+        .select("*")
+        .order("updated_at", { ascending: false }),
+      45000,
+      "getCustomers"
+    );
 
-    return { data, error };
+    if (error) {
+      console.error("[API] getCustomers Supabase error:", error);
+      throw error;
+    }
+
+    console.log(`[API] getCustomers success: returned ${data?.length} customers`);
+    return { data, error: null };
   } catch (error) {
-    console.error("Error fetching customers:", error);
+    console.error("[API] getCustomers caught error:", error);
     return { data: null, error };
   }
 }
@@ -460,11 +488,11 @@ export async function getAdminStats() {
 // CMS Functions
 export async function getCmsContent(key: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await withTimeout(supabase
       .from("cms_content")
       .select("*")
       .eq("key", key)
-      .maybeSingle();
+      .maybeSingle());
 
     return { data, error };
   } catch (error) {
@@ -490,6 +518,189 @@ export async function updateCmsContent(key: string, content: any) {
     return { data, error };
   } catch (error) {
     console.error(`Caught error updating CMS content for ${key}:`, error);
+    return { data: null, error };
+  }
+}
+
+export async function getNewsletterSubscribers() {
+  try {
+    const { data, error } = await withTimeout(supabase
+      .from("newsletter_subscribers")
+      .select("*")
+      .order("subscribed_at", { ascending: false }));
+
+    return { data, error };
+  } catch (error) {
+    console.error("Error fetching subscribers:", error);
+    return { data: null, error };
+  }
+}
+
+export async function deleteNewsletterSubscriber(id: string) {
+  try {
+    const { error } = await supabase
+      .from("newsletter_subscribers")
+      .delete()
+      .eq("id", id);
+
+    return { error };
+  } catch (error) {
+    console.error("Error deleting subscriber:", error);
+    return { error };
+  }
+}
+
+// Contact Messages
+export async function saveContactMessage(message: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) {
+  console.log("[API] saveContactMessage called", message);
+  try {
+    const { data, error } = await withTimeout(
+      supabase.from("contact_messages").insert([message]),
+      30000,
+      "saveContactMessage"
+    );
+
+    if (error) {
+      console.error("[API] saveContactMessage Supabase error:", error);
+      throw error;
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error("[API] saveContactMessage caught error:", error);
+    return { data: null, error };
+  }
+}
+
+export async function getContactMessages() {
+  console.log("[API] getContactMessages called");
+  try {
+    const { data, error } = await withTimeout(
+      supabase
+        .from("contact_messages")
+        .select("*")
+        .order("created_at", { ascending: false }),
+      45000,
+      "getContactMessages"
+    );
+
+    if (error) {
+      console.error("[API] getContactMessages Supabase error:", error);
+      throw error;
+    }
+
+    console.log(`[API] getContactMessages success: returned ${data?.length} messages`);
+    return { data, error: null };
+  } catch (error) {
+    console.error("[API] getContactMessages caught error:", error);
+    return { data: null, error };
+  }
+}
+
+export async function updateContactMessageStatus(id: number, status: string) {
+  console.log("[API] updateContactMessageStatus called", { id, status });
+  try {
+    const { data, error } = await withTimeout(
+      supabase
+        .from("contact_messages")
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq("id", id),
+      30000,
+      "updateContactMessageStatus"
+    );
+
+    if (error) {
+      console.error("[API] updateContactMessageStatus Supabase error:", error);
+      throw error;
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error("[API] updateContactMessageStatus caught error:", error);
+    return { data: null, error };
+  }
+}
+
+// Admin Management Functions
+export async function getAllProfiles() {
+  console.log("[API] getAllProfiles called");
+  try {
+    const { data, error } = await withTimeout(
+      supabase
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false }),
+      30000,
+      "getAllProfiles"
+    );
+
+    if (error) {
+      console.error("[API] getAllProfiles Supabase error:", error);
+      throw error;
+    }
+
+    console.log(`[API] getAllProfiles success: returned ${data?.length} profiles`);
+    return { data: data as any[] | null, error: null };
+  } catch (error) {
+    console.error("[API] getAllProfiles caught error:", error);
+    return { data: null, error };
+  }
+}
+
+export async function updateUserAdminStatus(userId: string, isAdmin: boolean) {
+  console.log("[API] updateUserAdminStatus called", { userId, isAdmin });
+  try {
+    const { data, error } = await withTimeout(
+      supabase
+        .from("profiles")
+        .update({ is_admin: isAdmin, updated_at: new Date().toISOString() })
+        .eq("id", userId),
+      30000,
+      "updateUserAdminStatus"
+    );
+
+    if (error) {
+      console.error("[API] updateUserAdminStatus Supabase error:", error);
+      throw error;
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error("[API] updateUserAdminStatus caught error:", error);
+    return { data: null, error };
+  }
+}
+
+export async function createProfileForUser(userId: string, email: string, fullName?: string) {
+  console.log("[API] createProfileForUser called", { userId, email, fullName });
+  try {
+    const { data, error } = await withTimeout(
+      supabase
+        .from("profiles")
+        .upsert({
+          id: userId,
+          username: email.split("@")[0],
+          full_name: fullName || null,
+          is_admin: email === "korantengabrahamagyei@gmail.com", // Auto-admin for this email
+          updated_at: new Date().toISOString()
+        }),
+      30000,
+      "createProfileForUser"
+    );
+
+    if (error) {
+      console.error("[API] createProfileForUser Supabase error:", error);
+      throw error;
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error("[API] createProfileForUser caught error:", error);
     return { data: null, error };
   }
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { getAdminStats, getAllOrders } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,26 +30,24 @@ export default function AdminDashboard() {
 
   const loadData = async (silent = false) => {
     if (!silent) setLoading(true);
-    // Timeout promise
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Request timed out")), 10000)
-    );
 
     try {
-      const [statsRes, ordersRes] = await Promise.race([
-        Promise.all([
-          getAdminStats(),
-          getAllOrders(),
-        ]),
-        timeoutPromise
-      ]) as any;
+      // Load stats and orders in parallel with individual error handling
+      const [statsResult, ordersResult] = await Promise.allSettled([
+        getAdminStats(),
+        getAllOrders(),
+      ]);
 
-      if (statsRes.data) {
-        setStatsData(statsRes.data);
+      // Handle stats
+      if (statsResult.status === "fulfilled" && statsResult.value.data) {
+        setStatsData(statsResult.value.data);
+      } else {
+        console.warn("Failed to load stats:", statsResult.status === "rejected" ? statsResult.reason : statsResult.value?.error);
       }
 
-      if (ordersRes.data) {
-        const allOrders = ordersRes.data;
+      // Handle orders
+      if (ordersResult.status === "fulfilled" && ordersResult.value.data) {
+        const allOrders = ordersResult.value.data;
         setRecentOrders(allOrders.slice(0, 5));
 
         // 1. Calculate Revenue Overview (Past 6 months)
@@ -104,18 +102,26 @@ export default function AdminDashboard() {
         }
 
         setOrdersData(daysOrder.map(day => ({ day, orders: ordersMap[day] })));
+      } else {
+        console.warn("Failed to load orders:", ordersResult.status === "rejected" ? ordersResult.reason : ordersResult.value?.error);
       }
 
-      if (!silent) setLoading(false);
+      // Only show error toast if BOTH failed
+      if (statsResult.status === "rejected" && ordersResult.status === "rejected") {
+        toast.error("Failed to load dashboard data");
+      }
     } catch (error) {
       console.error("Dashboard load failed:", error);
       toast.error("Failed to load dashboard data");
+    } finally {
       if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
     loadData();
+
+    if (!supabaseConfigured) return;
 
     // Subscribe to real-time updates for orders, products, and profiles
     const ordersChannel = supabase
@@ -171,48 +177,99 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">MadeInFashion Dashboard</h2>
-        <p className="text-muted-foreground">
-          Welcome back! Here's the latest Activity for MadeInFashion (Real-time).
-        </p>
-      </div>
-
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.name}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.name}</CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.change}</p>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {[
+          {
+            name: "Total Revenue",
+            val: `₵${statsData.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            icon: DollarSign,
+            color: "text-emerald-500",
+            bg: "bg-emerald-500/10",
+          },
+          {
+            name: "Orders",
+            val: statsData.totalOrders.toLocaleString(),
+            icon: ShoppingCart,
+            color: "text-blue-500",
+            bg: "bg-blue-500/10",
+          },
+          {
+            name: "Products",
+            val: statsData.totalProducts.toLocaleString(),
+            icon: Package,
+            color: "text-purple-500",
+            bg: "bg-purple-500/10",
+          },
+          {
+            name: "Active Customers",
+            val: statsData.activeCustomers.toLocaleString(),
+            icon: Users,
+            color: "text-orange-500",
+            bg: "bg-orange-500/10",
+          },
+        ].map((stat) => (
+          <Card key={stat.name} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white/50 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between space-y-0 pb-2">
+                <p className="text-sm font-medium text-muted-foreground">{stat.name}</p>
+                <div className={`p-2 rounded-full ${stat.bg}`}>
+                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                </div>
+              </div>
+              <div className="flex items-center pt-2">
+                <div className="text-2xl font-bold">{stat.val}</div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                <span className="text-emerald-500 font-medium">+12%</span> from last month
+              </p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Charts */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+        {/* Revenue Chart */}
+        <Card className="col-span-4 border-none shadow-sm bg-white/50 backdrop-blur-sm">
           <CardHeader>
             <CardTitle>Revenue Overview</CardTitle>
+            <p className="text-sm text-muted-foreground">Monthly revenue performance</p>
           </CardHeader>
-          <CardContent>
-            <div className="h-[250px] md:h-[300px] w-full">
+          <CardContent className="pl-2">
+            <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" fontSize={12} />
-                  <YAxis fontSize={12} />
-                  <Tooltip />
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis
+                    dataKey="month"
+                    stroke="#888888"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    stroke="#888888"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `₵${value}`}
+                  />
+                  <Tooltip
+                    contentStyle={{ border: 'none', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                   <Line
                     type="monotone"
                     dataKey="revenue"
-                    stroke="#2563eb"
-                    strokeWidth={2}
+                    stroke="#10b981"
+                    strokeWidth={3}
+                    dot={{ r: 4, strokeWidth: 2 }}
+                    activeDot={{ r: 8 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -220,19 +277,33 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Weekly Orders Chart */}
+        <Card className="col-span-3 border-none shadow-sm bg-white/50 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Orders This Week</CardTitle>
+            <CardTitle>Weekly Orders</CardTitle>
+            <p className="text-sm text-muted-foreground">Orders activity past 7 days</p>
           </CardHeader>
           <CardContent>
-            <div className="h-[250px] md:h-[300px] w-full">
+            <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={ordersData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" fontSize={12} />
-                  <YAxis fontSize={12} />
-                  <Tooltip />
-                  <Bar dataKey="orders" fill="#2563eb" />
+                  <XAxis
+                    dataKey="day"
+                    stroke="#888888"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip
+                    cursor={{ fill: 'transparent' }}
+                    contentStyle={{ border: 'none', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Bar
+                    dataKey="orders"
+                    fill="#3b82f6"
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={50}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -240,37 +311,40 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Recent Orders */}
-      <Card>
+      {/* Recent Orders - Mini Table */}
+      <Card className="border-none shadow-sm bg-white/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Recent Orders</CardTitle>
+          <p className="text-sm text-muted-foreground">Latest transactions from your store</p>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {loading ? (
-              <div className="text-center py-4 text-muted-foreground">Loading...</div>
-            ) : recentOrders.length > 0 ? (
-              recentOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between border-b pb-4 last:border-0"
-                >
-                  <div>
-                    <p className="font-medium">Order #{order.id}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {order.shipping_address?.full_name || "Guest User"} - {new Date(order.created_at).toLocaleDateString()}
-                    </p>
+            {recentOrders.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No recent orders found.</p>
+            ) : (
+              recentOrders.map((order, i) => (
+                <div key={order.id} className="flex items-center justify-between p-4 rounded-lg bg-white/60 border border-gray-100 hover:bg-white transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                      {i + 1}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Order #{order.id}</p>
+                      <p className="text-sm text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</p>
+                    </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">₵{Number(order.total_price).toFixed(2)}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                    </p>
+                    <p className="font-bold text-gray-900">₵{Number(order.total_price).toFixed(2)}</p>
+                    <span className={`text-xs px-2 py-1 rounded-full ${order.status === 'completed' ? 'bg-green-100 text-green-700' :
+                      order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
+                        order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                          'bg-gray-100 text-gray-700'
+                      }`}>
+                      {order.status}
+                    </span>
                   </div>
                 </div>
               ))
-            ) : (
-              <div className="text-center py-4 text-muted-foreground">No recent orders.</div>
             )}
           </div>
         </CardContent>

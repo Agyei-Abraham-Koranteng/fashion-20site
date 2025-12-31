@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { getNewsletterSubscribers, deleteNewsletterSubscriber } from "@/lib/api";
+import { supabase } from "@/lib/supabaseClient";
 import { format } from "date-fns";
 import { Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -38,12 +39,13 @@ export default function NewsletterAdmin() {
         fetchSubscribers();
     }, []);
 
+
+
+    // ... inside component
+
     const fetchSubscribers = async () => {
         try {
-            const { data, error } = await supabase
-                .from("newsletter_subscribers")
-                .select("*")
-                .order("subscribed_at", { ascending: false });
+            const { data, error } = await getNewsletterSubscribers();
 
             if (error) throw error;
             setSubscribers(data || []);
@@ -57,10 +59,7 @@ export default function NewsletterAdmin() {
 
     const handleDelete = async (id: string) => {
         try {
-            const { error } = await supabase
-                .from("newsletter_subscribers")
-                .delete()
-                .eq("id", id);
+            const { error } = await deleteNewsletterSubscriber(id);
 
             if (error) throw error;
 

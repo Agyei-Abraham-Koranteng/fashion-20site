@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { getAllOrders, updateOrderStatus } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,18 +47,29 @@ export default function OrdersListAdmin() {
 
   const loadOrders = async (silent = false) => {
     if (!silent) setLoading(true);
-    const { data, error } = await getAllOrders();
-    if (error) {
+    console.log("[OrdersList] Fetching orders...");
+    try {
+      const { data, error } = await getAllOrders();
+      if (error) {
+        console.error("[OrdersList] Error fetching orders:", error);
+        toast.error("Failed to load orders");
+      }
+      if (data) {
+        console.log(`[OrdersList] Loaded ${data.length} orders`);
+        setOrders(data);
+      }
+    } catch (err) {
+      console.error("[OrdersList] Exception:", err);
       toast.error("Failed to load orders");
+    } finally {
+      if (!silent) setLoading(false);
     }
-    if (data) {
-      setOrders(data);
-    }
-    if (!silent) setLoading(false);
   };
 
   useEffect(() => {
     loadOrders();
+
+    if (!supabaseConfigured) return;
 
     const subscription = supabase
       .channel("public:orders")
@@ -132,72 +143,120 @@ export default function OrdersListAdmin() {
           </div>
         </CardHeader>
         <CardContent className="p-0 sm:p-6">
-          {/* Desktop Table View */}
-          <div className="hidden md:block overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="min-w-[100px]">Order ID</TableHead>
-                  <TableHead className="min-w-[150px]">Customer ID</TableHead>
-                  <TableHead className="min-w-[120px]">Date</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead className="min-w-[150px]">Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-4">Loading orders...</TableCell>
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2">
+              {['all', 'pending', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${statusFilter === status
+                    ? 'bg-gray-900 text-white shadow-md'
+                    : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                    }`}
+                >
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+              <Table>
+                <TableHeader className="bg-gray-50/50">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="py-4">Order Info</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Total</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ) : filteredOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-medium">#{order.id}</TableCell>
-                    <TableCell>
-                      <div className="text-sm text-muted-foreground">
-                        {order.user_id.substring(0, 8)}...
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(order.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      ${Number(order.total_price).toFixed(2)}
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        value={order.status}
-                        onValueChange={(value) =>
-                          handleStatusUpdate(String(order.id), value)
-                        }
-                      >
-                        <SelectTrigger className="w-32">
-                          <Badge variant={statusColors[order.status as keyof typeof statusColors] || "default"}>
-                            {order.status}
-                          </Badge>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="processing">Processing</SelectItem>
-                          <SelectItem value="shipped">Shipped</SelectItem>
-                          <SelectItem value="delivered">Delivered</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedOrder(order)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-900" />
+                          Loading orders...
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredOrders.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                        No orders found matching your criteria.
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredOrders.map((order) => (
+                    <TableRow key={order.id} className="hover:bg-gray-50/50 transition-colors">
+                      <TableCell className="py-4 font-medium">
+                        <span className="text-gray-900">#{order.id}</span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col text-sm">
+                          <span className="text-gray-900 font-medium">{new Date(order.created_at).toLocaleDateString()}</span>
+                          <span className="text-gray-500 text-xs">{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                            {order.user_id.substring(0, 2).toUpperCase()}
+                          </div>
+                          <span className="text-sm text-gray-600 font-medium" title={order.user_id}>
+                            Customer...{order.user_id.substring(0, 4)}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-bold text-gray-900">
+                        ₵{Number(order.total_price).toFixed(2)}
+                      </TableCell>
+                      <TableCell>
+                        <Select
+                          value={order.status}
+                          onValueChange={(value) =>
+                            handleStatusUpdate(String(order.id), value)
+                          }
+                        >
+                          <SelectTrigger className={`w-36 border-0 h-8 text-xs font-medium shadow-none focus:ring-0 ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-50 text-emerald-700' :
+                            order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-50 text-blue-700' :
+                              order.status === 'cancelled' ? 'bg-red-50 text-red-700' :
+                                'bg-amber-50 text-amber-700'
+                            }`}>
+                            <div className="flex items-center gap-2">
+                              <div className={`h-1.5 w-1.5 rounded-full ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-500' :
+                                order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-500' :
+                                  order.status === 'cancelled' ? 'bg-red-500' :
+                                    'bg-amber-500'
+                                }`} />
+                              <SelectValue />
+                            </div>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="processing">Processing</SelectItem>
+                            <SelectItem value="shipped">Shipped</SelectItem>
+                            <SelectItem value="delivered">Delivered</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="bg-gray-50 hover:bg-gray-100 text-gray-600"
+                          onClick={() => setSelectedOrder(order)}
+                        >
+                          <Eye className="h-4 w-4 mr-2" /> Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
 
           {/* Mobile Card View */}
@@ -299,18 +358,22 @@ export default function OrdersListAdmin() {
               <div>
                 <h4 className="mb-2 font-semibold">Order Summary</h4>
                 <div className="space-y-2 text-sm mt-2">
-                  {selectedOrder.items?.map((item: any) => (
-                    <div key={item.id} className="flex justify-between items-center py-2 border-b">
-                      <div className="flex items-center gap-2">
-                        {item.product?.image && <img src={item.product?.image} className="w-8 h-8 rounded object-cover" />}
-                        <div>
-                          <p className="font-medium">{item.product?.name || "Product"}</p>
-                          <p className="text-xs text-muted-foreground">{item.size} / {item.color} x {item.quantity}</p>
+                  {selectedOrder.items && selectedOrder.items.length > 0 ? (
+                    selectedOrder.items.map((item: any) => (
+                      <div key={item.id} className="flex justify-between items-center py-2 border-b">
+                        <div className="flex items-center gap-2">
+                          {item.product?.image && <img src={item.product?.image} className="w-8 h-8 rounded object-cover" />}
+                          <div>
+                            <p className="font-medium">{item.product?.name || "Product"}</p>
+                            <p className="text-xs text-muted-foreground">{item.size} / {item.color} x {item.quantity}</p>
+                          </div>
                         </div>
+                        <span>₵{(item.price * item.quantity).toFixed(2)}</span>
                       </div>
-                      <span>₵{(item.price * item.quantity).toFixed(2)}</span>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-muted-foreground italic">No items found for this order.</p>
+                  )}
                   <div className="flex justify-between pt-4 font-semibold text-lg">
                     <span>Total</span>
                     <span>₵{Number(selectedOrder.total_price).toFixed(2)}</span>

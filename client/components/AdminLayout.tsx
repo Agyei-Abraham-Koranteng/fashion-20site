@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import { getContactMessages } from "@/lib/api";
 import {
   LayoutDashboard,
   Package,
@@ -12,6 +14,8 @@ import {
   FileText,
   Menu,
   Mail,
+  MailOpen,
+  Bell,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -21,6 +25,7 @@ const navigation = [
   { name: "Products", href: "/admin/products", icon: Package },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Customers", href: "/admin/customers", icon: Users },
+  { name: "Messages", href: "/admin/messages", icon: MailOpen },
   { name: "Newsletter", href: "/admin/newsletter", icon: Mail },
   { name: "Content Manager", href: "/admin/content", icon: FileText },
   { name: "Settings", href: "/admin/settings", icon: Settings },
@@ -29,8 +34,64 @@ const navigation = [
 export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user, loading: authLoading } = useAuth();
   const [open, setOpen] = useState(false);
+
+  // Fetch unread message count
+  const { data: messages = [] } = useQuery({
+    queryKey: ["contact_messages"],
+    queryFn: async () => {
+      const { data, error } = await getContactMessages();
+      if (error) return [];
+      return data || [];
+    },
+    refetchInterval: 30000, // Refresh every 30 seconds
+    enabled: !!user && user.role === "admin",
+  });
+
+  const unreadCount = messages.filter((msg: any) => msg.status === "unread").length;
+
+  // Check admin access
+  if (authLoading) {
+    return <div className="p-8 text-center">
+      <div>Loading authentication...</div>
+      <div className="text-sm text-gray-500 mt-2">Please wait while we check your login status</div>
+    </div>;
+  }
+
+  console.log("AdminLayout check:", { user, authLoading, userRole: user?.role, userEmail: user?.email });
+
+  if (!user) {
+    console.log("Redirecting to login - not logged in");
+    const redirect = encodeURIComponent(window.location.pathname + window.location.search);
+    return <Navigate to={`/login?redirect=${redirect}`} replace />;
+  }
+
+  // Prevent redirect loop: User is logged in but not admin
+  if (user.role !== "admin") {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 text-center">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+          <LogOut className="h-8 w-8 text-red-600" />
+        </div>
+        <h1 className="mb-2 text-2xl font-bold text-gray-900">Access Denied</h1>
+        <p className="mb-8 max-w-md text-gray-600">
+          You are logged in as <span className="font-semibold text-gray-900">{user.email}</span>,
+          but this account does not have administrator privileges.
+        </p>
+        <div className="flex gap-4">
+          <Button variant="outline" onClick={() => navigate("/")}>
+            Go to Home
+          </Button>
+          <Button variant="destructive" onClick={handleLogout}>
+            Sign Out
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Any logged-in user can now access admin panel
 
   const handleLogout = async () => {
     await logout();
@@ -38,79 +99,131 @@ export default function AdminLayout() {
   };
 
   const NavLinks = ({ onClick }: { onClick?: () => void }) => (
-    <nav className="mt-8 px-4 flex-1">
-      <div className="space-y-1">
-        {navigation.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              to={item.href}
-              onClick={onClick}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-gray-800 text-white"
-                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
-              )}
-            >
-              <item.icon className="h-5 w-5" />
-              {item.name}
-            </Link>
-          );
-        })}
-      </div>
+    <nav className="space-y-1">
+      {navigation.map((item) => {
+        const isActive = location.pathname === item.href;
+        const isMessages = item.name === "Messages";
+        return (
+          <Link
+            key={item.name}
+            to={item.href}
+            onClick={onClick}
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all relative group",
+              isActive
+                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-900/20"
+                : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
+            )}
+          >
+            <item.icon className={cn("h-5 w-5 transition-colors", isActive ? "text-white" : "text-slate-500 group-hover:text-white")} />
+            <span>{item.name}</span>
+            {isActive && (
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white/20 rounded-l-full" />
+            )}
+            {isMessages && unreadCount > 0 && (
+              <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-indigo-500 px-1.5 text-[10px] font-bold text-white shadow-sm ring-2 ring-slate-900">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </Link>
+        );
+      })}
     </nav>
   );
 
+  const NotificationButton = () => (
+    <Link
+      to="/admin/messages"
+      className="relative p-2 rounded-full hover:bg-gray-100 transition-colors group"
+      title="Messages"
+    >
+      <Bell className="h-5 w-5 text-gray-600 group-hover:text-gray-900 transition-colors" />
+      {unreadCount > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm animate-pulse">
+          {unreadCount > 99 ? "99+" : unreadCount}
+        </span>
+      )}
+    </Link>
+  );
+
   const SidebarContent = () => (
-    <div className="flex h-full flex-col bg-gray-900 border-r border-gray-800">
-      <div className="flex h-16 items-center justify-center border-b border-gray-800 px-4">
-        <h1 className="text-xl font-bold text-white tracking-wider">MadeInFashion Admin</h1>
+    <div className="flex h-full flex-col bg-slate-950 text-slate-300 border-r border-slate-800 shadow-xl">
+      <div className="flex h-20 items-center px-8 border-b border-slate-800/60 bg-slate-950/50 backdrop-blur-xl">
+        <h1 className="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent tracking-tight">
+          MadeInFashion
+        </h1>
       </div>
-      <NavLinks onClick={() => setOpen(false)} />
-      <div className="mt-auto border-t border-gray-800 p-4">
+
+      <div className="flex-1 overflow-y-auto py-6 px-4">
+        <NavLinks onClick={() => setOpen(false)} />
+      </div>
+
+      <div className="p-4 border-t border-slate-800/60 bg-slate-950/50">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-900/50 mb-3">
+          <div className="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold border border-indigo-500/30">
+            {user?.email?.charAt(0).toUpperCase()}
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <p className="text-sm font-medium text-white truncate">{user?.full_name || "Admin"}</p>
+            <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+          </div>
+        </div>
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray-400 transition-colors hover:bg-gray-800 hover:text-white"
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-400 transition-all hover:bg-red-500/10 hover:text-red-400 group"
         >
-          <LogOut className="h-5 w-5" />
-          Logout
+          <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          Sign Out
         </button>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Mobile Header */}
       <div className="sticky top-0 z-40 flex h-16 items-center border-b border-gray-200 bg-white/80 backdrop-blur-md px-4 lg:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="lg:hidden">
+            <Button variant="ghost" size="icon" className="lg:hidden text-gray-500">
               <Menu className="h-6 w-6" />
               <span className="sr-only">Open sidebar</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-64 border-r-0">
+          <SheetContent side="left" className="p-0 w-72 border-r-0 bg-slate-950">
             <SidebarContent />
           </SheetContent>
         </Sheet>
         <div className="ml-4 flex-1">
-          <span className="text-lg font-bold tracking-tight text-gray-900">
+          <span className="text-lg font-semibold tracking-tight text-gray-900">
             {navigation.find((item) => item.href === location.pathname)?.name || "Dashboard"}
           </span>
         </div>
+        {/* Mobile Notification Button */}
+        <NotificationButton />
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:w-64">
+      <div className="hidden lg:block lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:w-72">
         <SidebarContent />
       </div>
 
+      {/* Desktop Top Bar with Notification */}
+      <div className="hidden lg:flex lg:fixed lg:top-0 lg:left-72 lg:right-0 lg:z-40 h-20 items-center justify-between border-b border-gray-100 bg-white/95 backdrop-blur-sm px-8 shadow-sm">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-800 tracking-tight">
+            {navigation.find((item) => item.href === location.pathname)?.name || "Dashboard"}
+          </h2>
+          <p className="text-sm text-gray-500 mt-0.5">Manage your store efficiently</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <NotificationButton />
+        </div>
+      </div>
+
       {/* Main content */}
-      <div className="lg:pl-64">
-        <main className="min-h-screen p-4 md:p-8">
+      <div className="lg:pl-72 lg:pt-20">
+        <main className="min-h-[calc(100vh-80px)] p-6 md:p-10 animate-fade-in">
           <Outlet />
         </main>
       </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { getCustomers } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,14 +20,23 @@ export default function CustomersAdmin() {
 
   const loadCustomers = async (silent = false) => {
     if (!silent) setLoading(true);
-    const { data, error } = await getCustomers();
-    if (error) {
+    console.log("[Customers] Fetching customers...");
+    try {
+      const { data, error } = await getCustomers();
+      if (error) {
+        console.error("[Customers] Error fetching customers:", error);
+        toast.error("Failed to load customers");
+      }
+      if (data) {
+        console.log(`[Customers] Loaded ${data.length} customers`);
+        setCustomers(data);
+      }
+    } catch (err) {
+      console.error("[Customers] Exception:", err);
       toast.error("Failed to load customers");
+    } finally {
+      if (!silent) setLoading(false);
     }
-    if (data) {
-      setCustomers(data);
-    }
-    if (!silent) setLoading(false);
   };
 
   useEffect(() => {

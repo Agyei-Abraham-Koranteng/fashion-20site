@@ -31,7 +31,7 @@ import CmsPage from "./components/CmsPage";
 
 // Admin Pages
 import AdminLayout from "./components/AdminLayout";
-// import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/admin/Dashboard";
 import ProductsListAdmin from "./pages/admin/ProductsList";
 import ProductFormAdmin from "./pages/admin/ProductForm";
@@ -40,9 +40,12 @@ import CustomersAdmin from "./pages/admin/Customers";
 import SettingsAdmin from "./pages/admin/Settings";
 import NewsletterAdmin from "./pages/admin/Newsletter";
 import ContentManager from "./pages/admin/ContentManager";
+import MessagesAdmin from "./pages/admin/Messages";
 
 // Lazy-loaded pages
 const Login = lazy(() => import("./pages/Login"));
+const SignUp = lazy(() => import("./pages/SignUp"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 
 const queryClient = new QueryClient();
 
@@ -67,9 +70,10 @@ const App = () => (
 
                   {/* Auth */}
                   <Route path="/login" element={<Login />} />
-                  <Route path="/admin/login" element={<Login />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
 
-                  {/* Admin Routes (unprotected as requested) */}
+                  {/* Admin Routes */}
                   <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<AdminDashboard />} />
                     <Route path="products" element={<ProductsListAdmin />} />
@@ -78,6 +82,7 @@ const App = () => (
                     <Route path="orders" element={<OrdersListAdmin />} />
                     <Route path="customers" element={<CustomersAdmin />} />
                     <Route path="newsletter" element={<NewsletterAdmin />} />
+                    <Route path="messages" element={<MessagesAdmin />} />
                     <Route path="content" element={<ContentManager />} />
                     <Route path="settings" element={<SettingsAdmin />} />
                   </Route>

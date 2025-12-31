@@ -4,7 +4,7 @@ import { ArrowRight, Star, ShoppingBag, Truck, Shield, ChevronLeft, ChevronRight
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { getProducts, getCmsContent } from "@/lib/api";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import ProductCard from "@/components/ProductCard";
 import { Product } from "@/lib/types";

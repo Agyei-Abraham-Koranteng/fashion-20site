@@ -1,3 +1,4 @@
+import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useQuery } from "@tanstack/react-query";
-import { getCmsContent } from "@/lib/api";
+import { getCmsContent, saveContactMessage } from "@/lib/api";
 import { toast } from "sonner";
 
 export default function Contact() {
@@ -17,6 +18,8 @@ export default function Contact() {
         },
     });
 
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
+
     const contact = {
         title: (cmsData as any)?.title || "Get in Touch",
         subtitle: (cmsData as any)?.subtitle || "Have a question or just want to say hello? We'd love to hear from you.",
@@ -24,10 +27,116 @@ export default function Contact() {
         email: (cmsData as any)?.email || "hello@fashionbrand.com",
         phone: (cmsData as any)?.phone || "+1 (555) 123-4567"
     };
-    const handleSubmit = (e: React.FormEvent) => {
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulate form submission
-        toast.success("Thank you for your message! We will get back to you shortly.");
+        setIsSubmitting(true);
+
+        const formData = new FormData(e.target as HTMLFormElement);
+        const name = formData.get("name") as string;
+        const email = formData.get("email") as string;
+        const subject = formData.get("subject") as string;
+        const message = formData.get("message") as string;
+
+        try {
+            const { error } = await saveContactMessage({ name, email, subject, message });
+            if (error) throw error;
+
+            toast.custom((t) => (
+                <motion.div
+                    initial={{ opacity: 0, y: -50, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    className="flex items-center gap-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-2xl shadow-2xl max-w-md"
+                >
+                    <div className="flex-shrink-0">
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.2, type: "spring", stiffness: 400 }}
+                            className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
+                        >
+                            <motion.svg
+                                initial={{ pathLength: 0 }}
+                                animate={{ pathLength: 1 }}
+                                transition={{ delay: 0.3, duration: 0.5 }}
+                                className="w-6 h-6 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={3}
+                            >
+                                <motion.path
+                                    initial={{ pathLength: 0 }}
+                                    animate={{ pathLength: 1 }}
+                                    transition={{ delay: 0.3, duration: 0.5 }}
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M5 13l4 4L19 7"
+                                />
+                            </motion.svg>
+                        </motion.div>
+                    </div>
+                    <div className="flex-1">
+                        <motion.p
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.15 }}
+                            className="font-bold text-lg"
+                        >
+                            Message Sent!
+                        </motion.p>
+                        <motion.p
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.25 }}
+                            className="text-white/90 text-sm"
+                        >
+                            Thank you! We'll get back to you shortly.
+                        </motion.p>
+                    </div>
+                    <button
+                        onClick={() => toast.dismiss(t)}
+                        className="text-white/70 hover:text-white transition-colors p-1"
+                    >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </motion.div>
+            ), { duration: 5000 });
+
+            (e.target as HTMLFormElement).reset();
+        } catch (error) {
+            console.error("Error submitting contact form:", error);
+            toast.custom((t) => (
+                <motion.div
+                    initial={{ opacity: 0, y: -50, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    className="flex items-center gap-4 bg-gradient-to-r from-red-500 to-rose-600 text-white px-6 py-4 rounded-2xl shadow-2xl max-w-md"
+                >
+                    <div className="flex-shrink-0 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    <div className="flex-1">
+                        <p className="font-bold">Oops! Something went wrong</p>
+                        <p className="text-white/90 text-sm">Please try again later.</p>
+                    </div>
+                    <button onClick={() => toast.dismiss(t)} className="text-white/70 hover:text-white p-1">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </motion.div>
+            ), { duration: 5000 });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -112,31 +221,32 @@ export default function Contact() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label htmlFor="name" className="text-sm font-medium">Name</label>
-                                        <Input id="name" placeholder="John Doe" required className="input-modern" />
+                                        <Input id="name" name="name" placeholder="John Doe" required className="input-modern" />
                                     </div>
                                     <div className="space-y-2">
                                         <label htmlFor="email" className="text-sm font-medium">Email</label>
-                                        <Input id="email" type="email" placeholder="john@example.com" required className="input-modern" />
+                                        <Input id="email" name="email" type="email" placeholder="john@example.com" required className="input-modern" />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
                                     <label htmlFor="subject" className="text-sm font-medium">Subject</label>
-                                    <Input id="subject" placeholder="How can we help?" required className="input-modern" />
+                                    <Input id="subject" name="subject" placeholder="How can we help?" required className="input-modern" />
                                 </div>
 
                                 <div className="space-y-2">
                                     <label htmlFor="message" className="text-sm font-medium">Message</label>
                                     <Textarea
                                         id="message"
+                                        name="message"
                                         placeholder="Write your message here..."
                                         className="min-h-[150px] resize-none border-input bg-transparent focus-visible:ring-1"
                                         required
                                     />
                                 </div>
 
-                                <Button type="submit" className="w-full btn-primary h-12">
-                                    Send Message
+                                <Button type="submit" className="w-full btn-primary h-12" disabled={isSubmitting}>
+                                    {isSubmitting ? "Sending..." : "Send Message"}
                                 </Button>
                             </form>
                         </motion.div>

@@ -15,7 +15,7 @@ import {
 import { ArrowLeft, Save, Upload, X, Image as ImageIcon } from "lucide-react";
 import { getProductById, getCategories, createProduct, updateProduct } from "@/lib/api";
 import { Product, Category } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 
 export default function ProductFormAdmin() {
