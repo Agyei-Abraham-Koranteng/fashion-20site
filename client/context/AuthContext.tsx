@@ -96,39 +96,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log("[Auth] Attempting login for:", email);
     try {
       if (supabaseConfigured) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        // Step 1: Try to sign in
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password
+        });
 
-        if (error) {
-          console.error("[Auth] Login error:", error);
-          throw error;
+        if (signInError) {
+          // Step 2: If login fails due to invalid credentials, it might be a new user
+          // Frictionless approach: Attempt to sign them up automatically
+          if (signInError.message?.toLowerCase().includes("invalid login credentials")) {
+            console.log("[Auth] User not found, attempting auto-registration...");
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+              email: email.trim().toLowerCase(),
+              password,
+              options: {
+                data: {
+                  full_name: email.split("@")[0], // Default name from email
+                }
+              }
+            });
+
+            if (signUpError) {
+              console.error("[Auth] Auto-registration failed:", signUpError);
+              throw signInError; // Throw the original login error for clarity
+            }
+
+            // If auto-confirm is enabled in Supabase, they'll have a session now
+            if (signUpData.session) {
+              console.log("[Auth] Auto-registration successful");
+              return;
+            } else {
+              // If no session, email confirmation is likely required
+              throw new Error("Account created! Please check your email (" + email + ") to confirm your registration and continue.");
+            }
+          }
+          throw signInError;
         }
-        console.log("[Auth] Login successful");
         return;
       }
-      // Mock login for demo when Supabase isn't configured
+
+      // Mock login for demo/offline fallback if Supabase isn't configured at all
       const role: AuthUser["role"] = isAdminEmail(email) ? "admin" : "customer";
       const mockUser: AuthUser = { id: "00000000-0000-0000-0000-000000000000", email, role };
       setUser(mockUser);
       localStorage.setItem("auth:user", JSON.stringify(mockUser));
     } catch (error: any) {
       console.error("[Auth] Login exception:", error);
-
-      if (error.message?.includes("timed out") && supabaseConfigured) {
-        // Attempt to diagnose connectivity
-        console.log("[Auth] Diagnosing connectivity...");
-        try {
-          const url = (import.meta as any).env.VITE_SUPABASE_URL;
-          console.log("[Auth] Pinging Supabase URL:", url);
-          // Try a simple health check or just fetch the root
-          const start = Date.now();
-          const res = await fetch(`${url}/auth/v1/health`, { method: "GET" });
-          const end = Date.now();
-          console.log(`[Auth] Ping result: Status ${res.status} in ${end - start}ms`);
-        } catch (pingError) {
-          console.error("[Auth] Ping failed. Network might be unreachable:", pingError);
-        }
-      }
-
       throw error;
     } finally {
       setLoading(false);
@@ -140,34 +154,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       if (supabaseConfigured) {
         const { data, error } = await supabase.auth.signUp({
-          email,
+          email: email.trim().toLowerCase(),
           password,
           options: {
             data: {
-              full_name: fullName,
-            },
-            emailRedirectTo: undefined, // Disable email confirmation
+              full_name: fullName || email.split("@")[0],
+            }
           },
         });
         if (error) throw error;
 
-        // Create profile with full name if user was created
-        // Temporarily disabled to debug schema issues
-        /*
-        if (data.user && fullName) {
+        // Create/Sync profile
+        if (data.user) {
           try {
             await (supabase.from("profiles") as any).upsert({
               id: data.user.id,
-              full_name: fullName,
+              full_name: fullName || email.split("@")[0],
               username: email.split("@")[0],
-              is_admin: email === "korantengabrahamagyei@gmail.com", // Auto-admin for this email
+              is_admin: isAdminEmail(email),
             });
           } catch (profileError) {
-            console.warn("Failed to create profile:", profileError);
-            // Don't throw - registration succeeded even if profile creation failed
+            console.warn("[Auth] Failed to sync profile during registration:", profileError);
           }
         }
-        */
       }
     } finally {
       setLoading(false);
