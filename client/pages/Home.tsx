@@ -9,9 +9,13 @@ import { useQuery } from "@tanstack/react-query";
 import ProductCard from "@/components/ProductCard";
 import { Product } from "@/lib/types";
 import Layout from "@/components/Layout";
+import { useAuth } from "@/context/AuthContext";
+import AuthModal from "@/components/AuthModal";
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { user } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const { data: products, refetch: refetchProducts } = useQuery<Product[]>({
     queryKey: ["products", "featured"],
@@ -122,11 +126,23 @@ export default function Home() {
                     transition={{ delay: 0.8 }}
                     className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
                   >
-                    <Link to={slides[currentSlide].cta_link || "/shop"}>
-                      <Button size="lg" className="min-w-[220px] text-lg h-14 bg-white text-black hover:bg-zinc-100 border-none transition-all hover:scale-105">
-                        {slides[currentSlide].cta_text || "Shop Collection"}
-                      </Button>
-                    </Link>
+                    <div className="group relative">
+                      {!user ? (
+                        <Button
+                          onClick={() => setIsAuthModalOpen(true)}
+                          size="lg"
+                          className="min-w-[220px] text-lg h-14 bg-white text-black hover:bg-zinc-100 border-none transition-all hover:scale-105"
+                        >
+                          Get Started
+                        </Button>
+                      ) : (
+                        <Link to="/shop">
+                          <Button size="lg" className="min-w-[220px] text-lg h-14 bg-white text-black hover:bg-zinc-100 border-none transition-all hover:scale-105">
+                            Shop Collection
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
                     <Link to="/about">
                       <Button size="lg" variant="outline" className="min-w-[220px] text-lg h-14 border-white text-white hover:bg-white hover:text-black bg-transparent transition-all">
                         Our Story
@@ -259,6 +275,11 @@ export default function Home() {
         </section>
 
       </div>
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialView="signup"
+      />
     </Layout>
   );
 }

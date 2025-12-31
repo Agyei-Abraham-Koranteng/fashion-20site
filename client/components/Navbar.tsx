@@ -22,6 +22,8 @@ import {
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useAuth } from "@/context/AuthContext";
+import AuthModal from "./AuthModal";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   NavigationMenu,
@@ -57,6 +59,8 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const { itemCount } = useCart();
   const { items: wishlistItems } = useWishlist();
+  const { user } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -201,13 +205,19 @@ export default function Navbar() {
               )}
             </Link>
 
-            <Link
-              to="/dashboard"
+            <button
+              onClick={() => {
+                if (user) {
+                  navigate("/dashboard");
+                } else {
+                  setIsAuthModalOpen(true);
+                }
+              }}
               className="p-2 hover:bg-secondary rounded-sm transition-colors relative"
               aria-label="Account"
             >
               <User size={20} />
-            </Link>
+            </button>
 
             {/* Mobile menu toggle */}
             <button
@@ -371,6 +381,11 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </nav>
   );
 }
