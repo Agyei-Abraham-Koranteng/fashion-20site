@@ -168,6 +168,17 @@ export default function Navbar() {
 
           {/* Right icons */}
           <div className="flex items-center gap-4">
+            {/* Admin Panel Quick Link */}
+            {user?.role === "admin" && (
+              <Link
+                to="/admin"
+                className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white rounded-full text-[10px] font-bold tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200"
+              >
+                <Store size={12} />
+                ADMIN PANEL
+              </Link>
+            )}
+
             {/* Search icon */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}

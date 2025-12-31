@@ -6,7 +6,7 @@ import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Heart, User, Settings, Package, ChevronRight, Star } from "lucide-react";
+import { ShoppingBag, Heart, User, Settings, Package, ChevronRight, Star, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -54,9 +54,19 @@ export default function UserDashboard() {
         <Layout>
             <div className="bg-gray-50 min-h-screen py-12">
                 <div className="container-wide max-w-6xl">
-                    <header className="mb-10">
-                        <h1 className="text-4xl font-bold font-serif text-gray-900">My Account</h1>
-                        <p className="text-gray-500 mt-2">Welcome back, {user?.full_name || user?.username || "Fashionista"}!</p>
+                    <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h1 className="text-4xl font-bold font-serif text-gray-900">My Account</h1>
+                            <p className="text-gray-500 mt-2">Welcome back, {user?.full_name || user?.username || "Fashionista"}!</p>
+                        </div>
+                        {user?.role === "admin" && (
+                            <Link to="/admin">
+                                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 rounded-full shadow-lg shadow-indigo-100 flex items-center gap-2">
+                                    <Store className="h-4 w-4" />
+                                    Manage Store (Admin)
+                                </Button>
+                            </Link>
+                        )}
                     </header>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
