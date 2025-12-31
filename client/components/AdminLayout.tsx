@@ -62,9 +62,9 @@ export default function AdminLayout() {
   console.log("AdminLayout check:", { user, authLoading, userRole: user?.role, userEmail: user?.email });
 
   if (!user) {
-    console.log("Redirecting to login - not logged in");
+    console.log("Redirecting to admin login - not logged in");
     const redirect = encodeURIComponent(window.location.pathname + window.location.search);
-    return <Navigate to={`/login?redirect=${redirect}`} replace />;
+    return <Navigate to={`/admin/login?redirect=${redirect}`} replace />;
   }
 
   // Prevent redirect loop: User is logged in but not admin

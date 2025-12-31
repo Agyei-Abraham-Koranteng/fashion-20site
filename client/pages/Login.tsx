@@ -61,7 +61,7 @@ export default function Login() {
       const redirectParam = params.get("redirect");
       if (redirectParam && redirectParam !== "/login") {
         navigate(decodeURIComponent(redirectParam), { replace: true });
-      } else if (user.role === "admin") {
+      } else if (user.role === "admin" && !params.get("redirect")) {
         navigate("/admin", { replace: true });
       } else {
         navigate("/", { replace: true });
@@ -197,6 +197,9 @@ export default function Login() {
       <p className="mt-4 text-[10px] text-gray-300 uppercase tracking-widest font-bold">
         © 2025 MadeInFashion. All Rights Reserved.
       </p>
+      <Link to="/admin/login" className="mt-4 text-[10px] text-gray-300 hover:text-gray-500 transition-colors uppercase tracking-widest font-bold">
+        Admin Access
+      </Link>
     </div>
   );
 }

@@ -41,6 +41,8 @@ import SettingsAdmin from "./pages/admin/Settings";
 import NewsletterAdmin from "./pages/admin/Newsletter";
 import ContentManager from "./pages/admin/ContentManager";
 import MessagesAdmin from "./pages/admin/Messages";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminSignUp from "./pages/admin/AdminSignUp";
 
 // Lazy-loaded pages
 const Login = lazy(() => import("./pages/Login"));
@@ -72,6 +74,10 @@ const App = () => (
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<SignUp />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
+
+                  {/* Admin Auth */}
+                  <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route path="/admin/signup" element={<AdminSignUp />} />
 
                   {/* Admin Routes */}
                   <Route path="/admin" element={<AdminLayout />}>
