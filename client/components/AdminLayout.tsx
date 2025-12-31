@@ -51,6 +51,11 @@ export default function AdminLayout() {
 
   const unreadCount = messages.filter((msg: any) => msg.status === "unread").length;
 
+  const handleLogout = async () => {
+    await logout();
+    navigate("/admin/login");
+  };
+
   // Check admin access
   if (authLoading) {
     return <div className="p-8 text-center">
@@ -92,11 +97,6 @@ export default function AdminLayout() {
   }
 
   // Any logged-in user can now access admin panel
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
 
   const NavLinks = ({ onClick }: { onClick?: () => void }) => (
     <nav className="space-y-1">
