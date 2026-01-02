@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { getAdminStats, getAllOrders } from "@/lib/api";
@@ -214,23 +215,33 @@ export default function AdminDashboard() {
             color: "text-indigo-500",
             bg: "bg-indigo-500/10",
           },
+          {
+            name: "Feedback",
+            val: "Click to View",
+            href: "/admin/feedback",
+            icon: Star,
+            color: "text-yellow-500",
+            bg: "bg-yellow-500/10",
+          },
         ].map((stat) => (
-          <Card key={stat.name} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white/50 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between space-y-0 pb-2">
-                <p className="text-sm font-medium text-muted-foreground">{stat.name}</p>
-                <div className={`p-2 rounded-full ${stat.bg}`}>
-                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
+          <Link key={stat.name} to={stat.href || "#"}>
+            <Card className="border-none shadow-sm hover:shadow-md transition-all hover:-translate-y-1 bg-white/50 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between space-y-0 pb-2">
+                  <p className="text-sm font-medium text-muted-foreground">{stat.name}</p>
+                  <div className={`p-2 rounded-full ${stat.bg}`}>
+                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center pt-2">
-                <div className="text-2xl font-bold">{stat.val}</div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                <span className="text-emerald-500 font-medium">+12%</span> from last month
-              </p>
-            </CardContent>
-          </Card>
+                <div className="flex items-center pt-2">
+                  <div className="text-2xl font-bold">{stat.val}</div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  <span className="text-emerald-500 font-medium">+12%</span> from last month
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
 
@@ -377,7 +388,11 @@ function SystemFeedbackList() {
   const [feedback, setFeedback] = useState<any[]>([]);
 
   useEffect(() => {
-    getSystemFeedback().then(({ data }) => {
+    getSystemFeedback().then(({ data, error }) => {
+      if (error) {
+        console.warn("[Dashboard] Feedback blocked by RLS. Run SQL fixes.");
+        return;
+      }
       if (data) setFeedback(data.slice(0, 5));
     });
 

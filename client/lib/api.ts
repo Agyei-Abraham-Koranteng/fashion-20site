@@ -207,6 +207,7 @@ export const addSystemFeedback = async (feedback: {
   rating: number;
   feedback: string;
 }) => {
+  // Use minimal return to avoid 403 on the select-back if RLS is strict
   return await supabase.from("system_feedback").insert([feedback]);
 };
 
