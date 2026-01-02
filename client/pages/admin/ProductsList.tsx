@@ -282,64 +282,65 @@ export default function ProductsListAdmin() {
               </div>
 
               {/* Mobile Card View */}
-              <div className="md:hidden divide-y divide-gray-200">
+              <div className="md:hidden space-y-4 px-2">
                 {filteredProducts.map((product) => (
-                  <div key={product.id} className="p-4 space-y-4">
-                    <div className="flex items-start gap-4">
-                      {product.images?.[0] && (
-                        <img
-                          src={product.images[0].url}
-                          alt={product.name}
-                          className="h-20 w-20 rounded-lg object-cover flex-shrink-0 border"
-                        />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start">
-                          <h4 className="font-bold text-gray-900 truncate pr-4">{product.name}</h4>
-                          <span className="font-bold text-blue-600">
-                            ₵{product.sale_price || product.price}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-500 line-clamp-2 mt-1">
-                          {product.description}
-                        </p>
-                        <div className="flex gap-2 mt-3">
-                          <Badge variant="outline" className="bg-gray-50">
+                  <Card key={product.id} className="overflow-hidden border-gray-100 shadow-sm">
+                    <div className="flex p-4 gap-4">
+                      <div className="h-24 w-24 rounded-lg border border-gray-100 bg-white overflow-hidden flex-shrink-0 shadow-sm">
+                        {product.images?.[0] ? (
+                          <img
+                            src={product.images[0].url}
+                            alt={product.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-gray-50 text-gray-400">
+                            <ImageIcon className="h-6 w-6 opacity-30" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0 flex flex-col justify-between">
+                        <div>
+                          <div className="flex justify-between items-start gap-2">
+                            <h4 className="font-bold text-gray-900 truncate">{product.name}</h4>
+                            <span className="font-bold text-indigo-600 whitespace-nowrap">
+                              ₵{product.sale_price || product.price}
+                            </span>
+                          </div>
+                          <Badge variant="outline" className="mt-1 font-normal text-[10px] bg-gray-50/50 py-0">
                             {product.category?.name || "Uncategorized"}
                           </Badge>
-                          <Badge
-                            variant={product.stock > 10 ? "secondary" : "destructive"}
-                            className="text-[10px]"
-                          >
-                            {product.stock} in stock
-                          </Badge>
+                        </div>
+                        <div className="mt-auto flex items-center gap-2">
+                          <div className={`h-1.5 w-1.5 rounded-full ${product.stock > 10 ? 'bg-emerald-500' : product.stock > 0 ? 'bg-amber-500' : 'bg-red-500'}`} />
+                          <span className="text-[11px] font-medium text-gray-500">{product.stock} in stock</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2 pt-2">
+                    <div className="grid grid-cols-3 divide-x border-t border-gray-50">
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
-                        className="flex-1"
+                        className="rounded-none h-10 text-[11px] hover:bg-indigo-50 hover:text-indigo-600"
                         onClick={() => handleViewReviews(product.id)}
                       >
-                        <MessageSquare className="h-4 w-4 mr-2" /> Reviews
+                        <MessageSquare className="h-3.5 w-3.5 mr-1.5" /> Reviews
                       </Button>
-                      <Link to={`/admin/products/${product.id}/edit`} className="flex-1">
-                        <Button variant="outline" size="sm" className="w-full">
-                          <Edit className="h-4 w-4 mr-2" /> Edit
-                        </Button>
-                      </Link>
+                      <Button asChild variant="ghost" size="sm" className="rounded-none h-10 text-[11px] hover:bg-blue-50 hover:text-blue-600">
+                        <Link to={`/admin/products/${product.id}/edit`}>
+                          <Edit className="h-3.5 w-3.5 mr-1.5" /> Edit
+                        </Link>
+                      </Button>
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
-                        className="flex-1 text-destructive hover:text-destructive hover:bg-destructive/5"
+                        className="rounded-none h-10 text-[11px] text-gray-400 hover:bg-red-50 hover:text-red-600"
                         onClick={() => setProductToDelete(product.id)}
                       >
-                        <Trash2 className="h-4 w-4 mr-2" /> Delete
+                        <Trash2 className="h-3.5 w-3.5 mr-1.5" /> Delete
                       </Button>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
             </>

@@ -122,57 +122,6 @@ export default function SettingsAdmin() {
         </Card>
       </div>
 
-      {/* Admin Management Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Administrator Management
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Manage which users have administrator privileges. The email korantengabrahamagyei@gmail.com is automatically set as admin.
-          </p>
-        </CardHeader>
-        <CardContent>
-          {profilesLoading ? (
-            <div className="text-center py-4">Loading users...</div>
-          ) : profiles.length === 0 ? (
-            <div className="text-center py-4 text-muted-foreground">
-              No user profiles found. Users will appear here after they sign up.
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {profiles.map((profile: any) => (
-                <div key={profile.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <p className="font-medium">{profile.full_name || "No name"}</p>
-                      <p className="text-sm text-muted-foreground">@{profile.username}</p>
-                    </div>
-                    {profile.is_admin && (
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Shield className="h-3 w-3" />
-                        Admin
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor={`admin-${profile.id}`} className="text-sm">
-                      Admin Access
-                    </Label>
-                    <Switch
-                      id={`admin-${profile.id}`}
-                      checked={profile.is_admin || false}
-                      onCheckedChange={() => handleAdminToggle(profile.id, profile.is_admin)}
-                      disabled={updateAdminMutation.isPending}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }

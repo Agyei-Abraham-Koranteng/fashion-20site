@@ -194,9 +194,13 @@ export default function AdminLayout() {
       <div className="sticky top-0 z-40 flex h-16 items-center border-b border-gray-200 bg-white/80 backdrop-blur-md px-4 lg:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="sm" className="lg:hidden gap-2 border-gray-200 bg-white/80 backdrop-blur-sm shadow-sm hover:bg-gray-50 text-gray-700">
-              <Menu className="h-5 w-5" />
-              <span className="font-medium">Menu</span>
+            <Button
+              variant="outline"
+              size="icon"
+              className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl border-gray-200 bg-white shadow-sm hover:bg-gray-50 text-gray-900 focus-visible:ring-indigo-500 transition-all active:scale-95"
+            >
+              <Menu className="h-6 w-6 stroke-[2.5]" />
+              <span className="sr-only">Open Menu</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-72 border-r-0 bg-primary">

@@ -179,28 +179,40 @@ export default function Feedback() {
 
             {/* Main Content */}
             <Card className="bg-white border-gray-100 shadow-md overflow-hidden">
-                <CardHeader className="border-b bg-gray-50/30">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                            <MessageSquare className="h-5 w-5 text-indigo-600" />
-                            Customer Comments
-                        </CardTitle>
-                        <div className="flex flex-wrap items-center gap-3">
-                            <div className="relative min-w-[200px]">
+                <CardHeader className="border-b bg-gray-50/30 p-4 sm:p-6">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                                <MessageSquare className="h-5 w-5 text-indigo-600" />
+                                <span className="hidden sm:inline">Customer Comments</span>
+                                <span className="sm:hidden text-base">Reviews</span>
+                            </CardTitle>
+                            <button
+                                onClick={() => setSortOrder(prev => prev === "newest" ? "oldest" : "newest")}
+                                className="h-9 px-3 flex items-center gap-2 border border-gray-200 rounded-lg text-[11px] font-semibold bg-white hover:bg-gray-50 transition-colors shadow-sm"
+                            >
+                                <ArrowUpDown className="w-3.5 h-3.5" />
+                                {sortOrder === "newest" ? "Newest" : "Oldest"}
+                            </button>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <div className="relative flex-1">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    placeholder="Search comments..."
-                                    className="pl-9 h-9 border-gray-200 ring-offset-0 focus-visible:ring-1 focus-visible:ring-indigo-500"
+                                    placeholder="Search..."
+                                    className="pl-9 h-10 border-gray-200 ring-offset-0 focus-visible:ring-1 focus-visible:ring-indigo-500 shadow-sm"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
-                            <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg">
+
+                            <div className="flex overflow-x-auto pb-1 sm:pb-0 hide-scrollbar gap-2 p-1 bg-gray-100/80 rounded-xl border border-gray-200/50">
                                 <button
                                     onClick={() => setFilterRating("all")}
                                     className={cn(
-                                        "px-3 py-1 text-xs font-medium rounded-md transition-all",
-                                        filterRating === "all" ? "bg-white shadow-sm text-indigo-600" : "text-muted-foreground hover:text-gray-900"
+                                        "px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all whitespace-nowrap",
+                                        filterRating === "all" ? "bg-white shadow-md text-indigo-600 scale-105" : "text-muted-foreground hover:text-gray-900"
                                     )}
                                 >
                                     All
@@ -210,21 +222,14 @@ export default function Feedback() {
                                         key={r}
                                         onClick={() => setFilterRating(r)}
                                         className={cn(
-                                            "px-2 py-1 text-xs font-medium rounded-md flex items-center gap-1 transition-all",
-                                            filterRating === r ? "bg-white shadow-sm text-indigo-600" : "text-muted-foreground hover:text-gray-900"
+                                            "px-3 py-1.5 text-[11px] font-bold rounded-lg flex items-center gap-1 transition-all whitespace-nowrap",
+                                            filterRating === r ? "bg-white shadow-md text-indigo-600 scale-105" : "text-muted-foreground hover:text-gray-900"
                                         )}
                                     >
                                         {r} <Star className={cn("w-3 h-3", filterRating === r ? "fill-yellow-400 text-yellow-400" : "fill-none")} />
                                     </button>
                                 ))}
                             </div>
-                            <button
-                                onClick={() => setSortOrder(prev => prev === "newest" ? "oldest" : "newest")}
-                                className="h-9 px-3 flex items-center gap-2 border border-gray-200 rounded-lg text-xs font-medium bg-white hover:bg-gray-50 transition-colors"
-                            >
-                                <ArrowUpDown className="w-3.5 h-3.5" />
-                                {sortOrder === "newest" ? "Newest First" : "Oldest First"}
-                            </button>
                         </div>
                     </div>
                 </CardHeader>
