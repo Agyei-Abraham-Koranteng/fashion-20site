@@ -58,8 +58,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             role: role,
             full_name: session.user.user_metadata?.full_name || null,
           });
-          // Update last login timestamp for active customer tracking
-          await updateLastLogin(session.user.id);
+          // Update last login timestamp for active customer tracking (non-blocking)
+          updateLastLogin(session.user.id).catch(err =>
+            console.warn("[Auth] Failed to update last_login:", err)
+          );
         }
       } catch (err) {
         console.error("[Auth] Initial session check failed:", err);
@@ -82,9 +84,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             role: role,
             full_name: session.user.user_metadata?.full_name || null,
           });
-          // Update last login timestamp for active customer tracking
+          // Update last login timestamp for active customer tracking (non-blocking)
           if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            await updateLastLogin(session.user.id);
+            updateLastLogin(session.user.id).catch(err =>
+              console.warn("[Auth] Failed to update last_login:", err)
+            );
           }
         } else {
           setUser(null);
