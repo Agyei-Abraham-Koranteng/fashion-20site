@@ -34,6 +34,7 @@ const navigation = [
 ];
 
 export default function AdminLayout() {
+  console.log("[AdminLayout] Initializing with navigation:", navigation);
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user, loading: authLoading } = useAuth();
@@ -153,6 +154,7 @@ export default function AdminLayout() {
       <div className="flex h-20 items-center px-8 border-b border-slate-800/60 bg-slate-950/50 backdrop-blur-xl">
         <h1 className="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent tracking-tight">
           MadeInFashion
+          <span className="ml-2 inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="V2 Deployment Active"></span>
         </h1>
       </div>
 
