@@ -68,10 +68,10 @@ export default function ReviewSection() {
 
     return (
         <div className="space-y-4">
-            <h3 className="text-sm font-semibold tracking-wider uppercase mb-3 text-primary-foreground">
+            <h3 className="text-sm font-semibold tracking-wider uppercase mb-3 text-white">
                 Rate Your Experience
             </h3>
-            <p className="text-sm text-primary-foreground/70 mb-4">
+            <p className="text-sm text-slate-300 mb-4">
                 Help us improve the system with your valuable feedback.
             </p>
 
@@ -90,7 +90,7 @@ export default function ReviewSection() {
                             <Star
                                 className={`w-6 h-6 transition-colors ${star <= (hoverRating || rating)
                                     ? "fill-yellow-500 text-yellow-500"
-                                    : "text-primary-foreground/30"
+                                    : "text-slate-600"
                                     }`}
                             />
                         </button>
@@ -103,7 +103,7 @@ export default function ReviewSection() {
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
                         placeholder="Tell us what you think..."
-                        className="w-full min-h-[80px] rounded-md bg-primary-foreground/10 border-transparent focus:border-primary-foreground/30 focus:bg-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 p-3 text-sm resize-none transition-all focus:outline-none focus:ring-1 focus:ring-primary-foreground/30"
+                        className="w-full min-h-[80px] rounded-md bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-slate-500 focus:bg-slate-750 p-3 text-sm resize-none transition-all focus:outline-none focus:ring-1 focus:ring-slate-500"
                     />
                 </div>
 
