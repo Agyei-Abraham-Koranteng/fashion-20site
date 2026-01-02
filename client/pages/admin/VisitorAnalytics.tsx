@@ -131,39 +131,41 @@ export default function VisitorAnalytics() {
     };
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto">
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-3">
-                        <Activity className="h-8 w-8 text-indigo-600" />
-                        Visitor Analytics
-                    </h1>
-                    <p className="text-muted-foreground mt-1">Real-time traffic insights and visitor behavior.</p>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100">
-                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Live Tracking Active</span>
+        <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto px-1 sm:px-0">
+            <header className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-2 sm:gap-3">
+                            <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
+                            Visitors
+                        </h1>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1">Real-time traffic and flow.</p>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-100 shadow-sm">
+                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[10px] sm:text-xs font-bold text-emerald-700 uppercase tracking-widest">Live</span>
+                    </div>
                 </div>
             </header>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {[
-                    { label: "Total Visits", value: stats.total, icon: Users, color: "indigo" },
+                    { label: "Total", value: stats.total, icon: Users, color: "indigo" },
                     { label: "Today", value: stats.today, icon: Clock, color: "emerald" },
-                    { label: "Past 7 Days", value: stats.last7Days, icon: Calendar, color: "blue" },
-                    { label: "Weekly Growth", value: `${stats.growth > 0 ? "+" : ""}${stats.growth}%`, icon: ArrowUpRight, color: "orange" },
+                    { label: "7 Days", value: stats.last7Days, icon: Calendar, color: "blue" },
+                    { label: "Growth", value: `${stats.growth > 0 ? "+" : ""}${stats.growth}%`, icon: ArrowUpRight, color: "orange" },
                 ].map((item, i) => (
-                    <Card key={i} className="border-none shadow-sm bg-white/50 backdrop-blur-sm">
-                        <CardContent className="p-6">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className={cn("p-2 rounded-xl", `bg-${item.color}-500/10`)}>
-                                    <item.icon className={cn("h-5 w-5", `text-${item.color}-600`)} />
+                    <Card key={i} className="border-none shadow-sm bg-white border border-gray-100/50">
+                        <CardContent className="p-4 sm:p-6">
+                            <div className="flex justify-between items-start mb-2 sm:mb-4">
+                                <div className={cn("p-1.5 sm:p-2 rounded-lg sm:rounded-xl", `bg-${item.color}-500/10`)}>
+                                    <item.icon className={cn("h-4 w-4 sm:h-5 sm:w-5", `text-${item.color}-600`)} />
                                 </div>
                             </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{item.label}</p>
-                                <h3 className="text-2xl font-bold text-gray-900">{item.value}</h3>
+                            <div className="space-y-0.5">
+                                <p className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest truncate">{item.label}</p>
+                                <h3 className="text-lg sm:text-2xl font-black text-gray-900">{item.value}</h3>
                             </div>
                         </CardContent>
                     </Card>

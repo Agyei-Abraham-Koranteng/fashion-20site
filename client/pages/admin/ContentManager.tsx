@@ -163,21 +163,21 @@ export default function ContentManager() {
     }
 
     return (
-        <div className="container py-10 max-w-5xl space-y-8">
+        <div className="container py-6 sm:py-10 px-4 sm:px-6 max-w-5xl space-y-8">
             <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Content Manager</h2>
-                    <p className="text-muted-foreground mt-2">Manage dynamic text and images across your boutique store</p>
+                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Content Manager</h2>
+                    <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">Manage dynamic text and images across your boutique store</p>
                 </div>
             </div>
 
             <Tabs defaultValue="homepage" className="space-y-6">
-                <div className="overflow-x-auto pb-2">
-                    <TabsList className="bg-muted p-1 inline-flex w-full md:w-auto">
-                        <TabsTrigger value="homepage">Homepage</TabsTrigger>
-                        <TabsTrigger value="brand">Brand</TabsTrigger>
-                        <TabsTrigger value="support">Support</TabsTrigger>
-                        <TabsTrigger value="legal">Legal</TabsTrigger>
+                <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 hide-scrollbar">
+                    <TabsList className="bg-muted p-1 inline-flex w-auto min-w-full sm:min-w-0">
+                        <TabsTrigger value="homepage" className="px-6">Homepage</TabsTrigger>
+                        <TabsTrigger value="brand" className="px-6">Brand</TabsTrigger>
+                        <TabsTrigger value="support" className="px-6">Support</TabsTrigger>
+                        <TabsTrigger value="legal" className="px-6">Legal</TabsTrigger>
                     </TabsList>
                 </div>
 
