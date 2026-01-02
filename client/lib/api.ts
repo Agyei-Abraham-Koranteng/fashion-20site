@@ -70,6 +70,7 @@ export async function getProducts(filters?: {
     let query = supabase
       .from("products")
       .select("*")
+      .is("deleted_at", null) // Filter out soft deleted
       .order("created_at", { ascending: false });
 
     if (filters?.category) {
@@ -110,6 +111,7 @@ export async function getProductById(id: string) {
       .from("products")
       .select("*")
       .eq("id", Number(id))
+      .is("deleted_at", null) // Filter out soft deleted
       .single();
 
     if (error) throw error;
@@ -406,7 +408,7 @@ export async function deleteProduct(id: string) {
   try {
     const { data, error } = await supabase
       .from("products")
-      .delete()
+      .update({ deleted_at: new Date().toISOString() }) // Soft delete
       .eq("id", Number(id))
       .select();
 
