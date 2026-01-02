@@ -9,7 +9,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
-import { ThemeProvider } from "@/context/ThemeContext";
 
 import Home from "./pages/Home";
 import ProductListing from "./pages/ProductListing";
@@ -54,70 +53,68 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Suspense fallback={<div className="p-6">Loading...</div>}>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/shop" element={<ProductListing />} />
-                    <Route path="/product/:id" element={<ProductDetail />} />
-                    <Route path="/cart" element={<Cart />} />
-                    <Route path="/wishlist" element={<Wishlist />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/checkout" element={<Checkout />} />
+    <AuthProvider>
+      <CartProvider>
+        <WishlistProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Suspense fallback={<div className="p-6">Loading...</div>}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/shop" element={<ProductListing />} />
+                  <Route path="/product/:id" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/checkout" element={<Checkout />} />
 
-                    {/* Auth */}
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                  {/* Auth */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
 
-                    {/* Admin Auth */}
-                    <Route path="/admin/login" element={<AdminLogin />} />
-                    <Route path="/admin/signup" element={<AdminSignUp />} />
+                  {/* Admin Auth */}
+                  <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route path="/admin/signup" element={<AdminSignUp />} />
 
-                    {/* Admin Routes */}
-                    <Route path="/admin" element={<AdminLayout />}>
-                      <Route index element={<AdminDashboard />} />
-                      <Route path="products" element={<ProductsListAdmin />} />
-                      <Route path="products/new" element={<ProductFormAdmin />} />
-                      <Route path="products/:id/edit" element={<ProductFormAdmin />} />
-                      <Route path="orders" element={<OrdersListAdmin />} />
-                      <Route path="customers" element={<CustomersAdmin />} />
-                      <Route path="newsletter" element={<NewsletterAdmin />} />
-                      <Route path="messages" element={<MessagesAdmin />} />
-                      <Route path="content" element={<ContentManager />} />
-                      <Route path="settings" element={<SettingsAdmin />} />
-                    </Route>
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="products" element={<ProductsListAdmin />} />
+                    <Route path="products/new" element={<ProductFormAdmin />} />
+                    <Route path="products/:id/edit" element={<ProductFormAdmin />} />
+                    <Route path="orders" element={<OrdersListAdmin />} />
+                    <Route path="customers" element={<CustomersAdmin />} />
+                    <Route path="newsletter" element={<NewsletterAdmin />} />
+                    <Route path="messages" element={<MessagesAdmin />} />
+                    <Route path="content" element={<ContentManager />} />
+                    <Route path="settings" element={<SettingsAdmin />} />
+                  </Route>
 
-                    {/* Static Pages */}
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/faq" element={<FAQ />} />
-                    <Route path="/size-guide" element={<SizeGuide />} />
-                    <Route path="/shipping" element={<Shipping />} />
-                    <Route path="/returns" element={<Returns />} />
-                    <Route path="/privacy" element={<PrivacyPolicy />} />
-                    <Route path="/terms" element={<TermsOfService />} />
-                    <Route path="/cookies" element={<CmsPage slug="cookie_policy" defaultTitle="Cookie Policy" />} />
-                    <Route path="/careers" element={<CmsPage slug="careers" defaultTitle="Careers" />} />
-                    <Route path="/press" element={<CmsPage slug="press" defaultTitle="Press" />} />
-                    <Route path="/blog" element={<CmsPage slug="blog" defaultTitle="Blog" />} />
-                    <Route path="/sustainability" element={<CmsPage slug="sustainability" defaultTitle="Sustainability" />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Suspense>
-              </BrowserRouter>
-            </TooltipProvider>
-          </WishlistProvider>
-        </CartProvider>
-      </AuthProvider>
-    </ThemeProvider>
+                  {/* Static Pages */}
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/size-guide" element={<SizeGuide />} />
+                  <Route path="/shipping" element={<Shipping />} />
+                  <Route path="/returns" element={<Returns />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/cookies" element={<CmsPage slug="cookie_policy" defaultTitle="Cookie Policy" />} />
+                  <Route path="/careers" element={<CmsPage slug="careers" defaultTitle="Careers" />} />
+                  <Route path="/press" element={<CmsPage slug="press" defaultTitle="Press" />} />
+                  <Route path="/blog" element={<CmsPage slug="blog" defaultTitle="Blog" />} />
+                  <Route path="/sustainability" element={<CmsPage slug="sustainability" defaultTitle="Sustainability" />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </TooltipProvider>
+        </WishlistProvider>
+      </CartProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

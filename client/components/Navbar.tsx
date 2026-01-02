@@ -17,15 +17,12 @@ import {
   Ruler,
   ChevronRight,
   Sparkles,
-  Store,
-  Sun,
-  Moon
+  Store
 } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
-import { useTheme } from "@/context/ThemeContext";
 import AuthModal from "./AuthModal";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -63,7 +60,6 @@ export default function Navbar() {
   const { itemCount } = useCart();
   const { items: wishlistItems } = useWishlist();
   const { user } = useAuth();
-  const { theme, toggleMode } = useTheme();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -183,15 +179,6 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleMode}
-              className="p-2 hover:bg-secondary rounded-sm transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme.mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-
             {/* Search icon */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
@@ -296,7 +283,7 @@ export default function Navbar() {
           >
             <div className="container-wide py-6 pb-20 space-y-8">
               {/* Mobile Quick Actions */}
-              <div className="grid grid-cols-3 gap-4 pb-6 border-b border-border">
+              <div className="grid grid-cols-2 gap-4 pb-6 border-b border-border">
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
@@ -323,13 +310,6 @@ export default function Navbar() {
                   </div>
                   <span className="text-xs font-bold uppercase tracking-wider">Wishlist</span>
                 </Link>
-                <button
-                  onClick={toggleMode}
-                  className="flex flex-col items-center justify-center p-4 bg-secondary/50 rounded-lg"
-                >
-                  {theme.mode === 'dark' ? <Sun size={24} className="mb-2" /> : <Moon size={24} className="mb-2" />}
-                  <span className="text-xs font-bold uppercase tracking-wider">{theme.mode === 'dark' ? 'Light' : 'Dark'}</span>
-                </button>
               </div>
 
               {/* Shop Section */}

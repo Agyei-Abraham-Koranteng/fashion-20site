@@ -16,7 +16,6 @@ import {
   Mail,
   MailOpen,
   Bell,
-  Palette,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -147,16 +146,6 @@ export default function AdminLayout() {
     </Link>
   );
 
-  const CustomizeButton = () => (
-    <Link
-      to="/admin/settings"
-      className="relative p-2 rounded-full hover:bg-gray-100 transition-colors group mr-1"
-      title="Customize Appearance"
-    >
-      <Palette className="h-5 w-5 text-gray-600 group-hover:text-indigo-600 transition-colors" />
-    </Link>
-  );
-
   const SidebarContent = () => (
     <div className="flex h-full flex-col bg-slate-950 text-slate-300 border-r border-slate-800 shadow-xl">
       <div className="flex h-20 items-center px-8 border-b border-slate-800/60 bg-slate-950/50 backdrop-blur-xl">
@@ -211,7 +200,6 @@ export default function AdminLayout() {
           </span>
         </div>
         {/* Mobile Notification Button */}
-        <CustomizeButton />
         <NotificationButton />
       </div>
 
@@ -229,7 +217,6 @@ export default function AdminLayout() {
           <p className="text-sm text-gray-500 mt-0.5">Manage your store efficiently</p>
         </div>
         <div className="flex items-center gap-4">
-          <CustomizeButton />
           <NotificationButton />
         </div>
       </div>

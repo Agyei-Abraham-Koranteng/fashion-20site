@@ -9,38 +9,9 @@ import { getAllProfiles, updateUserAdminStatus } from "@/lib/api";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { useTheme } from "@/context/ThemeContext";
-import { Palette, Type, LayoutTemplate } from "lucide-react";
 
 export default function SettingsAdmin() {
   const queryClient = useQueryClient();
-  const { theme, updateTheme, resetTheme } = useTheme();
-
-  // Pre-defined color schemes
-  const colorSchemes = [
-    { name: "Navy (Default)", value: "217 32% 17%", hex: "#1e293b" },
-    { name: "Emerald", value: "142 71% 45%", hex: "#10b981" },
-    { name: "Violet", value: "262 83% 58%", hex: "#8b5cf6" },
-    { name: "Rose", value: "343 87% 55%", hex: "#f43f5e" },
-    { name: "Amber", value: "45 93% 47%", hex: "#f59e0b" },
-    { name: "Midnight", value: "222 47% 11%", hex: "#0f172a" },
-  ];
-
-  // Fonts
-  const fonts = [
-    { name: "Modern Sans (Inter)", value: "'Inter', sans-serif" },
-    { name: "Classic Serif (Playfair)", value: "'Playfair Display', serif" },
-    { name: "System UI", value: "system-ui, -apple-system, sans-serif" },
-  ];
-
-  // Radii
-  const radii = [
-    { name: "Sharp", value: "0rem" },
-    { name: "Slight", value: "0.25rem" },
-    { name: "Standard", value: "0.5rem" },
-    { name: "Rounded", value: "1rem" },
-  ];
-
 
   // Fetch all profiles
   const { data: profiles = [], isLoading: profilesLoading } = useQuery({
@@ -79,96 +50,6 @@ export default function SettingsAdmin() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Appearance Settings */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5" />
-              Site Appearance
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Customize the look and feel of your store. Changes apply immediately.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label className="flex items-center gap-2 text-base font-medium">
-                  <Palette className="h-4 w-4 text-muted-foreground" />
-                  Primary Color Theme
-                </Label>
-                <Button variant="outline" size="sm" onClick={resetTheme}>Reset to Default</Button>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {colorSchemes.map((scheme) => (
-                  <button
-                    key={scheme.name}
-                    onClick={() => updateTheme({ primaryColor: scheme.value })}
-                    className={`flex items-center gap-3 p-3 rounded-md border transition-all ${theme.primaryColor === scheme.value
-                        ? "border-primary ring-1 ring-primary bg-primary/5"
-                        : "border-border hover:border-primary/50"
-                      }`}
-                  >
-                    <div
-                      className="h-6 w-6 rounded-full shadow-sm border border-black/10"
-                      style={{ backgroundColor: scheme.hex }}
-                    />
-                    <span className="text-sm font-medium">{scheme.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6 pt-4 border-t">
-              <div className="space-y-3">
-                <Label className="flex items-center gap-2 text-base font-medium">
-                  <Type className="h-4 w-4 text-muted-foreground" />
-                  Font Family
-                </Label>
-                <div className="space-y-2">
-                  {fonts.map((font) => (
-                    <button
-                      key={font.name}
-                      onClick={() => updateTheme({ fontFamily: font.value })}
-                      className={`w-full flex items-center justify-between p-3 rounded-md border text-left transition-all ${theme.fontFamily === font.value
-                          ? "border-primary ring-1 ring-primary bg-primary/5"
-                          : "border-border hover:border-primary/50"
-                        }`}
-                    >
-                      <span className="text-sm font-medium">{font.name}</span>
-                      <span className="text-xs text-muted-foreground" style={{ fontFamily: font.value }}>
-                        Aa Bb Cc
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <Label className="flex items-center gap-2 text-base font-medium">
-                  <LayoutTemplate className="h-4 w-4 text-muted-foreground" />
-                  Border Radius
-                </Label>
-                <div className="space-y-2">
-                  {radii.map((radius) => (
-                    <button
-                      key={radius.name}
-                      onClick={() => updateTheme({ radius: radius.value })}
-                      className={`w-full flex items-center justify-between p-3 rounded-md border text-left transition-all ${theme.radius === radius.value
-                          ? "border-primary ring-1 ring-primary bg-primary/5"
-                          : "border-border hover:border-primary/50"
-                        }`}
-                    >
-                      <span className="text-sm font-medium">{radius.name}</span>
-                      <div className="h-4 w-12 border border-gray-400 bg-gray-100" style={{ borderRadius: radius.value }} />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Store Information</CardTitle>
