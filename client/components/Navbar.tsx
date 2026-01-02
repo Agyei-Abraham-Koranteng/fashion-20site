@@ -191,7 +191,7 @@ export default function Navbar() {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="p-2 hover:bg-secondary rounded-sm transition-colors relative"
+              className="hidden sm:block p-2 hover:bg-secondary rounded-sm transition-colors relative"
               aria-label="Wishlist"
             >
               <Heart size={20} />
@@ -224,7 +224,7 @@ export default function Navbar() {
                   setIsAuthModalOpen(true);
                 }
               }}
-              className="p-2 hover:bg-secondary rounded-sm transition-colors relative"
+              className="hidden sm:block p-2 hover:bg-secondary rounded-sm transition-colors relative"
               aria-label="Account"
             >
               <User size={20} />
@@ -278,10 +278,40 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "100vh" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="md:hidden border-t border-border bg-background fixed left-0 right-0 z-50 overflow-y-auto"
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="md:hidden border-t border-border bg-background fixed inset-0 top-16 z-50 overflow-y-auto"
           >
-            <div className="container-wide py-8 space-y-10">
+            <div className="container-wide py-6 pb-20 space-y-8">
+              {/* Mobile Quick Actions */}
+              <div className="grid grid-cols-2 gap-4 pb-6 border-b border-border">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (user) navigate("/dashboard");
+                    else setIsAuthModalOpen(true);
+                  }}
+                  className="flex flex-col items-center justify-center p-4 bg-secondary/50 rounded-lg"
+                >
+                  <User size={24} className="mb-2" />
+                  <span className="text-xs font-bold uppercase tracking-wider">{user ? "Dashboard" : "Login"}</span>
+                </button>
+                <Link
+                  to="/wishlist"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex flex-col items-center justify-center p-4 bg-secondary/50 rounded-lg group"
+                >
+                  <div className="relative">
+                    <Heart size={24} className="mb-2" />
+                    {wishlistItems.length > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-accent text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                        {wishlistItems.length}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider">Wishlist</span>
+                </Link>
+              </div>
+
               {/* Shop Section */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

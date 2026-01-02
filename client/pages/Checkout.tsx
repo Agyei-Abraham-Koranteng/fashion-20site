@@ -314,7 +314,7 @@ export default function Checkout() {
 
                 <button
                   onClick={() => setStep(2)}
-                  className="btn-primary flex items-center gap-2 ml-auto"
+                  className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto sm:ml-auto h-12 md:h-14"
                 >
                   Continue to Billing
                   <ChevronRight size={18} />
@@ -403,16 +403,16 @@ export default function Checkout() {
                   </div>
                 )}
 
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                   <button
                     onClick={() => setStep(1)}
-                    className="btn-secondary flex-1"
+                    className="btn-secondary w-full h-12 md:h-14"
                   >
                     Back
                   </button>
                   <button
                     onClick={() => setStep(3)}
-                    className="btn-primary flex-1 flex items-center justify-center gap-2"
+                    className="btn-primary w-full flex items-center justify-center gap-2 h-12 md:h-14"
                   >
                     Continue to Confirmation
                     <ChevronRight size={18} />
@@ -446,17 +446,17 @@ export default function Checkout() {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                   <button
                     onClick={() => setStep(2)}
-                    className="btn-secondary flex-1"
+                    className="btn-secondary w-full h-12 md:h-14"
                   >
                     Back
                   </button>
                   <button
                     onClick={handlePlaceOrder}
                     disabled={isSubmitting}
-                    className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed h-12 md:h-14"
                   >
                     {isSubmitting ? (
                       <>

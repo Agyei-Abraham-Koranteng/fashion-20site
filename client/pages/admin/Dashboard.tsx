@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { getAdminStats, getAllOrders } from "@/lib/api";
@@ -28,10 +28,22 @@ export default function AdminDashboard() {
   const [ordersData, setOrdersData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Refs for debouncing and concurrency control
+  const isFetchingRef = useRef(false);
+  const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const loadData = async (silent = false) => {
+    // Basic guard against overlapping fetches
+    if (isFetchingRef.current) {
+      console.log("[Dashboard] Load already in progress, skipping...");
+      return;
+    }
+
     if (!silent) setLoading(true);
+    isFetchingRef.current = true;
 
     try {
+      console.log("[Dashboard] Loading data...");
       // Load stats and orders in parallel with individual error handling
       const [statsResult, ordersResult] = await Promise.allSettled([
         getAdminStats(),
@@ -115,7 +127,15 @@ export default function AdminDashboard() {
       toast.error("Failed to load dashboard data");
     } finally {
       if (!silent) setLoading(false);
+      isFetchingRef.current = false;
     }
+  };
+
+  const debouncedReload = () => {
+    if (reloadTimeoutRef.current) clearTimeout(reloadTimeoutRef.current);
+    reloadTimeoutRef.current = setTimeout(() => {
+      loadData(true);
+    }, 2500); // 2.5 second debounce for real-time updates
   };
 
   useEffect(() => {
@@ -129,51 +149,25 @@ export default function AdminDashboard() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "orders" },
-        () => loadData(true)
+        () => debouncedReload()
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "products" },
-        () => loadData(true)
+        () => debouncedReload()
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "profiles" },
-        () => loadData(true)
+        () => debouncedReload()
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(ordersChannel);
+      if (reloadTimeoutRef.current) clearTimeout(reloadTimeoutRef.current);
     };
   }, []);
-
-  const stats = [
-    {
-      name: "Total Revenue",
-      value: `₵${statsData.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      change: "Live Database",
-      icon: DollarSign,
-    },
-    {
-      name: "Orders",
-      value: statsData.totalOrders.toLocaleString(),
-      change: "Live Database",
-      icon: ShoppingCart,
-    },
-    {
-      name: "Products",
-      value: statsData.totalProducts.toLocaleString(),
-      change: "Live Database",
-      icon: Package,
-    },
-    {
-      name: "Active Customers",
-      value: statsData.activeCustomers.toLocaleString(),
-      change: "Live Database",
-      icon: Users,
-    },
-  ];
 
   return (
     <div className="space-y-8">
@@ -230,7 +224,7 @@ export default function AdminDashboard() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         {/* Revenue Chart */}
-        <Card className="col-span-4 border-none shadow-sm bg-white/50 backdrop-blur-sm">
+        <Card className="col-span-full lg:col-span-4 border-none shadow-sm bg-white/50 backdrop-blur-sm">
           <CardHeader>
             <CardTitle>Revenue Overview</CardTitle>
             <p className="text-sm text-muted-foreground">Monthly revenue performance</p>
@@ -278,7 +272,7 @@ export default function AdminDashboard() {
         </Card>
 
         {/* Weekly Orders Chart */}
-        <Card className="col-span-3 border-none shadow-sm bg-white/50 backdrop-blur-sm">
+        <Card className="col-span-full lg:col-span-3 border-none shadow-sm bg-white/50 backdrop-blur-sm">
           <CardHeader>
             <CardTitle>Weekly Orders</CardTitle>
             <p className="text-sm text-muted-foreground">Orders activity past 7 days</p>

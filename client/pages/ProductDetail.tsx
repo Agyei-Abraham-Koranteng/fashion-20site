@@ -175,12 +175,12 @@ export default function ProductDetail() {
             </div>
 
             {/* Thumbnail images */}
-            <div className="flex gap-3">
+            <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-none">
               {product.images.map((image, idx) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedImage(idx)}
-                  className={`w-20 h-20 rounded-sm overflow-hidden border-2 transition-colors ${selectedImage === idx ? "border-primary" : "border-border"
+                  className={`w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-sm overflow-hidden border-2 transition-colors ${selectedImage === idx ? "border-primary" : "border-border"
                     }`}
                 >
                   <img
@@ -240,16 +240,16 @@ export default function ProductDetail() {
 
               {/* Rating */}
               <div className="flex items-center gap-2 mb-6">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      size={16}
+                      size={14}
                       className="fill-primary text-primary"
                     />
                   ))}
                 </div>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   (127 reviews)
                 </span>
               </div>
@@ -265,12 +265,12 @@ export default function ProductDetail() {
               <label className="block text-sm font-semibold mb-3 tracking-wider uppercase">
                 Size
               </label>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-4 gap-2">
                 {availableSizes.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`py-3 px-2 rounded-sm border-2 font-medium text-sm transition-colors ${selectedSize === size
+                    className={`py-2 px-1 md:py-3 md:px-2 rounded-sm border-2 font-medium text-xs md:text-sm transition-colors ${selectedSize === size
                       ? "bg-primary text-primary-foreground border-primary"
                       : "bg-background border-border hover:border-primary"
                       }`}
@@ -328,13 +328,13 @@ export default function ProductDetail() {
             <div className="flex flex-col gap-3 mb-8">
               <button
                 onClick={handleAddToCart}
-                className={`btn-primary flex items-center justify-center gap-2 transition-all ${addedToCart ? "bg-green-600" : ""
+                className={`btn-primary w-full flex items-center justify-center gap-2 h-12 md:h-14 transition-all ${addedToCart ? "bg-green-600" : ""
                   }`}
               >
                 <ShoppingBag size={18} />
                 {addedToCart ? "Added to Cart!" : "Add to Cart"}
               </button>
-              <button onClick={handleBuyNow} className="btn-outline">Buy Now</button>
+              <button onClick={handleBuyNow} className="btn-outline w-full h-12 md:h-14">Buy Now</button>
             </div>
 
             {/* Info boxes */}

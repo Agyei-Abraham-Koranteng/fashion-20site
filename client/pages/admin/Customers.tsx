@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { getCustomers } from "@/lib/api";
@@ -18,8 +18,16 @@ export default function CustomersAdmin() {
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Refs for debouncing and concurrency control
+  const isFetchingRef = useRef(false);
+  const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const loadCustomers = async (silent = false) => {
+    if (isFetchingRef.current) return;
+
     if (!silent) setLoading(true);
+    isFetchingRef.current = true;
+
     console.log("[Customers] Fetching customers...");
     try {
       const { data, error } = await getCustomers();
@@ -36,7 +44,15 @@ export default function CustomersAdmin() {
       toast.error("Failed to load customers");
     } finally {
       if (!silent) setLoading(false);
+      isFetchingRef.current = false;
     }
+  };
+
+  const debouncedReload = () => {
+    if (reloadTimeoutRef.current) clearTimeout(reloadTimeoutRef.current);
+    reloadTimeoutRef.current = setTimeout(() => {
+      loadCustomers(true);
+    }, 2500); // 2.5 second debounce
   };
 
   useEffect(() => {
@@ -47,12 +63,13 @@ export default function CustomersAdmin() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "profiles" },
-        () => loadCustomers(true)
+        () => debouncedReload()
       )
       .subscribe();
 
     return () => {
       subscription.unsubscribe();
+      if (reloadTimeoutRef.current) clearTimeout(reloadTimeoutRef.current);
     };
   }, []);
 

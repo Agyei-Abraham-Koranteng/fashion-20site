@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { getAllOrders, updateOrderStatus } from "@/lib/api";
@@ -45,8 +45,16 @@ export default function OrdersListAdmin() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
+  // Refs for debouncing and concurrency control
+  const isFetchingRef = useRef(false);
+  const reloadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const loadOrders = async (silent = false) => {
+    if (isFetchingRef.current) return;
+
     if (!silent) setLoading(true);
+    isFetchingRef.current = true;
+
     console.log("[OrdersList] Fetching orders...");
     try {
       const { data, error } = await getAllOrders();
@@ -63,7 +71,15 @@ export default function OrdersListAdmin() {
       toast.error("Failed to load orders");
     } finally {
       if (!silent) setLoading(false);
+      isFetchingRef.current = false;
     }
+  };
+
+  const debouncedReload = () => {
+    if (reloadTimeoutRef.current) clearTimeout(reloadTimeoutRef.current);
+    reloadTimeoutRef.current = setTimeout(() => {
+      loadOrders(true);
+    }, 2500); // 2.5 second debounce
   };
 
   useEffect(() => {
@@ -78,13 +94,14 @@ export default function OrdersListAdmin() {
         { event: "*", schema: "public", table: "orders" },
         (payload) => {
           console.log("Real-time update:", payload);
-          loadOrders(true);
+          debouncedReload();
         }
       )
       .subscribe();
 
     return () => {
       subscription.unsubscribe();
+      if (reloadTimeoutRef.current) clearTimeout(reloadTimeoutRef.current);
     };
   }, []);
 

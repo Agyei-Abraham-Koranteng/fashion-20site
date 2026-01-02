@@ -451,31 +451,26 @@ export async function updateOrderStatus(orderId: string, status: string) {
 
 export async function getAdminStats() {
   try {
-    // Basic stats aggregation
-    const { count: productsCount } = await withTimeout(supabase
-      .from('products')
-      .select('*', { count: 'exact', head: true }));
+    // Parallelize stats aggregation with individual error handling
+    const [pResult, oResult, rResult, cResult] = await Promise.allSettled([
+      withTimeout(supabase.from('products').select('*', { count: 'exact', head: true }), 15000, "stats:products"),
+      withTimeout(supabase.from('orders').select('*', { count: 'exact', head: true }), 15000, "stats:orders_count"),
+      withTimeout(supabase.from('orders').select('total_price'), 20000, "stats:revenue"),
+      withTimeout(supabase.from('profiles').select('*', { count: 'exact', head: true }), 15000, "stats:customers")
+    ]);
 
-    const { count: ordersCount } = await withTimeout(supabase
-      .from('orders')
-      .select('*', { count: 'exact', head: true }));
-
-    const { data: orders } = await withTimeout(supabase
-      .from('orders')
-      .select('total_price'));
-
-    const totalRevenue = (orders as any[])?.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0) || 0;
-
-    const { count: customersCount } = await withTimeout(supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true }));
+    const productsCount = pResult.status === 'fulfilled' ? (pResult.value.count || 0) : 0;
+    const ordersCount = oResult.status === 'fulfilled' ? (oResult.value.count || 0) : 0;
+    const orders = rResult.status === 'fulfilled' ? (rResult.value.data as any[] || []) : [];
+    const totalRevenue = orders.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0) || 0;
+    const customersCount = cResult.status === 'fulfilled' ? (cResult.value.count || 0) : 0;
 
     return {
       data: {
         totalRevenue,
-        totalOrders: ordersCount || 0,
-        totalProducts: productsCount || 0,
-        activeCustomers: customersCount || 0,
+        totalOrders: ordersCount,
+        totalProducts: productsCount,
+        activeCustomers: customersCount,
       },
       error: null,
     };

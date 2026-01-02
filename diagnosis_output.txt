@@ -1,0 +1,10 @@
+[dotenv@17.2.1] injecting env (4) from .env -- tip: ΓÜÖ∩╕Å  enable debug logging with { debug: true }
+Starting Admin Diagnosis...
+Γ£à [Products (Simple)] took 1240.95ms
+   [Products (Simple)] Data count: 3
+Γ£à [Profiles (Count)] took 254.81ms
+   [Profiles (Count)] Data count: 1
+Γ£à [Orders (Nested)] took 407.74ms
+   [Orders (Nested)] Data count: 8
+Γ£à [CMS Content] took 336.28ms
+   [CMS Content] Data count: 1
