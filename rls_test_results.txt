@@ -1,0 +1,22 @@
+--- RLS Test Results ---
+
+system_feedback Error: {
+  "code": "42501",
+  "details": null,
+  "hint": null,
+  "message": "new row violates row-level security policy for table \"system_feedback\""
+}
+
+product_reviews Success: [
+  {
+    "id": "7993a023-5586-4cb6-a004-026da9cd95f0",
+    "product_id": 8,
+    "user_id": null,
+    "user_name": "Test Bot",
+    "rating": 5,
+    "title": "Test Review",
+    "comment": "Test Comment",
+    "created_at": "2026-01-02T14:09:30.762451+00:00"
+  }
+]
+

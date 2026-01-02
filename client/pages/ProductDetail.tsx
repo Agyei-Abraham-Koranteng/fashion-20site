@@ -23,6 +23,7 @@ export default function ProductDetail() {
   const [addedToCart, setAddedToCart] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 0, title: "", comment: "", user_name: "" });
+  const [reviewSort, setReviewSort] = useState<"newest" | "highest" | "lowest">("newest");
 
   const { addItem } = useCart();
   const {
@@ -291,7 +292,7 @@ export default function ProductDetail() {
                   ))}
                 </div>
                 <span className="text-xs text-muted-foreground">
-                  (127 reviews)
+                  ({reviews.length} reviews)
                 </span>
               </div>
 
@@ -463,12 +464,70 @@ export default function ProductDetail() {
         <div className="container-wide">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold">Customer Reviews</h2>
-            <button
-              onClick={() => setShowReviewForm(!showReviewForm)}
-              className="btn-outline text-sm"
-            >
-              Write a Review
-            </button>
+            <div className="flex items-center gap-4">
+              <select
+                value={reviewSort}
+                onChange={(e) => setReviewSort(e.target.value as any)}
+                className="text-sm bg-transparent border-none focus:ring-0 cursor-pointer font-medium"
+              >
+                <option value="newest">Newest First</option>
+                <option value="highest">Highest Rating</option>
+                <option value="lowest">Lowest Rating</option>
+              </select>
+              <button
+                onClick={() => setShowReviewForm(!showReviewForm)}
+                className="btn-outline text-sm"
+              >
+                Write a Review
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            {/* Rating Summary Card */}
+            <div className="md:col-span-1 bg-secondary/30 p-6 rounded-lg flex flex-col items-center justify-center text-center">
+              <div className="text-5xl font-bold mb-2">
+                {reviews.length > 0
+                  ? (reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / reviews.length).toFixed(1)
+                  : "0.0"}
+              </div>
+              <div className="flex gap-1 mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    size={20}
+                    className={
+                      i < Math.round(reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / (reviews.length || 1))
+                        ? "fill-primary text-primary"
+                        : "text-muted-foreground/30"
+                    }
+                  />
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground font-medium">Based on {reviews.length} reviews</p>
+            </div>
+
+            {/* Rating Distribution */}
+            <div className="md:col-span-3 bg-secondary/10 p-6 rounded-lg space-y-3">
+              {[5, 4, 3, 2, 1].map((rating) => {
+                const count = reviews.filter((r: any) => r.rating === rating).length;
+                const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                return (
+                  <div key={rating} className="flex items-center gap-4 text-sm">
+                    <div className="w-12 font-medium flex items-center gap-1">
+                      {rating} <Star size={12} className="fill-primary text-primary" />
+                    </div>
+                    <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all duration-500"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <div className="w-12 text-right text-muted-foreground">{count}</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {showReviewForm && (
@@ -553,42 +612,48 @@ export default function ProductDetail() {
 
           <div className="space-y-6">
             {reviews.length > 0 ? (
-              reviews.map((review: any) => (
-                <div key={review.id} className="border-b border-border last:border-0 pb-6 animate-fade-in">
-                  <div className="flex items-start gap-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                      {(review.user_name || "A").charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-bold text-sm text-gray-900">{review.user_name || "Anonymous"}</h4>
-                          <span className="text-xs text-green-600 flex items-center gap-0.5 mt-0.5 font-medium">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
-                            Verified Buyer
+              [...reviews]
+                .sort((a: any, b: any) => {
+                  if (reviewSort === "highest") return b.rating - a.rating;
+                  if (reviewSort === "lowest") return a.rating - b.rating;
+                  return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                })
+                .map((review: any) => (
+                  <div key={review.id} className="border-b border-border last:border-0 pb-6 animate-fade-in group">
+                    <div className="flex items-start gap-4">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold transition-transform group-hover:scale-110">
+                        {(review.user_name || "A").charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h4 className="font-bold text-sm text-gray-900">{review.user_name || "Anonymous"}</h4>
+                            <span className="text-xs text-green-600 flex items-center gap-0.5 mt-0.5 font-medium">
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+                              Verified Buyer
+                            </span>
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(review.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                           </span>
                         </div>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(review.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-                        </span>
+                        <div className="flex items-center gap-1 my-2">
+                          {[...Array(5)].map((_, j) => (
+                            <Star
+                              key={j}
+                              size={14}
+                              className={j < review.rating ? "fill-yellow-500 text-yellow-500" : "text-gray-200"}
+                            />
+                          ))}
+                          <span className="text-xs font-semibold ml-2">{review.title}</span>
+                        </div>
+                        <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-900 transition-colors">
+                          {review.comment}
+                        </p>
                       </div>
-                      <div className="flex items-center gap-1 my-2">
-                        {[...Array(5)].map((_, j) => (
-                          <Star
-                            key={j}
-                            size={14}
-                            className={j < review.rating ? "fill-yellow-500 text-yellow-500" : "text-gray-200"}
-                          />
-                        ))}
-                        <span className="text-xs font-semibold ml-2">{review.title}</span>
-                      </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">
-                        {review.comment}
-                      </p>
                     </div>
                   </div>
-                </div>
-              ))
+                ))
             ) : (
               <div className="text-center py-12 bg-secondary/30 rounded-lg">
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-secondary mb-4">

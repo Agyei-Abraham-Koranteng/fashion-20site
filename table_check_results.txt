@@ -1,0 +1,10 @@
+--- Database Table Check ---
+✅ products                 : Exists
+✅ profiles                 : Exists
+✅ orders                   : Exists
+✅ categories               : Exists
+✅ system_feedback          : Exists
+✅ product_reviews          : Exists
+✅ contact_messages         : Exists
+✅ newsletter_subscribers   : Exists
+✅ cms_content              : Exists
