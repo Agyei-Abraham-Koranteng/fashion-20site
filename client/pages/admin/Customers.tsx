@@ -13,6 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Trash2, UserX, Clock, MapPin } from "lucide-react";
+import { deleteProfile } from "@/lib/api";
+import { format, isAfter, subDays } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function CustomersAdmin() {
   const [customers, setCustomers] = useState<any[]>([]);
@@ -46,6 +51,25 @@ export default function CustomersAdmin() {
       if (!silent) setLoading(false);
       isFetchingRef.current = false;
     }
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete customer "${name}"? This action cannot be undone.`)) return;
+
+    try {
+      const { error } = await deleteProfile(id);
+      if (error) throw error;
+      toast.success("Customer deleted successfully");
+      loadCustomers(true);
+    } catch (err) {
+      console.error("[Customers] Delete error:", err);
+      toast.error("Failed to delete customer");
+    }
+  };
+
+  const isActive = (lastLogin: string | null) => {
+    if (!lastLogin) return false;
+    return isAfter(new Date(lastLogin), subDays(new Date(), 30));
   };
 
   const debouncedReload = () => {
@@ -95,7 +119,9 @@ export default function CustomersAdmin() {
                   <TableHead className="min-w-[200px]">Customer</TableHead>
                   <TableHead className="min-w-[200px]">Email/Username</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Last Active</TableHead>
                   <TableHead>Joined</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -128,9 +154,33 @@ export default function CustomersAdmin() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {customer.updated_at
-                          ? new Date(customer.updated_at).toLocaleDateString()
+                        <div className="flex items-center gap-2">
+                          {isActive(customer.last_login) && (
+                            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="Active in last 30 days" />
+                          )}
+                          <span className="text-sm">
+                            {customer.last_login
+                              ? format(new Date(customer.last_login), "MMM d, yyyy")
+                              : "Never"}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {customer.created_at
+                          ? format(new Date(customer.created_at), "MMM d, yyyy")
                           : "N/A"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {!customer.is_admin && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-red-400 hover:text-red-600 hover:bg-red-50"
+                            onClick={() => handleDelete(customer.id, customer.full_name || customer.username)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
@@ -170,13 +220,26 @@ export default function CustomersAdmin() {
                     <p className="text-sm text-gray-500 truncate mt-1">
                       {customer.username || "No Email"}
                     </p>
-                    <div className="flex items-center gap-1 mt-2 text-[11px] text-muted-foreground">
-                      <span className="font-semibold uppercase tracking-wider">Joined:</span>
-                      <span>
-                        {customer.updated_at
-                          ? new Date(customer.updated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
-                          : "N/A"}
-                      </span>
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                        <Clock className="w-3 h-3" />
+                        <span className="font-semibold uppercase tracking-wider">Active:</span>
+                        <span className={cn(isActive(customer.last_login) ? "text-emerald-600 font-medium" : "")}>
+                          {customer.last_login
+                            ? format(new Date(customer.last_login), "MMM d")
+                            : "Never"}
+                        </span>
+                      </div>
+                      {!customer.is_admin && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-red-400"
+                          onClick={() => handleDelete(customer.id, customer.full_name || customer.username)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>

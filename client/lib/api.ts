@@ -463,6 +463,23 @@ export async function getCustomers() {
   }
 }
 
+export async function deleteProfile(id: string) {
+  console.log("[API] deleteProfile called", id);
+  try {
+    const { error } = await withTimeout(
+      supabase.from("profiles").delete().eq("id", id),
+      30000,
+      "deleteProfile"
+    );
+
+    if (error) throw error;
+    return { error: null };
+  } catch (error) {
+    console.error("[API] deleteProfile caught error:", error);
+    return { error };
+  }
+}
+
 export async function getUserProfile(userId: string) {
   try {
     const { data, error } = await supabase
