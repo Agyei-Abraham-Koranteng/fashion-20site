@@ -28,9 +28,9 @@ export default function ReviewSection() {
 
             setSubmitted(true);
             toast.success("Thank you for your feedback!");
-        } catch (error) {
+        } catch (error: any) {
             console.error("Feedback error:", error);
-            toast.error("Failed to submit feedback. Please try again.");
+            toast.error(`Failed: ${error.message || error.details || "Unknown error"}`);
         }
     };
 
