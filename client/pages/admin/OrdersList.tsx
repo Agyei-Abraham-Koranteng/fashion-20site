@@ -150,13 +150,13 @@ export default function OrdersListAdmin() {
                 <SelectTrigger className="w-full sm:w-40 h-10">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
-                  <SelectItem value="shipped">Shipped</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectContent className="z-[100] bg-white shadow-lg border border-gray-200" position="popper" sideOffset={4}>
+                  <SelectItem value="all" className="cursor-pointer hover:bg-gray-50 focus:bg-gray-50">All Status</SelectItem>
+                  <SelectItem value="pending" className="cursor-pointer hover:bg-amber-50 focus:bg-amber-50">Pending</SelectItem>
+                  <SelectItem value="processing" className="cursor-pointer hover:bg-blue-50 focus:bg-blue-50">Processing</SelectItem>
+                  <SelectItem value="shipped" className="cursor-pointer hover:bg-blue-50 focus:bg-blue-50">Shipped</SelectItem>
+                  <SelectItem value="delivered" className="cursor-pointer hover:bg-emerald-50 focus:bg-emerald-50">Delivered</SelectItem>
+                  <SelectItem value="cancelled" className="cursor-pointer hover:bg-red-50 focus:bg-red-50">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -385,7 +385,7 @@ export default function OrdersListAdmin() {
                           order.status === 'cancelled' ? 'bg-red-50 text-red-700' :
                             'bg-amber-50 text-amber-700'
                         }`}>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 whitespace-nowrap">
                           <div className={`h-1.5 w-1.5 rounded-full ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-500' :
                             order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-500' :
                               order.status === 'cancelled' ? 'bg-red-500' :
