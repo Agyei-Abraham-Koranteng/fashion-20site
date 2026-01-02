@@ -204,6 +204,7 @@ export default function AdminDashboard() {
           {
             name: "Active Customers",
             val: statsData.activeCustomers.toLocaleString(),
+            href: "/admin/customers?filter=active",
             icon: Users,
             color: "text-orange-500",
             bg: "bg-orange-500/10",

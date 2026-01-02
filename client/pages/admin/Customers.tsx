@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { getCustomers } from "@/lib/api";
@@ -20,6 +21,9 @@ import { format, isAfter, subDays } from "date-fns";
 import { cn } from "@/lib/utils";
 
 export default function CustomersAdmin() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeFilter = searchParams.get("filter") === "active";
+
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -72,6 +76,11 @@ export default function CustomersAdmin() {
     return isAfter(new Date(lastLogin), subDays(new Date(), 30));
   };
 
+  const filteredCustomers = useMemo(() => {
+    if (!activeFilter) return customers;
+    return customers.filter(c => isActive(c.last_login));
+  }, [customers, activeFilter]);
+
   const debouncedReload = () => {
     if (reloadTimeoutRef.current) clearTimeout(reloadTimeoutRef.current);
     reloadTimeoutRef.current = setTimeout(() => {
@@ -106,6 +115,26 @@ export default function CustomersAdmin() {
         </p>
       </div>
 
+      <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg w-fit">
+        <Button
+          variant={!activeFilter ? "secondary" : "ghost"}
+          size="sm"
+          className={cn("h-8 text-xs", !activeFilter ? "bg-white shadow-sm" : "")}
+          onClick={() => setSearchParams({})}
+        >
+          All Customers
+        </Button>
+        <Button
+          variant={activeFilter ? "secondary" : "ghost"}
+          size="sm"
+          className={cn("h-8 text-xs", activeFilter ? "bg-white shadow-sm" : "")}
+          onClick={() => setSearchParams({ filter: "active" })}
+        >
+          Active Only
+          {activeFilter && <span className="ml-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+        </Button>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>All Customers ({customers.length})</CardTitle>
@@ -131,8 +160,8 @@ export default function CustomersAdmin() {
                       Loading customers...
                     </TableCell>
                   </TableRow>
-                ) : customers.length > 0 ? (
-                  customers.map((customer) => (
+                ) : filteredCustomers.length > 0 ? (
+                  filteredCustomers.map((customer) => (
                     <TableRow key={customer.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
@@ -199,8 +228,8 @@ export default function CustomersAdmin() {
           <div className="md:hidden divide-y divide-gray-200">
             {loading ? (
               <div className="p-8 text-center text-muted-foreground">Loading customers...</div>
-            ) : customers.length > 0 ? (
-              customers.map((customer) => (
+            ) : filteredCustomers.length > 0 ? (
+              filteredCustomers.map((customer) => (
                 <div key={customer.id} className="p-4 flex items-center gap-4">
                   <Avatar className="h-12 w-12 border">
                     <AvatarImage src={customer.avatar_url} />
