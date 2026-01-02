@@ -25,6 +25,7 @@ console.log("!!! ADMIN_LAYOUT_LOADED_V3 !!!");
 
 const navigation = [
   { name: "Feedback", href: "/admin/feedback", icon: Star },
+  { name: "Product Reviews", href: "/admin/reviews", icon: Star },
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Products", href: "/admin/products", icon: Package },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },

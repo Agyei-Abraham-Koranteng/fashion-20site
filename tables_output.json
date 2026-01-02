@@ -1,0 +1,12 @@
+[dotenv@17.2.3] injecting env (4) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+{
+  "products": "EXISTS",
+  "profiles": "EXISTS",
+  "orders": "EXISTS",
+  "categories": "EXISTS",
+  "system_feedback": "EXISTS",
+  "product_reviews": "EXISTS",
+  "reviews": "EXISTS",
+  "contact_messages": "EXISTS",
+  "newsletter_subscribers": "EXISTS"
+}

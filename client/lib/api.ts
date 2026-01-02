@@ -144,7 +144,7 @@ export async function getCategories() {
 export async function getProductReviews(productId: string) {
   try {
     const { data, error } = await supabase
-      .from("reviews")
+      .from("product_reviews")
       .select("*")
       .eq("product_id", productId)
       .order("created_at", { ascending: false });
@@ -166,9 +166,9 @@ export async function createReview(
   },
 ) {
   try {
-    const { data, error } = await (supabase
-      .from("reviews") as any)
-      .insert([{ product_id: Number(productId), user_id: userId, ...review }])
+    const { data, error } = await supabase
+      .from("product_reviews")
+      .insert([{ product_id: Number(productId), user_id: userId, ...review, user_name: "User" }])
       .select();
 
     return { data: data as Review[] | null, error };
@@ -181,7 +181,7 @@ export async function createReview(
 export async function getUserReviews(userId: string) {
   try {
     const { data, error } = await supabase
-      .from("reviews")
+      .from("product_reviews")
       .select("*")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
@@ -216,6 +216,20 @@ export const getSystemFeedback = async () => {
     .from("system_feedback")
     .select("*")
     .order("created_at", { ascending: false });
+};
+
+export const getAllProductReviews = async () => {
+  return await supabase
+    .from("product_reviews")
+    .select(`
+      *,
+      product:products(name)
+    `)
+    .order("created_at", { ascending: false });
+};
+
+export const deleteProductReview = async (id: string) => {
+  return await supabase.from("product_reviews").delete().eq("id", id);
 };
 
 // Orders
