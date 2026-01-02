@@ -1,0 +1,8 @@
+
+> typecheck
+> tsc
+
+client/lib/supabaseClient.ts(17,5): error TS2352: Conversion of type 'Record<string, unknown>' to type 'SupabaseClient<unknown, { PostgrestVersion: string; }, never, never, { PostgrestVersion: string; }>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Record<string, unknown>' is missing the following properties from type 'SupabaseClient<unknown, { PostgrestVersion: string; }, never, never, { PostgrestVersion: string; }>': supabaseUrl, supabaseKey, auth, realtime, and 21 more.
+client/pages/admin/VisitorAnalytics.tsx(4,10): error TS2305: Module '"@/lib/api"' has no exported member 'getSiteVisits'.
+client/pages/admin/VisitorAnalytics.tsx(4,25): error TS2305: Module '"@/lib/api"' has no exported member 'deleteSiteVisit'.

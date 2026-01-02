@@ -795,3 +795,40 @@ export async function createProfileForUser(userId: string, email: string, fullNa
     return { data: null, error };
   }
 }
+
+export async function getSiteVisits() {
+  console.log("[API] getSiteVisits called");
+  try {
+    const { data, error } = await withTimeout(
+      supabase
+        .from("site_visits")
+        .select("*")
+        .order("visited_at", { ascending: false }),
+      30000,
+      "getSiteVisits"
+    );
+
+    if (error) throw error;
+    return { data, error: null };
+  } catch (error) {
+    console.error("[API] getSiteVisits caught error:", error);
+    return { data: null, error };
+  }
+}
+
+export async function deleteSiteVisit(id: string) {
+  console.log("[API] deleteSiteVisit called", id);
+  try {
+    const { error } = await withTimeout(
+      supabase.from("site_visits").delete().eq("id", id),
+      30000,
+      "deleteSiteVisit"
+    );
+
+    if (error) throw error;
+    return { error: null };
+  } catch (error) {
+    console.error("[API] deleteSiteVisit caught error:", error);
+    return { error };
+  }
+}
