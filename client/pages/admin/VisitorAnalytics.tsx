@@ -174,8 +174,8 @@ export default function VisitorAnalytics() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Traffic Chart */}
-                <Card className="lg:col-span-2 border-none shadow-md bg-white overflow-hidden">
-                    <CardHeader className="border-b bg-gray-50/50">
+                <Card className="lg:col-span-2 border-none shadow-md bg-white dark:bg-slate-900/50 overflow-hidden">
+                    <CardHeader className="border-b bg-gray-50/50 dark:bg-slate-900/50">
                         <div className="flex items-center justify-between">
                             <div>
                                 <CardTitle className="text-lg">Traffic Overview</CardTitle>
@@ -190,27 +190,36 @@ export default function VisitorAnalytics() {
                                 <AreaChart data={chartData}>
                                     <defs>
                                         <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1} />
+                                            <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.15} />
                                             <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-gray-100 dark:text-gray-800" opacity={0.5} />
                                     <XAxis
                                         dataKey="date"
                                         axisLine={false}
                                         tickLine={false}
                                         fontSize={12}
                                         tickMargin={10}
-                                        stroke="#94a3b8"
+                                        stroke="currentColor"
+                                        className="text-muted-foreground"
                                     />
                                     <YAxis
                                         axisLine={false}
                                         tickLine={false}
                                         fontSize={12}
-                                        stroke="#94a3b8"
+                                        stroke="currentColor"
+                                        className="text-muted-foreground"
                                     />
                                     <Tooltip
-                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                        contentStyle={{
+                                            borderRadius: '12px',
+                                            border: 'none',
+                                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                                            backgroundColor: 'var(--background)',
+                                            color: 'var(--foreground)'
+                                        }}
+                                        itemStyle={{ color: '#4f46e5', fontWeight: 'bold' }}
                                     />
                                     <Area
                                         type="monotone"
@@ -219,7 +228,7 @@ export default function VisitorAnalytics() {
                                         strokeWidth={3}
                                         fillOpacity={1}
                                         fill="url(#colorVisits)"
-                                        dot={{ r: 4, fill: '#4f46e5', strokeWidth: 2, stroke: '#fff' }}
+                                        dot={{ r: 4, fill: '#4f46e5', strokeWidth: 2, stroke: 'var(--background)' }}
                                         activeDot={{ r: 6, strokeWidth: 0 }}
                                     />
                                 </AreaChart>
@@ -296,10 +305,10 @@ export default function VisitorAnalytics() {
                     </div>
                 </CardHeader>
                 <CardContent className="p-0">
-                    {/* Desktop Table */}
-                    <div className="hidden md:block overflow-x-auto">
+                    {/* Desktop Table - Hidden on small tablets and below */}
+                    <div className="hidden lg:block overflow-x-auto">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-gray-50 text-gray-600 font-medium border-y border-gray-100">
+                            <thead className="bg-gray-50/50 dark:bg-slate-900/50 text-muted-foreground font-medium border-y border-border">
                                 <tr>
                                     <th className="px-6 py-3">Timestamp</th>
                                     <th className="px-6 py-3">Path</th>
@@ -307,31 +316,31 @@ export default function VisitorAnalytics() {
                                     <th className="px-6 py-3 text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-border">
                                 {isLoading ? (
                                     Array(3).fill(0).map((_, i) => (
                                         <tr key={i} className="animate-pulse">
-                                            <td colSpan={4} className="px-6 py-4 bg-gray-50/50"></td>
+                                            <td colSpan={4} className="px-6 py-4 bg-muted/20"></td>
                                         </tr>
                                     ))
                                 ) : filteredVisits.map((visit) => (
-                                    <tr key={visit.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-600">
+                                    <tr key={visit.id} className="hover:bg-muted/10 transition-colors">
+                                        <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
                                             {format(new Date(visit.visited_at), "MMM d, yyyy HH:mm:ss")}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="font-medium text-gray-900 bg-gray-100 px-2 py-0.5 rounded text-xs uppercase letter-spacing-tight">
+                                            <span className="font-medium text-foreground bg-muted px-2 py-0.5 rounded text-xs uppercase tracking-tight">
                                                 {visit.page_path}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-500 italic text-xs max-w-xs truncate">
+                                        <td className="px-6 py-4 text-muted-foreground italic text-xs max-w-xs truncate">
                                             {visit.user_agent}
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
                                                 onClick={() => handleDelete(visit.id)}
                                             >
                                                 Delete
@@ -343,35 +352,35 @@ export default function VisitorAnalytics() {
                         </table>
                     </div>
 
-                    {/* Mobile List View */}
-                    <div className="md:hidden divide-y divide-gray-100">
+                    {/* Mobile/Tablet List View - Visible on screens smaller than lg */}
+                    <div className="lg:hidden divide-y divide-border">
                         {isLoading ? (
                             Array(3).fill(0).map((_, i) => (
                                 <div key={i} className="p-4 animate-pulse">
-                                    <div className="h-4 w-1/2 bg-gray-100 rounded mb-2" />
-                                    <div className="h-3 w-1/4 bg-gray-50 rounded" />
+                                    <div className="h-4 w-1/2 bg-muted/20 rounded mb-2" />
+                                    <div className="h-3 w-1/4 bg-muted/10 rounded" />
                                 </div>
                             ))
                         ) : filteredVisits.map((visit) => (
-                            <div key={visit.id} className="p-4 space-y-2 hover:bg-gray-50/50">
+                            <div key={visit.id} className="p-4 space-y-2 hover:bg-muted/10">
                                 <div className="flex justify-between items-start">
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-bold text-gray-900 text-[11px] uppercase tracking-tighter bg-gray-100 px-1.5 py-0.5 rounded">
+                                    <div className="space-y-1 overflow-hidden">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="font-bold text-foreground text-[10px] uppercase tracking-tighter bg-muted px-1.5 py-0.5 rounded">
                                                 {visit.page_path}
                                             </span>
-                                            <span className="text-[10px] text-muted-foreground">
+                                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">
                                                 {format(new Date(visit.visited_at), "MMM d, HH:mm")}
                                             </span>
                                         </div>
-                                        <p className="text-[10px] text-gray-500 italic max-w-[200px] truncate">
+                                        <p className="text-[10px] text-muted-foreground italic truncate">
                                             {visit.user_agent}
                                         </p>
                                     </div>
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 text-red-500"
+                                        className="h-8 w-8 text-destructive flex-shrink-0"
                                         onClick={() => handleDelete(visit.id)}
                                     >
                                         <Trash2 className="h-4 w-4" />

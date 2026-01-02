@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation, useNavigate, Navigate } from "react-router-d
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import { ThemeToggle } from "./ThemeToggle";
 import { getContactMessages } from "@/lib/api";
 import {
   LayoutDashboard,
@@ -140,18 +141,21 @@ export default function AdminLayout() {
   );
 
   const NotificationButton = () => (
-    <Link
-      to="/admin/messages"
-      className="relative p-2 rounded-full hover:bg-gray-100 transition-colors group"
-      title="Messages"
-    >
-      <Bell className="h-5 w-5 text-gray-600 group-hover:text-gray-900 transition-colors" />
-      {unreadCount > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm animate-pulse">
-          {unreadCount > 99 ? "99+" : unreadCount}
-        </span>
-      )}
-    </Link>
+    <div className="flex items-center gap-2">
+      <ThemeToggle />
+      <Link
+        to="/admin/messages"
+        className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group"
+        title="Messages"
+      >
+        <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm animate-pulse">
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
+        )}
+      </Link>
+    </div>
   );
 
   const SidebarContent = () => (
@@ -189,9 +193,9 @@ export default function AdminLayout() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Mobile Header */}
-      <div className="sticky top-0 z-40 flex h-16 items-center border-b border-gray-200 bg-white/80 backdrop-blur-md px-4 lg:hidden">
+      <div className="sticky top-0 z-40 flex h-16 items-center border-b border-border bg-background/80 backdrop-blur-md px-4 lg:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button
@@ -226,12 +230,12 @@ export default function AdminLayout() {
       </div>
 
       {/* Desktop Top Bar with Notification */}
-      <div className="hidden lg:flex lg:fixed lg:top-0 lg:left-72 lg:right-0 lg:z-40 h-20 items-center justify-between border-b border-gray-100 bg-white/95 backdrop-blur-sm px-8 shadow-sm">
+      <div className="hidden lg:flex lg:fixed lg:top-0 lg:left-72 lg:right-0 lg:z-40 h-20 items-center justify-between border-b border-border bg-background/95 backdrop-blur-sm px-8 shadow-sm">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-800 tracking-tight">
+          <h2 className="text-2xl font-semibold text-foreground tracking-tight">
             {navigation.find((item) => item.href === location.pathname)?.name || "Dashboard"}
           </h2>
-          <p className="text-sm text-gray-500 mt-0.5">Manage your store efficiently</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Manage your store efficiently</p>
         </div>
         <div className="flex items-center gap-4">
           <NotificationButton />
