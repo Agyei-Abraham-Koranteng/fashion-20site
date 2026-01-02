@@ -1,0 +1,20 @@
+[
+  {
+    "success": false,
+    "error": {
+      "code": "PGRST202",
+      "details": "Searched for the function public.exec_sql with parameter sql_query or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.",
+      "hint": null,
+      "message": "Could not find the function public.exec_sql(sql_query) in the schema cache"
+    }
+  },
+  {
+    "success": false,
+    "error": {
+      "code": "PGRST202",
+      "details": "Searched for the function public.exec_sql with parameter sql_query or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.",
+      "hint": null,
+      "message": "Could not find the function public.exec_sql(sql_query) in the schema cache"
+    }
+  }
+]
