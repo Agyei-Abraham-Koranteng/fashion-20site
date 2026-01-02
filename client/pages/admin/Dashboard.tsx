@@ -167,6 +167,11 @@ export default function AdminDashboard() {
         { event: "*", schema: "public", table: "profiles" },
         () => debouncedReload()
       )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "site_visits" },
+        () => debouncedReload()
+      )
       .subscribe();
 
     return () => {
@@ -212,6 +217,7 @@ export default function AdminDashboard() {
           {
             name: "Total Visitors",
             val: statsData.totalVisitors.toLocaleString(),
+            href: "/admin/visitors",
             icon: Users,
             color: "text-indigo-500",
             bg: "bg-indigo-500/10",

@@ -46,6 +46,7 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminSignUp from "./pages/admin/AdminSignUp";
 import FeedbackAdmin from "./pages/admin/Feedback";
 import ProductReviewsAdmin from "./pages/admin/ProductReviews";
+import VisitorAnalyticsAdmin from "./pages/admin/VisitorAnalytics";
 
 // Lazy-loaded pages
 const Login = lazy(() => import("./pages/Login"));
@@ -100,6 +101,7 @@ const App = () => {
                       <Route path="messages" element={<MessagesAdmin />} />
                       <Route path="feedback" element={<FeedbackAdmin />} />
                       <Route path="reviews" element={<ProductReviewsAdmin />} />
+                      <Route path="visitors" element={<VisitorAnalyticsAdmin />} />
                       <Route path="content" element={<ContentManager />} />
                       <Route path="settings" element={<SettingsAdmin />} />
                     </Route>
