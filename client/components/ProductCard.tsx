@@ -48,7 +48,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               e.stopPropagation();
               wishlisted ? removeItem(product.id) : addItem(product);
             }}
-            className="absolute top-4 right-4 p-2 bg-white/90 hover:bg-white rounded-full transition-all duration-200 shadow-sm"
+            className="absolute top-4 right-4 p-2 bg-background/80 hover:bg-background rounded-full transition-all duration-200 shadow-sm border border-border text-foreground"
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           >
             <Heart

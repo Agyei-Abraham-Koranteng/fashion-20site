@@ -120,35 +120,30 @@ export default function Home() {
                   >
                     {slides[currentSlide].subtitle}
                   </motion.p>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 }}
-                    className="flex flex-col sm:flex-row gap-3 justify-center pt-6 px-4"
-                  >
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center pt-6 px-4">
                     <div className="group relative w-full sm:w-auto">
                       {!user ? (
                         <Button
                           onClick={() => setIsAuthModalOpen(true)}
                           size="lg"
-                          className="w-full sm:min-w-[200px] text-base h-12 md:h-14 bg-white text-black hover:bg-zinc-100 border-none transition-all"
+                          className="w-full sm:min-w-[200px] text-base h-12 md:h-14 bg-primary text-primary-foreground hover:bg-primary/90 border-none transition-all shadow-xl"
                         >
                           Get Started
                         </Button>
                       ) : (
                         <Link to="/shop" className="w-full sm:w-auto block">
-                          <Button size="lg" className="w-full sm:min-w-[200px] text-base h-12 md:h-14 bg-white text-black hover:bg-zinc-100 border-none transition-all">
+                          <Button size="lg" className="w-full sm:min-w-[200px] text-base h-12 md:h-14 bg-primary text-primary-foreground hover:bg-primary/90 border-none transition-all shadow-xl">
                             Shop Collection
                           </Button>
                         </Link>
                       )}
                     </div>
                     <Link to="/about" className="w-full sm:w-auto block">
-                      <Button size="lg" variant="outline" className="w-full sm:min-w-[200px] text-base h-12 md:h-14 border-white text-white hover:bg-white hover:text-black bg-transparent transition-all">
+                      <Button size="lg" variant="outline" className="w-full sm:min-w-[200px] text-base h-12 md:h-14 border-white text-white hover:bg-white hover:text-black bg-transparent transition-all backdrop-blur-sm">
                         Our Story
                       </Button>
                     </Link>
-                  </motion.div>
+                  </div>
                 </div>
               </div>
             </motion.div>

@@ -25,6 +25,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 import AuthModal from "./AuthModal";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "./ThemeToggle";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -179,6 +180,9 @@ export default function Navbar() {
               </Link>
             )}
 
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Search icon */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
@@ -282,8 +286,11 @@ export default function Navbar() {
             className="md:hidden border-t border-border bg-background fixed inset-0 top-16 z-50 overflow-y-auto"
           >
             <div className="container-wide py-6 pb-20 space-y-8">
-              {/* Mobile Quick Actions */}
-              <div className="grid grid-cols-2 gap-4 pb-6 border-b border-border">
+              <div className="grid grid-cols-3 gap-4 pb-6 border-b border-border">
+                <div className="flex flex-col items-center justify-center p-4 bg-secondary/50 rounded-lg">
+                  <ThemeToggle />
+                  <span className="text-[10px] font-bold uppercase tracking-wider mt-2">Theme</span>
+                </div>
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
