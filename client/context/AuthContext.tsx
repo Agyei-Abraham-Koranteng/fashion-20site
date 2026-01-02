@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
+import { updateLastLogin } from "@/lib/api";
 
 // Helper to determine admin status based on configured emails or default rules
 const isAdminEmail = (email: string) => {
@@ -57,6 +58,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             role: role,
             full_name: session.user.user_metadata?.full_name || null,
           });
+          // Update last login timestamp for active customer tracking
+          await updateLastLogin(session.user.id);
         }
       } catch (err) {
         console.error("[Auth] Initial session check failed:", err);
@@ -79,6 +82,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             role: role,
             full_name: session.user.user_metadata?.full_name || null,
           });
+          // Update last login timestamp for active customer tracking
+          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            await updateLastLogin(session.user.id);
+          }
         } else {
           setUser(null);
         }

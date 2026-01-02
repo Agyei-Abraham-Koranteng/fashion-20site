@@ -416,7 +416,7 @@ export default function Navbar() {
                   <Sparkles size={16} className="text-accent" />
                   <span>PREMIUM FASHION EXPERIENCE</span>
                 </div>
-                <p className="text-xs text-muted-foreground tracking-widest uppercase">© 2025 LUXE ATELIER</p>
+                <p className="text-xs text-muted-foreground tracking-widest uppercase">© 2025 MadeInFashion</p>
               </motion.div>
             </div>
           </motion.div>

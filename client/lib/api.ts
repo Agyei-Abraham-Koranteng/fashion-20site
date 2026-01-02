@@ -451,12 +451,25 @@ export async function updateOrderStatus(orderId: string, status: string) {
 
 export async function getAdminStats() {
   try {
+    // Calculate date for active customers (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const activeCustomerDate = thirtyDaysAgo.toISOString();
+
     // Parallelize stats aggregation with individual error handling
     const [pResult, oResult, rResult, cResult] = await Promise.allSettled([
       withTimeout(supabase.from('products').select('*', { count: 'exact', head: true }), 15000, "stats:products"),
       withTimeout(supabase.from('orders').select('*', { count: 'exact', head: true }), 15000, "stats:orders_count"),
       withTimeout(supabase.from('orders').select('total_price'), 20000, "stats:revenue"),
-      withTimeout(supabase.from('profiles').select('*', { count: 'exact', head: true }), 15000, "stats:customers")
+      // Active customers: users who logged in within last 30 days
+      withTimeout(
+        supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .gte('last_login', activeCustomerDate),
+        15000,
+        "stats:active_customers"
+      )
     ]);
 
     const productsCount = pResult.status === 'fulfilled' ? (pResult.value.count || 0) : 0;
@@ -477,6 +490,27 @@ export async function getAdminStats() {
   } catch (error) {
     console.error("Error fetching admin stats:", error);
     return { data: null, error };
+  }
+}
+
+// Update user's last login timestamp for active customer tracking
+export async function updateLastLogin(userId: string) {
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ last_login: new Date().toISOString() })
+      .eq('id', userId);
+
+    if (error) {
+      console.error('Error updating last login:', error);
+      return { error };
+    }
+
+    console.log(`[Auth] Updated last_login for user ${userId}`);
+    return { error: null };
+  } catch (error) {
+    console.error('Error updating last login:', error);
+    return { error };
   }
 }
 
