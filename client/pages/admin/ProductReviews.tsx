@@ -299,7 +299,7 @@ export default function ProductReviews() {
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="text-red-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className="text-red-400 hover:text-red-600 hover:bg-red-50 transition-opacity"
                                                 onClick={() => handleDelete(f.id)}
                                             >
                                                 <Trash2 className="w-4 h-4" />

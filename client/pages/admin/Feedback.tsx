@@ -1,9 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getSystemFeedback } from "@/lib/api";
-import { supabase } from "@/lib/supabaseClient";
-import { SystemFeedback } from "@/lib/types";
-import { format } from "date-fns";
 import {
     Star,
     Search,
@@ -13,13 +9,17 @@ import {
     TrendingUp,
     AlertCircle,
     ArrowUpDown,
+    Trash2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { deleteSystemFeedback } from "@/lib/api";
 
 export default function Feedback() {
     const queryClient = useQueryClient();
@@ -92,6 +92,20 @@ export default function Feedback() {
                 return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
             });
     }, [feedbackList, searchTerm, filterRating, sortOrder]);
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this feedback?")) return;
+
+        try {
+            const { error } = await deleteSystemFeedback(id);
+            if (error) throw error;
+            toast.success("Feedback deleted successfully");
+            queryClient.invalidateQueries({ queryKey: ["system_feedback"] });
+        } catch (error) {
+            console.error("Error deleting feedback:", error);
+            toast.error("Failed to delete feedback");
+        }
+    };
 
     const renderStars = (rating: number) => {
         return (
@@ -261,6 +275,14 @@ export default function Feedback() {
                                                     </div>
                                                 </div>
                                             </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-red-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                onClick={() => handleDelete(f.id)}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
                                         </div>
                                         <div className="bg-white border border-gray-100 p-4 rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
                                             <p className="text-gray-800 text-sm leading-relaxed italic">

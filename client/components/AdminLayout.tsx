@@ -24,14 +24,14 @@ import { Button } from "@/components/ui/button";
 console.log("!!! ADMIN_LAYOUT_LOADED_V3 !!!");
 
 const navigation = [
-  { name: "Feedback", href: "/admin/feedback", icon: Star },
-  { name: "Product Reviews", href: "/admin/reviews", icon: Star },
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Products", href: "/admin/products", icon: Package },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Customers", href: "/admin/customers", icon: Users },
   { name: "Messages", href: "/admin/messages", icon: MailOpen },
   { name: "Newsletter", href: "/admin/newsletter", icon: Mail },
+  { name: "Feedback", href: "/admin/feedback", icon: Star },
+  { name: "Product Reviews", href: "/admin/reviews", icon: Star },
   { name: "Content Manager", href: "/admin/content", icon: FileText },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
@@ -153,8 +153,8 @@ export default function AdminLayout() {
   );
 
   const SidebarContent = () => (
-    <div className="flex h-full flex-col bg-red-950 text-slate-300 border-r border-slate-800 shadow-xl">
-      <div className="flex h-20 items-center px-8 border-b border-slate-800/60 bg-red-950/50 backdrop-blur-xl">
+    <div className="flex h-full flex-col bg-primary text-slate-300 border-r border-slate-800 shadow-xl">
+      <div className="flex h-20 items-center px-8 border-b border-slate-800/60 bg-primary/50 backdrop-blur-xl">
         <h1 className="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent tracking-tight">
           MadeInFashion
           <span className="ml-2 inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="V2 Deployment Active"></span>
@@ -165,8 +165,8 @@ export default function AdminLayout() {
         <NavLinks onClick={() => setOpen(false)} />
       </div>
 
-      <div className="p-4 border-t border-slate-800/60 bg-red-950/50">
-        <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-900/50 mb-3">
+      <div className="p-4 border-t border-slate-800/60 bg-primary/50">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 mb-3">
           <div className="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold border border-indigo-500/30">
             {user?.email?.charAt(0).toUpperCase()}
           </div>
@@ -177,7 +177,7 @@ export default function AdminLayout() {
         </div>
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-400 transition-all hover:bg-red-500/10 hover:text-red-400 group"
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-400 transition-all hover:bg-white/10 hover:text-white group"
         >
           <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
           Sign Out
@@ -197,7 +197,7 @@ export default function AdminLayout() {
               <span className="font-medium">Menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-72 border-r-0 bg-red-950">
+          <SheetContent side="left" className="p-0 w-72 border-r-0 bg-primary">
             <div className="sr-only">
               <SheetTitle>Admin Menu</SheetTitle>
               <SheetDescription>Navigation links for the admin panel</SheetDescription>

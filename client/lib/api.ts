@@ -89,7 +89,7 @@ export async function getProducts(filters?: {
       query = query.ilike("name", `%${filters.search}%`);
     }
 
-    const { data, error } = await withTimeout((query as any).then((r: any) => r), 20000, "getProducts");
+    const { data, error } = await withTimeout((query as any).then((r: any) => r), 20000, "getProducts") as any;
 
     if (error) {
       console.error("[API] getProducts Supabase error:", error);
@@ -218,6 +218,10 @@ export const getSystemFeedback = async () => {
     .order("created_at", { ascending: false });
 };
 
+export const deleteSystemFeedback = async (id: string) => {
+  return await supabase.from("system_feedback").delete().eq("id", id);
+};
+
 export const getAllProductReviews = async () => {
   return await supabase
     .from("product_reviews")
@@ -258,7 +262,7 @@ export async function getAllOrders() {
         .order("created_at", { ascending: false }) as any).then((r: any) => r),
       20000,
       "getAllOrders (nested)"
-    );
+    ) as any;
 
     if (error) {
       console.error("[API] getAllOrders Supabase error:", error);
@@ -444,7 +448,7 @@ export async function getCustomers() {
         .order("updated_at", { ascending: false }),
       45000,
       "getCustomers"
-    );
+    ) as any;
 
     if (error) {
       console.error("[API] getCustomers Supabase error:", error);
@@ -597,7 +601,7 @@ export async function getNewsletterSubscribers() {
     const { data, error } = await withTimeout(supabase
       .from("newsletter_subscribers")
       .select("*")
-      .order("subscribed_at", { ascending: false }));
+      .order("subscribed_at", { ascending: false })) as any;
 
     return { data, error };
   } catch (error) {
@@ -633,7 +637,7 @@ export async function saveContactMessage(message: {
       supabase.from("contact_messages").insert([message]),
       30000,
       "saveContactMessage"
-    );
+    ) as any;
 
     if (error) {
       console.error("[API] saveContactMessage Supabase error:", error);
@@ -657,7 +661,7 @@ export async function getContactMessages() {
         .order("created_at", { ascending: false }),
       45000,
       "getContactMessages"
-    );
+    ) as any;
 
     if (error) {
       console.error("[API] getContactMessages Supabase error:", error);
@@ -682,7 +686,7 @@ export async function updateContactMessageStatus(id: number, status: string) {
         .eq("id", id),
       30000,
       "updateContactMessageStatus"
-    );
+    ) as any;
 
     if (error) {
       console.error("[API] updateContactMessageStatus Supabase error:", error);
@@ -707,7 +711,7 @@ export async function getAllProfiles() {
         .order("created_at", { ascending: false }),
       30000,
       "getAllProfiles"
-    );
+    ) as any;
 
     if (error) {
       console.error("[API] getAllProfiles Supabase error:", error);
