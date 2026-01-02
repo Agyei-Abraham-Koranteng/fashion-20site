@@ -23,9 +23,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Edit, Trash2, Image as ImageIcon } from "lucide-react";
-import { getProducts, deleteProduct } from "@/lib/api";
+import { Plus, Search, Edit, Trash2, Image as ImageIcon, MessageSquare, Star } from "lucide-react";
+import { getProducts, deleteProduct, getProductReviews } from "@/lib/api";
 import { toast } from "sonner";
 import { Product } from "@/lib/types";
 
@@ -33,6 +39,11 @@ export default function ProductsListAdmin() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
+
+  // Reviews State
+  const [selectedProductReviews, setSelectedProductReviews] = useState<any[] | null>(null);
+  const [isReviewsOpen, setIsReviewsOpen] = useState(false);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -102,6 +113,22 @@ export default function ProductsListAdmin() {
       toast.error(`Failed to delete product: ${err.message || "Unknown error"}`);
     } finally {
       setProductToDelete(null);
+    }
+  };
+
+  const handleViewReviews = async (productId: string) => {
+    setReviewsLoading(true);
+    setIsReviewsOpen(true);
+    setSelectedProductReviews(null);
+
+    try {
+      const { data } = await getProductReviews(productId);
+      setSelectedProductReviews(data || []);
+    } catch (error) {
+      console.error("Failed to load reviews:", error);
+      toast.error("Failed to load reviews");
+    } finally {
+      setReviewsLoading(false);
     }
   };
 
@@ -197,7 +224,7 @@ export default function ProductsListAdmin() {
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col">
-                            <span className="font-bold text-gray-900">
+                            <span className="font-bold text-gray-900 whitespace-nowrap">
                               ₵{product.sale_price || product.price}
                             </span>
                             {product.sale_price && (
@@ -223,6 +250,15 @@ export default function ProductsListAdmin() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 hover:bg-gray-100 hover:text-indigo-600 transition-colors"
+                              onClick={() => handleViewReviews(product.id)}
+                              title="View Reviews"
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                            </Button>
                             <Button asChild variant="ghost" size="icon" className="h-8 w-8 hover:bg-gray-100 hover:text-blue-600 transition-colors">
                               <Link to={`/admin/products/${product.id}/edit`}>
                                 <Edit className="h-4 w-4" />
@@ -280,6 +316,14 @@ export default function ProductsListAdmin() {
                       </div>
                     </div>
                     <div className="flex gap-2 pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => handleViewReviews(product.id)}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" /> Reviews
+                      </Button>
                       <Link to={`/admin/products/${product.id}/edit`} className="flex-1">
                         <Button variant="outline" size="sm" className="w-full">
                           <Edit className="h-4 w-4 mr-2" /> Edit
@@ -318,6 +362,38 @@ export default function ProductsListAdmin() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={isReviewsOpen} onOpenChange={setIsReviewsOpen}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Product Reviews</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {reviewsLoading ? (
+              <div className="text-center py-4 text-muted-foreground">Loading reviews...</div>
+            ) : selectedProductReviews?.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground">No reviews found for this product.</div>
+            ) : (
+              selectedProductReviews?.map((review) => (
+                <div key={review.id} className="border-b border-border pb-4 last:border-0">
+                  <div className="flex justify-between items-start mb-1">
+                    <div className="font-semibold text-sm">{review.title}</div>
+                    <div className="flex">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={12} className={i < review.rating ? "fill-primary text-primary" : "text-muted-foreground/30"} />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-1">{review.comment}</p>
+                  <div className="text-xs text-muted-foreground">
+                    By {review.user_name || "Anonymous"} on {new Date(review.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

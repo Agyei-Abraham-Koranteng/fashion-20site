@@ -1,7 +1,7 @@
 -- Create Product Reviews Table
 CREATE TABLE IF NOT EXISTS product_reviews (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  product_id BIGINT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL, -- Optional: allow anon reviews? Let's say yes for now or just track name
   user_name TEXT, -- To store name if user is not logged in or just for display
   rating INTEGER CHECK (rating >= 1 AND rating <= 5),
