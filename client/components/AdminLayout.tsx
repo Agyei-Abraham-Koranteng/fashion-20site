@@ -3,7 +3,6 @@ import { Link, Outlet, useLocation, useNavigate, Navigate } from "react-router-d
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
-import { ThemeToggle } from "./ThemeToggle";
 import { getContactMessages } from "@/lib/api";
 import {
   LayoutDashboard,

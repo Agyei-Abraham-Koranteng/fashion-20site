@@ -75,13 +75,13 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-primary text-primary-foreground border-t border-border">
+    <footer className="bg-[#0f172a] text-slate-100 border-t border-slate-800 dark:bg-[#0f172a] dark:border-slate-800">
       <div className="container-wide py-16">
         {/* Footer sections */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           {footerSections.map((section) => (
             <div key={section.title}>
-              <h3 className="text-sm font-semibold tracking-wider mb-4 uppercase">
+              <h3 className="text-sm font-semibold tracking-wider mb-4 uppercase text-white">
                 {section.title}
               </h3>
               <ul className="space-y-2">
@@ -89,7 +89,7 @@ export default function Footer() {
                   <li key={link.name}>
                     <Link
                       to={link.href}
-                      className="text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+                      className="text-sm text-slate-300 hover:text-white transition-colors"
                     >
                       {link.name}
                     </Link>
@@ -101,14 +101,14 @@ export default function Footer() {
         </div>
 
         {/* Newsletter and social */}
-        <div className="border-t border-primary-foreground/20 pt-12 pb-8">
+        <div className="border-t border-slate-800 pt-12 pb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             {/* Newsletter */}
             <div>
-              <h3 className="text-sm font-semibold tracking-wider mb-3 uppercase">
+              <h3 className="text-sm font-semibold tracking-wider mb-3 uppercase text-white">
                 Subscribe to our Newsletter
               </h3>
-              <p className="text-sm text-primary-foreground/80 mb-4">
+              <p className="text-sm text-slate-400 mb-4">
                 Get exclusive offers and updates delivered to your inbox.
               </p>
               <form className="flex flex-col sm:flex-row gap-2" onSubmit={handleSubscribe}>
@@ -117,13 +117,13 @@ export default function Footer() {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 px-4 py-2 text-primary bg-primary-foreground/10 text-primary-foreground placeholder-primary-foreground/50 focus:outline-none text-sm"
+                  className="flex-1 px-4 py-2 bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-accent text-sm rounded-sm"
                   required
                 />
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-6 py-2 bg-accent text-accent-foreground font-medium text-sm hover:bg-accent/90 transition-colors disabled:opacity-50"
+                  className="px-6 py-2 bg-accent text-accent-foreground font-medium text-sm hover:bg-accent/90 transition-colors disabled:opacity-50 rounded-sm"
                 >
                   {loading ? "Subscribing..." : "Subscribe"}
                 </button>
@@ -138,8 +138,8 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-primary-foreground/20 pt-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/70">
+        <div className="border-t border-slate-800 pt-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-500">
             <p>&copy; 2025 MadeInFashion. All rights reserved.</p>
             <div className="flex gap-6">
             </div>

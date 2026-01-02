@@ -80,7 +80,7 @@ export default function Navbar() {
       <div className="container-wide">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0">
+          <Link to="/" className="flex-shrink-0 mr-8 md:mr-0 lg:mr-8">
             <div className="text-xl font-bold tracking-wider text-primary">
               MadeInFashion
             </div>
@@ -168,7 +168,7 @@ export default function Navbar() {
           </div>
 
           {/* Right icons */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 ml-auto">
             {/* Admin Panel Quick Link */}
             {user?.role === "admin" && (
               <Link
@@ -237,7 +237,7 @@ export default function Navbar() {
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 hover:bg-secondary rounded-sm transition-colors"
+              className="md:hidden p-2 hover:bg-secondary rounded-sm transition-colors bg-secondary/30 ml-1"
               aria-label="Toggle menu"
             >
               <AnimatePresence mode="wait">
@@ -288,7 +288,9 @@ export default function Navbar() {
             <div className="container-wide py-6 pb-20 space-y-8">
               <div className="grid grid-cols-3 gap-4 pb-6 border-b border-border">
                 <div className="flex flex-col items-center justify-center p-4 bg-secondary/50 rounded-lg">
-                  <ThemeToggle />
+                  <div className="scale-110">
+                    <ThemeToggle />
+                  </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider mt-2">Theme</span>
                 </div>
                 <button
