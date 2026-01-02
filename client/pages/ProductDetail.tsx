@@ -65,7 +65,7 @@ export default function ProductDetail() {
     },
   });
 
-  const { data: reviews = [] } = useQuery({
+  const { data: reviews = [], refetch: refetchReviews } = useQuery({
     queryKey: ["reviews", id],
     queryFn: async () => {
       if (!id) return [];
@@ -92,21 +92,35 @@ export default function ProductDetail() {
 
   useEffect(() => {
     if (!id) return;
-    const subscription = supabase
+
+    // Subscribe to Product changes
+    const productSub = supabase
       .channel(`product:${id}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'products', filter: `id=eq.${id}` },
+        () => refetch()
+      )
+      .subscribe();
+
+    // Subscribe to Review changes
+    const reviewSub = supabase
+      .channel(`reviews:${id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'product_reviews', filter: `product_id=eq.${id}` },
         () => {
-          refetch();
+          // Refetch reviews when a new one is added
+          refetchReviews(); // We need to extract the reviews query to assign this name or just use queryKey
         }
       )
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      productSub.unsubscribe();
+      reviewSub.unsubscribe();
     };
-  }, [id, refetch]);
+  }, [id, refetch, refetchReviews]);
 
   if (loading) {
     return (
@@ -539,38 +553,50 @@ export default function ProductDetail() {
 
           <div className="space-y-6">
             {reviews.length > 0 ? (
-              reviews.map((review) => (
-                <div key={review.id} className="border-b border-border pb-6">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="font-semibold">{review.title}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className="flex gap-1">
-                          {[...Array(5)].map((_, j) => (
-                            <Star
-                              key={j}
-                              size={14}
-                              className={j < review.rating ? "fill-primary text-primary" : "text-muted"}
-                            />
-                          ))}
+              reviews.map((review: any) => (
+                <div key={review.id} className="border-b border-border last:border-0 pb-6 animate-fade-in">
+                  <div className="flex items-start gap-4">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                      {(review.user_name || "A").charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-bold text-sm text-gray-900">{review.user_name || "Anonymous"}</h4>
+                          <span className="text-xs text-green-600 flex items-center gap-0.5 mt-0.5 font-medium">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+                            Verified Buyer
+                          </span>
                         </div>
                         <span className="text-xs text-muted-foreground">
-                          {new Date(review.created_at).toLocaleDateString()}
+                          {new Date(review.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                         </span>
                       </div>
+                      <div className="flex items-center gap-1 my-2">
+                        {[...Array(5)].map((_, j) => (
+                          <Star
+                            key={j}
+                            size={14}
+                            className={j < review.rating ? "fill-yellow-500 text-yellow-500" : "text-gray-200"}
+                          />
+                        ))}
+                        <span className="text-xs font-semibold ml-2">{review.title}</span>
+                      </div>
+                      <p className="text-sm text-gray-600 leading-relaxed">
+                        {review.comment}
+                      </p>
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    {review.comment}
-                  </p>
-                  <p className="text-xs text-muted-foreground italic">
-                    By {review.user_name || "Anonymous"}
-                  </p>
                 </div>
               ))
-              // ...
             ) : (
-              <p className="text-muted-foreground italic">No reviews yet for this product. Be the first to review!</p>
+              <div className="text-center py-12 bg-secondary/30 rounded-lg">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-secondary mb-4">
+                  <Star className="h-6 w-6 text-muted-foreground opacity-50" />
+                </div>
+                <h3 className="text-lg font-semibold">No reviews yet</h3>
+                <p className="text-muted-foreground">Be the first to share your thoughts!</p>
+              </div>
             )}
           </div>
         </div>

@@ -207,7 +207,7 @@ export const addSystemFeedback = async (feedback: {
   rating: number;
   feedback: string;
 }) => {
-  return await supabase.from("system_feedback").insert([feedback]).select().single();
+  return await supabase.from("system_feedback").insert([feedback]);
 };
 
 export const getSystemFeedback = async () => {
