@@ -16,6 +16,7 @@ import {
   Mail,
   MailOpen,
   Bell,
+  Star,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ const navigation = [
   { name: "Customers", href: "/admin/customers", icon: Users },
   { name: "Messages", href: "/admin/messages", icon: MailOpen },
   { name: "Newsletter", href: "/admin/newsletter", icon: Mail },
+  { name: "Feedback", href: "/admin/feedback", icon: Star },
   { name: "Content Manager", href: "/admin/content", icon: FileText },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];

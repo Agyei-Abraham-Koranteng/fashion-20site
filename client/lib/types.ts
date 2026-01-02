@@ -106,3 +106,10 @@ export interface UserProfile {
   created_at: string;
   updated_at: string;
 }
+
+export interface SystemFeedback {
+  id: string;
+  rating: number;
+  feedback: string;
+  created_at: string;
+}

@@ -40,7 +40,7 @@ export default function Home() {
       image_url: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2070&auto=format&fit=crop",
       cta_text: "Shop Collection",
       cta_link: "/shop",
-      tagline: "New Collection 2024"
+      tagline: "New Collection 2025"
     }
   ];
 
