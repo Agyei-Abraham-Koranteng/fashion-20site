@@ -152,8 +152,8 @@ export default function AdminLayout() {
   );
 
   const SidebarContent = () => (
-    <div className="flex h-full flex-col bg-slate-950 text-slate-300 border-r border-slate-800 shadow-xl">
-      <div className="flex h-20 items-center px-8 border-b border-slate-800/60 bg-slate-950/50 backdrop-blur-xl">
+    <div className="flex h-full flex-col bg-red-950 text-slate-300 border-r border-slate-800 shadow-xl">
+      <div className="flex h-20 items-center px-8 border-b border-slate-800/60 bg-red-950/50 backdrop-blur-xl">
         <h1 className="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent tracking-tight">
           MadeInFashion
           <span className="ml-2 inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="V2 Deployment Active"></span>
@@ -164,8 +164,8 @@ export default function AdminLayout() {
         <NavLinks onClick={() => setOpen(false)} />
       </div>
 
-      <div className="p-4 border-t border-slate-800/60 bg-slate-950/50">
-        <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-900/50 mb-3">
+      <div className="p-4 border-t border-slate-800/60 bg-red-950/50">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-900/50 mb-3">
           <div className="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold border border-indigo-500/30">
             {user?.email?.charAt(0).toUpperCase()}
           </div>
@@ -196,7 +196,7 @@ export default function AdminLayout() {
               <span className="font-medium">Menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-72 border-r-0 bg-slate-950">
+          <SheetContent side="left" className="p-0 w-72 border-r-0 bg-red-950">
             <div className="sr-only">
               <SheetTitle>Admin Menu</SheetTitle>
               <SheetDescription>Navigation links for the admin panel</SheetDescription>
