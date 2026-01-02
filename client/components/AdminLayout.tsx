@@ -18,7 +18,7 @@ import {
   Bell,
   Star,
 } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 const navigation = [
@@ -193,6 +193,10 @@ export default function AdminLayout() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-72 border-r-0 bg-slate-950">
+            <div className="sr-only">
+              <SheetTitle>Admin Menu</SheetTitle>
+              <SheetDescription>Navigation links for the admin panel</SheetDescription>
+            </div>
             <SidebarContent />
           </SheetContent>
         </Sheet>

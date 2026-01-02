@@ -28,6 +28,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Edit, Trash2, Image as ImageIcon, MessageSquare, Star } from "lucide-react";
@@ -367,6 +368,7 @@ export default function ProductsListAdmin() {
         <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Product Reviews</DialogTitle>
+            <DialogDescription>Customer feedback for this product.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {reviewsLoading ? (
