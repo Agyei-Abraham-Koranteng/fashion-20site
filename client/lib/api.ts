@@ -191,6 +191,30 @@ export async function getUserReviews(userId: string) {
   }
 }
 
+export const addProductReview = async (review: {
+  product_id: string;
+  rating: number;
+  title: string;
+  comment: string;
+  user_name?: string;
+}) => {
+  return await supabase.from("product_reviews").insert([review]).select().single();
+};
+
+export const addSystemFeedback = async (feedback: {
+  rating: number;
+  feedback: string;
+}) => {
+  return await supabase.from("system_feedback").insert([feedback]).select().single();
+};
+
+export const getSystemFeedback = async () => {
+  return await supabase
+    .from("system_feedback")
+    .select("*")
+    .order("created_at", { ascending: false });
+};
+
 // Orders
 export async function getOrders(userId: string) {
   try {

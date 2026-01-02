@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Layout from "@/components/Layout";
-import { getProductById, getProductReviews } from "@/lib/api";
+import { getProductById, getProductReviews, addProductReview } from "@/lib/api";
 import { Product } from "@/lib/types";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -21,6 +21,8 @@ export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [newReview, setNewReview] = useState({ rating: 0, title: "", comment: "", user_name: "" });
 
   const { addItem } = useCart();
   const {
@@ -28,6 +30,31 @@ export default function ProductDetail() {
     addItem: addToWishlist,
     removeItem: removeFromWishlist,
   } = useWishlist();
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id) return;
+
+    try {
+      const { error } = await addProductReview({
+        product_id: id,
+        rating: newReview.rating,
+        title: newReview.title,
+        comment: newReview.comment,
+        user_name: newReview.user_name || "Anonymous",
+      });
+
+      if (error) throw error;
+
+      toast.success("Review submitted successfully!");
+      setShowReviewForm(false);
+      setNewReview({ rating: 0, title: "", comment: "", user_name: "" });
+      refetch(); // Refresh reviews
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast.error("Failed to submit review");
+    }
+  };
 
   const { data: product, isLoading: loading, refetch } = useQuery<Product | null>({
     queryKey: ["product", id],
@@ -420,7 +447,96 @@ export default function ProductDetail() {
       {/* Reviews section */}
       <section className="py-12">
         <div className="container-wide">
-          <h2 className="text-2xl font-bold mb-8">Customer Reviews</h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold">Customer Reviews</h2>
+            <button
+              onClick={() => setShowReviewForm(!showReviewForm)}
+              className="btn-outline text-sm"
+            >
+              Write a Review
+            </button>
+          </div>
+
+          {showReviewForm && (
+            <form onSubmit={handleReviewSubmit} className="bg-secondary/30 p-6 rounded-lg mb-8 space-y-4 animate-fade-in">
+              <h3 className="font-semibold text-lg">Write your review</h3>
+
+              {/* Rating */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Rating</label>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setNewReview(prev => ({ ...prev, rating: star }))}
+                      className="focus:outline-none"
+                    >
+                      <Star
+                        className={`w-6 h-6 transition-colors ${star <= newReview.rating ? "fill-primary text-primary" : "text-muted-foreground/30"
+                          }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Title</label>
+                <input
+                  type="text"
+                  required
+                  value={newReview.title}
+                  onChange={(e) => setNewReview(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-4 py-2 rounded-sm border border-border focus:ring-1 focus:ring-primary focus:outline-none"
+                  placeholder="Summary of your experience"
+                />
+              </div>
+
+              {/* Comment */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Review</label>
+                <textarea
+                  required
+                  value={newReview.comment}
+                  onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
+                  className="w-full px-4 py-2 rounded-sm border border-border focus:ring-1 focus:ring-primary focus:outline-none min-h-[100px]"
+                  placeholder="Tell us about the product..."
+                />
+              </div>
+
+              {/* Name (Optional) */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Name (Optional)</label>
+                <input
+                  type="text"
+                  value={newReview.user_name}
+                  onChange={(e) => setNewReview(prev => ({ ...prev, user_name: e.target.value }))}
+                  className="w-full px-4 py-2 rounded-sm border border-border focus:ring-1 focus:ring-primary focus:outline-none"
+                  placeholder="Your name"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowReviewForm(false)}
+                  className="text-sm px-4 py-2 hover:bg-black/5 rounded-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary px-6 py-2 text-sm"
+                  disabled={newReview.rating === 0}
+                >
+                  Submit Review
+                </button>
+              </div>
+            </form>
+          )}
+
           <div className="space-y-6">
             {reviews.length > 0 ? (
               reviews.map((review) => (
@@ -447,8 +563,12 @@ export default function ProductDetail() {
                   <p className="text-sm text-muted-foreground mb-2">
                     {review.comment}
                   </p>
+                  <p className="text-xs text-muted-foreground italic">
+                    By {review.user_name || "Anonymous"}
+                  </p>
                 </div>
               ))
+              // ...
             ) : (
               <p className="text-muted-foreground italic">No reviews yet for this product. Be the first to review!</p>
             )}

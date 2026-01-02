@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
+import ReviewSection from "./ReviewSection";
 
 const footerSections = [
   {
@@ -110,7 +111,7 @@ export default function Footer() {
               <p className="text-sm text-primary-foreground/80 mb-4">
                 Get exclusive offers and updates delivered to your inbox.
               </p>
-              <form className="flex" onSubmit={handleSubscribe}>
+              <form className="flex flex-col sm:flex-row gap-2" onSubmit={handleSubscribe}>
                 <input
                   type="email"
                   placeholder="Enter your email"
@@ -129,37 +130,9 @@ export default function Footer() {
               </form>
             </div>
 
-            {/* Social links */}
+            {/* Review Section */}
             <div>
-              <h3 className="text-sm font-semibold tracking-wider mb-3 uppercase">
-                Follow Us
-              </h3>
-              <div className="flex gap-4">
-                <a
-                  href="#"
-                  className="text-primary-foreground/80 hover:text-primary-foreground transition-colors text-sm"
-                >
-                  Instagram
-                </a>
-                <a
-                  href="#"
-                  className="text-primary-foreground/80 hover:text-primary-foreground transition-colors text-sm"
-                >
-                  Facebook
-                </a>
-                <a
-                  href="#"
-                  className="text-primary-foreground/80 hover:text-primary-foreground transition-colors text-sm"
-                >
-                  Twitter
-                </a>
-                <a
-                  href="#"
-                  className="text-primary-foreground/80 hover:text-primary-foreground transition-colors text-sm"
-                >
-                  Pinterest
-                </a>
-              </div>
+              <ReviewSection />
             </div>
           </div>
         </div>

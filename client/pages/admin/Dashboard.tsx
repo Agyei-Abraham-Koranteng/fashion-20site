@@ -3,7 +3,7 @@ import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { getAdminStats, getAllOrders } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
+import { DollarSign, Package, ShoppingCart, Users, Star } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -22,6 +22,7 @@ export default function AdminDashboard() {
     totalOrders: 0,
     totalProducts: 0,
     activeCustomers: 0,
+    totalVisitors: 0,
   });
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [revenueData, setRevenueData] = useState<any[]>([]);
@@ -44,17 +45,21 @@ export default function AdminDashboard() {
 
     try {
       console.log("[Dashboard] Loading data...");
-      // Load stats and orders in parallel with individual error handling
-      const [statsResult, ordersResult] = await Promise.allSettled([
+      // Load stats, orders, and visitors in parallel
+      const [statsResult, ordersResult, visitorsResult] = await Promise.allSettled([
         getAdminStats(),
         getAllOrders(),
+        supabase.from('site_visits').select('*', { count: 'exact', head: true }),
       ]);
 
       // Handle stats
       if (statsResult.status === "fulfilled" && statsResult.value.data) {
-        setStatsData(statsResult.value.data);
-      } else {
-        console.warn("Failed to load stats:", statsResult.status === "rejected" ? statsResult.reason : statsResult.value?.error);
+        setStatsData(prev => ({ ...prev, ...statsResult.value.data }));
+      }
+
+      // Handle visitors
+      if (visitorsResult.status === "fulfilled" && visitorsResult.value.count !== null) {
+        setStatsData(prev => ({ ...prev, totalVisitors: visitorsResult.value.count || 0 }));
       }
 
       // Handle orders
@@ -202,6 +207,13 @@ export default function AdminDashboard() {
             color: "text-orange-500",
             bg: "bg-orange-500/10",
           },
+          {
+            name: "Total Visitors",
+            val: statsData.totalVisitors.toLocaleString(),
+            icon: Users,
+            color: "text-indigo-500",
+            bg: "bg-indigo-500/10",
+          },
         ].map((stat) => (
           <Card key={stat.name} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white/50 backdrop-blur-sm">
             <CardContent className="p-6">
@@ -343,6 +355,63 @@ export default function AdminDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Recent Feedback - Mini Table */}
+      <Card className="border-none shadow-sm bg-white/50 backdrop-blur-sm mt-6">
+        <CardHeader>
+          <CardTitle>Recent System Feedback</CardTitle>
+          <p className="text-sm text-muted-foreground">What users are saying about the site</p>
+        </CardHeader>
+        <CardContent>
+          <SystemFeedbackList />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// Simple component to list feedback
+import { getSystemFeedback } from "@/lib/api";
+
+function SystemFeedbackList() {
+  const [feedback, setFeedback] = useState<any[]>([]);
+
+  useEffect(() => {
+    getSystemFeedback().then(({ data }) => {
+      if (data) setFeedback(data.slice(0, 5));
+    });
+
+    // Subscribe to new feedback
+    const channel = supabase
+      .channel('feedback-updates')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'system_feedback' }, (payload) => {
+        setFeedback(prev => [payload.new, ...prev].slice(0, 5));
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  if (feedback.length === 0) return <p className="text-muted-foreground text-sm">No feedback yet.</p>;
+
+  return (
+    <div className="space-y-4">
+      {feedback.map((item, i) => (
+        <div key={item.id || i} className="flex items-start gap-4 p-4 rounded-lg bg-white/60 border border-gray-100">
+          <div className="flex gap-1 mt-1">
+            {[...Array(5)].map((_, j) => (
+              <Star
+                key={j}
+                className={`w-4 h-4 ${j < item.rating ? "fill-yellow-500 text-yellow-500" : "text-gray-300"}`}
+              />
+            ))}
+          </div>
+          <div>
+            <p className="text-sm text-gray-800">{item.feedback}</p>
+            <p className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()}</p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

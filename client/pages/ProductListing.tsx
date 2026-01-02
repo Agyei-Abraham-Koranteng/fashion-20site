@@ -139,7 +139,7 @@ export default function ProductListing() {
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="max-w-2xl"
+            className="max-w-2xl bg-white/10 dark:bg-black/20 backdrop-blur-md p-6 md:p-8 rounded-lg border border-white/20 shadow-2xl"
           >
             <h1 className="text-4xl md:text-6xl font-serif font-bold mb-4 tracking-tight">
               {category
