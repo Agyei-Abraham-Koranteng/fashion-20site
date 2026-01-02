@@ -4,18 +4,21 @@ type Theme = {
     primaryColor: string;
     fontFamily: string;
     radius: string;
+    mode: 'light' | 'dark';
 };
 
 type ThemeContextType = {
     theme: Theme;
     updateTheme: (newTheme: Partial<Theme>) => void;
     resetTheme: () => void;
+    toggleMode: () => void;
 };
 
 const defaultTheme: Theme = {
     primaryColor: "217 32% 17%", // Default independent navy
     fontFamily: "'Inter', sans-serif",
     radius: "0.5rem",
+    mode: 'light',
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -23,21 +26,22 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [theme, setTheme] = useState<Theme>(() => {
         const saved = localStorage.getItem("site-theme");
-        return saved ? JSON.parse(saved) : defaultTheme;
+        return saved ? { ...defaultTheme, ...JSON.parse(saved) } : defaultTheme;
     });
 
     useEffect(() => {
         const root = document.documentElement;
         root.style.setProperty("--primary", theme.primaryColor);
-        // Also update ring and other derived colors if needed, 
-        // but typically they track primary or are distinct.
-        // For now we assume typical shadcn usage where --ring often matches primary.
         root.style.setProperty("--ring", theme.primaryColor);
-
         root.style.setProperty("--radius", theme.radius);
-
-        // For font, we update the body style
         document.body.style.fontFamily = theme.fontFamily;
+
+        // Handle Dark Mode
+        if (theme.mode === 'dark') {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
 
         localStorage.setItem("site-theme", JSON.stringify(theme));
     }, [theme]);
@@ -46,12 +50,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setTheme((prev) => ({ ...prev, ...newTheme }));
     };
 
+    const toggleMode = () => {
+        setTheme((prev) => ({ ...prev, mode: prev.mode === 'light' ? 'dark' : 'light' }));
+    };
+
     const resetTheme = () => {
         setTheme(defaultTheme);
     };
 
     return (
-        <ThemeContext.Provider value={{ theme, updateTheme, resetTheme }}>
+        <ThemeContext.Provider value={{ theme, updateTheme, resetTheme, toggleMode }}>
             {children}
         </ThemeContext.Provider>
     );
