@@ -172,8 +172,8 @@ export default function OrdersListAdmin() {
                   key={status}
                   onClick={() => setStatusFilter(status)}
                   className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${statusFilter === status
-                      ? 'bg-gray-900 text-white shadow-md'
-                      : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
+                    ? 'bg-gray-900 text-white shadow-md'
+                    : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
                     }`}
                 >
                   {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -256,12 +256,37 @@ export default function OrdersListAdmin() {
                             <SelectValue />
                           </div>
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="processing">Processing</SelectItem>
-                          <SelectItem value="shipped">Shipped</SelectItem>
-                          <SelectItem value="delivered">Delivered</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                        <SelectContent className="min-w-[180px] z-[100] bg-white shadow-lg border border-gray-200" position="popper" sideOffset={4}>
+                          <SelectItem value="pending" className="cursor-pointer hover:bg-amber-50 focus:bg-amber-50">
+                            <div className="flex items-center gap-2">
+                              <div className="h-2 w-2 rounded-full bg-amber-500" />
+                              <span>Pending</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="processing" className="cursor-pointer hover:bg-blue-50 focus:bg-blue-50">
+                            <div className="flex items-center gap-2">
+                              <div className="h-2 w-2 rounded-full bg-blue-500" />
+                              <span>Processing</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="shipped" className="cursor-pointer hover:bg-blue-50 focus:bg-blue-50">
+                            <div className="flex items-center gap-2">
+                              <div className="h-2 w-2 rounded-full bg-blue-500" />
+                              <span>Shipped</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="delivered" className="cursor-pointer hover:bg-emerald-50 focus:bg-emerald-50">
+                            <div className="flex items-center gap-2">
+                              <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                              <span>Delivered</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="cancelled" className="cursor-pointer hover:bg-red-50 focus:bg-red-50">
+                            <div className="flex items-center gap-2">
+                              <div className="h-2 w-2 rounded-full bg-red-500" />
+                              <span>Cancelled</span>
+                            </div>
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
@@ -356,25 +381,50 @@ export default function OrdersListAdmin() {
                       }
                     >
                       <SelectTrigger className={`w-full h-9 text-xs font-medium border-0 shadow-none ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-50 text-emerald-700' :
-                          order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-50 text-blue-700' :
-                            order.status === 'cancelled' ? 'bg-red-50 text-red-700' :
-                              'bg-amber-50 text-amber-700'
+                        order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-50 text-blue-700' :
+                          order.status === 'cancelled' ? 'bg-red-50 text-red-700' :
+                            'bg-amber-50 text-amber-700'
                         }`}>
                         <div className="flex items-center gap-1.5">
                           <div className={`h-1.5 w-1.5 rounded-full ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-500' :
-                              order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-500' :
-                                order.status === 'cancelled' ? 'bg-red-500' :
-                                  'bg-amber-500'
+                            order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-500' :
+                              order.status === 'cancelled' ? 'bg-red-500' :
+                                'bg-amber-500'
                             }`} />
                           <SelectValue />
                         </div>
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="processing">Processing</SelectItem>
-                        <SelectItem value="shipped">Shipped</SelectItem>
-                        <SelectItem value="delivered">Delivered</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      <SelectContent className="min-w-[180px] z-[100] bg-white shadow-lg border border-gray-200" position="popper" sideOffset={4}>
+                        <SelectItem value="pending" className="cursor-pointer hover:bg-amber-50 focus:bg-amber-50">
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-amber-500" />
+                            <span>Pending</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="processing" className="cursor-pointer hover:bg-blue-50 focus:bg-blue-50">
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-blue-500" />
+                            <span>Processing</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="shipped" className="cursor-pointer hover:bg-blue-50 focus:bg-blue-50">
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-blue-500" />
+                            <span>Shipped</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="delivered" className="cursor-pointer hover:bg-emerald-50 focus:bg-emerald-50">
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                            <span>Delivered</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="cancelled" className="cursor-pointer hover:bg-red-50 focus:bg-red-50">
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-red-500" />
+                            <span>Cancelled</span>
+                          </div>
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
