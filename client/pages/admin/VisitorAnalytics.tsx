@@ -296,7 +296,8 @@ export default function VisitorAnalytics() {
                     </div>
                 </CardHeader>
                 <CardContent className="p-0">
-                    <div className="overflow-x-auto">
+                    {/* Desktop Table */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-sm text-left">
                             <thead className="bg-gray-50 text-gray-600 font-medium border-y border-gray-100">
                                 <tr>
@@ -340,6 +341,44 @@ export default function VisitorAnalytics() {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* Mobile List View */}
+                    <div className="md:hidden divide-y divide-gray-100">
+                        {isLoading ? (
+                            Array(3).fill(0).map((_, i) => (
+                                <div key={i} className="p-4 animate-pulse">
+                                    <div className="h-4 w-1/2 bg-gray-100 rounded mb-2" />
+                                    <div className="h-3 w-1/4 bg-gray-50 rounded" />
+                                </div>
+                            ))
+                        ) : filteredVisits.map((visit) => (
+                            <div key={visit.id} className="p-4 space-y-2 hover:bg-gray-50/50">
+                                <div className="flex justify-between items-start">
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-bold text-gray-900 text-[11px] uppercase tracking-tighter bg-gray-100 px-1.5 py-0.5 rounded">
+                                                {visit.page_path}
+                                            </span>
+                                            <span className="text-[10px] text-muted-foreground">
+                                                {format(new Date(visit.visited_at), "MMM d, HH:mm")}
+                                            </span>
+                                        </div>
+                                        <p className="text-[10px] text-gray-500 italic max-w-[200px] truncate">
+                                            {visit.user_agent}
+                                        </p>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-red-500"
+                                        onClick={() => handleDelete(visit.id)}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </CardContent>
             </Card>
