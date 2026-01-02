@@ -21,12 +21,14 @@ import {
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
+console.log("!!! ADMIN_LAYOUT_LOADED_V3 !!!");
+
 const navigation = [
+  { name: "Feedback", href: "/admin/feedback", icon: Star },
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Products", href: "/admin/products", icon: Package },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
   { name: "Customers", href: "/admin/customers", icon: Users },
-  { name: "Feedback", href: "/admin/feedback", icon: Star },
   { name: "Messages", href: "/admin/messages", icon: MailOpen },
   { name: "Newsletter", href: "/admin/newsletter", icon: Mail },
   { name: "Content Manager", href: "/admin/content", icon: FileText },
