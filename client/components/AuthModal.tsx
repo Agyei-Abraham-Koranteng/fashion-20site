@@ -66,12 +66,12 @@ export default function AuthModal({ isOpen, onClose, initialView = "login" }: Au
                             {/* Close Button */}
                             <button
                                 onClick={onClose}
-                                className="absolute right-5 top-5 p-2.5 bg-gray-50/80 backdrop-blur-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all rounded-full z-20 shadow-sm border border-gray-100 group active:scale-95"
+                                className="absolute right-4 top-4 p-2.5 bg-gray-50/80 backdrop-blur-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all rounded-full z-20 shadow-sm border border-gray-100 group active:scale-95"
                             >
                                 <X size={16} className="transition-transform group-hover:rotate-90" />
                             </button>
 
-                            <div className="p-8 md:p-10">
+                            <div className="px-8 pt-16 pb-8 md:px-10 md:pt-20 md:pb-10">
                                 <div className="text-center mb-10">
                                     <motion.div
                                         key={view}
