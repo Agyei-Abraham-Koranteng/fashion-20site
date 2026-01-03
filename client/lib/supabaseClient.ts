@@ -13,7 +13,18 @@ if (!supabaseConfigured) {
 
 // Create a safe client only when credentials are present; otherwise, throw on use.
 export const supabase = supabaseConfigured
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 10,
+      },
+    },
+  })
   : (new Proxy({} as Record<string, unknown>, {
     get() {
       throw new Error(
