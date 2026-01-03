@@ -139,7 +139,7 @@ export default function VisitorAnalytics() {
                             <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600 dark:text-indigo-400" />
                             Visitors
                         </h1>
-                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Real-time traffic and flow.</p>
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">Real-time traffic and flow.</p>
                     </div>
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-full border border-emerald-100 dark:border-emerald-800/30 shadow-sm">
                         <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -156,11 +156,11 @@ export default function VisitorAnalytics() {
                     { label: "7 Days", value: stats.last7Days, icon: Calendar, color: "blue" },
                     { label: "Growth", value: `${stats.growth > 0 ? "+" : ""}${stats.growth}%`, icon: ArrowUpRight, color: "orange" },
                 ].map((item, i) => (
-                    <Card key={i} className="border-none shadow-sm bg-white dark:bg-slate-900 border border-gray-100/50 dark:border-slate-800">
+                    <Card key={i} className="border-none shadow-sm bg-white dark:bg-slate-900 border border-gray-100/50 dark:border-slate-800/50">
                         <CardContent className="p-4 sm:p-6">
                             <div className="flex justify-between items-start mb-2 sm:mb-4">
                                 <div className={cn("p-1.5 sm:p-2 rounded-lg sm:rounded-xl", `bg-${item.color}-500/10`)}>
-                                    <item.icon className={cn("h-4 w-4 sm:h-5 sm:w-5", `text-${item.color}-600`)} />
+                                    <item.icon className={cn("h-4 w-4 sm:h-5 sm:w-5", `text-${item.color}-600 dark:text-${item.color}-400`)} />
                                 </div>
                             </div>
                             <div className="space-y-0.5">
@@ -250,7 +250,7 @@ export default function VisitorAnalytics() {
                     </CardHeader>
                     <CardContent className="p-0">
                         <ScrollArea className="h-[380px]">
-                            <div className="divide-y divide-gray-100">
+                            <div className="divide-y divide-gray-100 dark:divide-slate-800">
                                 {filteredVisits.length === 0 ? (
                                     <div className="p-8 text-center text-muted-foreground">
                                         No recent activity
@@ -261,14 +261,14 @@ export default function VisitorAnalytics() {
                                             <div className="flex items-start justify-between">
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-2">
-                                                        <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-none px-1.5 py-0 text-[10px]">
+                                                        <Badge variant="secondary" className="bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 border-none px-1.5 py-0 text-[10px]">
                                                             {visit.page_path}
                                                         </Badge>
                                                         <span className="text-[10px] text-muted-foreground">
                                                             {format(new Date(visit.visited_at), "h:mm a")}
                                                         </span>
                                                     </div>
-                                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate max-w-[180px]">
+                                                    <p className="text-[11px] text-gray-500 dark:text-slate-400 truncate max-w-[180px]">
                                                         {visit.user_agent}
                                                     </p>
                                                 </div>
@@ -297,7 +297,7 @@ export default function VisitorAnalytics() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder="Search by path or device..."
-                                className="pl-9 h-9 border-gray-100 focus-visible:ring-indigo-500"
+                                className="pl-9 h-9 border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 focus-visible:ring-indigo-500"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />

@@ -13,15 +13,25 @@ export function useVisitorTracker() {
 
         if (!visited) {
             const trackVisit = async () => {
+                const userAgent = navigator.userAgent;
+                const path = window.location.pathname;
+
+                console.log(`[VisitorTracker] Initializing session... (Path: ${path})`);
+
                 try {
-                    await supabase.from("site_visits").insert([{
-                        user_agent: navigator.userAgent,
-                        page_path: window.location.pathname
+                    const { error } = await supabase.from("site_visits").insert([{
+                        user_agent: userAgent,
+                        page_path: path
                     }]);
-                    sessionStorage.setItem("site_session_active", "true");
+
+                    if (error) {
+                        console.warn("[VisitorTracker] Failed to record visit:", error.message);
+                    } else {
+                        console.log("[VisitorTracker] Visit recorded successfully.");
+                        sessionStorage.setItem("site_session_active", "true");
+                    }
                 } catch (error) {
-                    // Silent fail for tracking
-                    console.warn("Visitor tracking failed:", error);
+                    console.warn("[VisitorTracker] Unexpected error during tracking:", error);
                 }
             };
             trackVisit();

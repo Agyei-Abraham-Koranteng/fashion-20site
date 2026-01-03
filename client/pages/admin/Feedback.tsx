@@ -135,7 +135,7 @@ export default function Feedback() {
 
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="bg-white/50 backdrop-blur-sm border-gray-100 shadow-sm">
+                <Card className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-gray-100 dark:border-slate-800 shadow-sm">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                             <TrendingUp className="h-4 w-4 text-indigo-500" />
@@ -154,7 +154,7 @@ export default function Feedback() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-white/50 backdrop-blur-sm border-gray-100 shadow-sm md:col-span-2">
+                <Card className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-gray-100 dark:border-slate-800 shadow-sm md:col-span-2">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Rating Distribution</CardTitle>
                     </CardHeader>
@@ -178,8 +178,8 @@ export default function Feedback() {
             </div>
 
             {/* Main Content */}
-            <Card className="bg-white border-gray-100 shadow-md overflow-hidden">
-                <CardHeader className="border-b bg-gray-50/30 p-4 sm:p-6">
+            <Card className="bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800 shadow-md overflow-hidden">
+                <CardHeader className="border-b bg-gray-50/30 dark:bg-slate-900/50 p-4 sm:p-6">
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -201,7 +201,7 @@ export default function Feedback() {
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
                                     placeholder="Search..."
-                                    className="pl-9 h-10 border-gray-200 ring-offset-0 focus-visible:ring-1 focus-visible:ring-indigo-500 shadow-sm"
+                                    className="pl-9 h-10 border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 ring-offset-0 focus-visible:ring-1 focus-visible:ring-indigo-500 shadow-sm"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -235,21 +235,21 @@ export default function Feedback() {
                 </CardHeader>
                 <CardContent className="p-0">
                     <ScrollArea className="h-[600px]">
-                        <div className="divide-y divide-gray-100">
+                        <div className="divide-y divide-gray-100 dark:divide-slate-800">
                             {isLoading ? (
                                 Array(5).fill(0).map((_, i) => (
                                     <div key={i} className="p-6 space-y-3 animate-pulse">
                                         <div className="flex justify-between">
-                                            <div className="h-4 w-24 bg-gray-100 rounded" />
-                                            <div className="h-4 w-20 bg-gray-100 rounded" />
+                                            <div className="h-4 w-24 bg-gray-100 dark:bg-slate-800 rounded" />
+                                            <div className="h-4 w-20 bg-gray-100 dark:bg-slate-800 rounded" />
                                         </div>
-                                        <div className="h-16 w-full bg-gray-50 rounded" />
+                                        <div className="h-16 w-full bg-gray-50 dark:bg-slate-800/50 rounded" />
                                     </div>
                                 ))
                             ) : filteredFeedback.length === 0 ? (
                                 <div className="p-20 text-center text-muted-foreground">
                                     <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-10" />
-                                    <p className="text-lg font-medium text-gray-400">No feedback entries found</p>
+                                    <p className="text-lg font-medium text-gray-400 dark:text-gray-500">No feedback entries found</p>
                                     <p className="text-sm">Try adjusting your filters or search term</p>
                                 </div>
                             ) : (
@@ -259,9 +259,9 @@ export default function Feedback() {
                                             <div className="flex items-center gap-3">
                                                 <div className={cn(
                                                     "h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm",
-                                                    f.rating >= 4 ? "bg-green-50 text-green-700 border border-green-100" :
-                                                        f.rating === 3 ? "bg-yellow-50 text-yellow-700 border border-yellow-100" :
-                                                            "bg-red-50 text-red-700 border border-red-100"
+                                                    f.rating >= 4 ? "bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-900/30" :
+                                                        f.rating === 3 ? "bg-yellow-50 dark:bg-yellow-950/20 text-yellow-700 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-900/30" :
+                                                            "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/30"
                                                 )}>
                                                     {f.rating}
                                                 </div>
@@ -270,9 +270,9 @@ export default function Feedback() {
                                                         {renderStars(f.rating)}
                                                         <Badge variant="outline" className={cn(
                                                             "text-[10px] px-1.5 py-0 uppercase tracking-tight",
-                                                            f.rating >= 4 ? "text-green-600 border-green-100 bg-green-50/50" :
-                                                                f.rating === 3 ? "text-yellow-600 border-yellow-100 bg-yellow-50/50" :
-                                                                    "text-red-600 border-red-100 bg-red-50/50"
+                                                            f.rating >= 4 ? "text-green-600 dark:text-green-400 border-green-100 dark:border-green-900 bg-green-50/50 dark:bg-green-950/30" :
+                                                                f.rating === 3 ? "text-yellow-600 dark:text-yellow-400 border-yellow-100 dark:border-yellow-900 bg-yellow-50/50 dark:bg-yellow-950/30" :
+                                                                    "text-red-600 dark:text-red-400 border-red-100 dark:border-red-900 bg-red-50/50 dark:bg-red-950/30"
                                                         )}>
                                                             {f.rating >= 4 ? "Positive" : f.rating === 3 ? "Neutral" : "Negative"}
                                                         </Badge>
@@ -286,14 +286,14 @@ export default function Feedback() {
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="text-red-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 opacity-0 group-hover:opacity-100 transition-opacity"
                                                 onClick={() => handleDelete(f.id)}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
-                                        <div className="bg-white dark:bg-slate-900/50 border border-gray-100 dark:border-slate-800 p-4 rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
-                                            <p className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed italic">
+                                        <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-4 rounded-xl shadow-sm group-hover:shadow-md transition-all">
+                                            <p className="text-gray-800 dark:text-slate-300 text-sm leading-relaxed italic">
                                                 "{f.feedback || "No comment provided"}"
                                             </p>
                                         </div>
@@ -304,7 +304,7 @@ export default function Feedback() {
                     </ScrollArea>
                 </CardContent>
                 {filteredFeedback.length > 0 && (
-                    <div className="p-4 border-t bg-gray-50/30 text-center text-xs text-muted-foreground font-medium">
+                    <div className="p-4 border-t dark:border-slate-800 bg-gray-50/30 dark:bg-slate-900/50 text-center text-xs text-muted-foreground font-medium">
                         Showing {filteredFeedback.length} of {feedbackList.length} total entries
                     </div>
                 )}
