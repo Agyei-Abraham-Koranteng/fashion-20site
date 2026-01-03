@@ -78,10 +78,10 @@ export default function Navbar() {
     <nav className="bg-background border-b border-border sticky top-0 z-50">
       {/* Top bar with logo, search, and icons */}
       <div className="container-wide">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14 md:h-16">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 mr-4 md:mr-0 lg:mr-8">
-            <div className="text-xl font-bold tracking-wider text-primary">
+          <Link to="/" className="flex-shrink-0 mr-2 md:mr-0 lg:mr-8">
+            <div className="text-lg md:text-xl font-bold tracking-wider text-primary truncate max-w-[140px] md:max-w-none">
               MadeInFashion
             </div>
           </Link>
@@ -168,7 +168,7 @@ export default function Navbar() {
           </div>
 
           {/* Right icons */}
-          <div className="flex items-center gap-2 sm:gap-4 ml-auto">
+          <div className="flex items-center gap-1 sm:gap-4 ml-auto">
             {/* Admin Panel Quick Link */}
             {user?.role === "admin" && (
               <Link
@@ -180,16 +180,18 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Theme Toggle */}
-            <ThemeToggle />
+            {/* Theme Toggle - Hidden on mobile, available in menu */}
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
 
             {/* Search icon */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 hover:bg-secondary rounded-sm transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-secondary rounded-sm transition-colors"
               aria-label="Search"
             >
-              <Search size={20} />
+              <Search size={20} className="w-5 h-5" />
             </button>
 
             {/* Wishlist */}
@@ -209,12 +211,12 @@ export default function Navbar() {
             {/* Cart */}
             <Link
               to="/cart"
-              className="p-2 hover:bg-secondary rounded-sm transition-colors relative"
+              className="p-1.5 sm:p-2 hover:bg-secondary rounded-sm transition-colors relative"
               aria-label="Shopping cart"
             >
-              <ShoppingBag size={20} />
+              <ShoppingBag size={20} className="w-5 h-5" />
               {itemCount > 0 && (
-                <span className="absolute top-1 right-1 bg-accent text-accent-foreground text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute top-0 right-0 bg-accent text-accent-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                   {itemCount}
                 </span>
               )}
@@ -237,7 +239,7 @@ export default function Navbar() {
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 hover:bg-secondary rounded-sm transition-colors bg-secondary/30 ml-1"
+              className="md:hidden p-1.5 hover:bg-secondary rounded-sm transition-colors bg-secondary/30 ml-1"
               aria-label="Toggle menu"
             >
               <AnimatePresence mode="wait">
@@ -248,7 +250,7 @@ export default function Navbar() {
                   exit={{ opacity: 0, rotate: 90 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                  {mobileMenuOpen ? <X size={20} className="w-5 h-5" /> : <Menu size={20} className="w-5 h-5" />}
                 </motion.div>
               </AnimatePresence>
             </button>
