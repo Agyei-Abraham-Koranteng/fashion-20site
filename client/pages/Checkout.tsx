@@ -68,6 +68,30 @@ export default function Checkout() {
     return true;
   };
 
+  const validateShipping = () => {
+    const requiredFields = ["firstName", "lastName", "email", "phone", "address", "city", "state", "zipCode", "country"];
+    const emptyFields = requiredFields.filter(field => !shippingInfo[field as keyof typeof shippingInfo]);
+
+    if (emptyFields.length > 0) {
+      toast.error("Please fill in all required shipping fields");
+      return false;
+    }
+    return true;
+  };
+
+  const validateBilling = () => {
+    if (sameAsBilling) return true;
+
+    const requiredFields = ["firstName", "lastName", "address", "city", "state", "zipCode", "country"];
+    const emptyFields = requiredFields.filter(field => !billingInfo[field as keyof typeof billingInfo]);
+
+    if (emptyFields.length > 0) {
+      toast.error("Please fill in all required billing fields");
+      return false;
+    }
+    return true;
+  };
+
   const handleValidationPlaceOrder = async () => {
     if (!validateShipping() || !validateBilling()) return;
     handlePlaceOrder();
