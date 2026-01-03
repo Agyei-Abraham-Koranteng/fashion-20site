@@ -49,6 +49,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Initial session check
     const initSession = async () => {
+      // Safety timeout: stop loading after 10s no matter what
+      const timer = setTimeout(() => {
+        console.warn("[Auth] Session check timed out. Stopping loading.");
+        setLoading(false);
+      }, 10000);
+
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
@@ -67,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (err) {
         console.error("[Auth] Initial session check failed:", err);
       } finally {
+        clearTimeout(timer);
         setLoading(false);
       }
     };
