@@ -10,8 +10,19 @@ import { Lock, Loader2, ArrowRight, Check, X, ShieldCheck, Sparkles } from "luci
 import { cn } from "@/lib/utils";
 
 export default function ResetPassword() {
-    const { updatePassword } = useAuth();
+    const { user, updatePassword, loading } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // If loading, wait
+        if (loading) return;
+
+        // If no user session, they shouldn't be here (recovery link sets a session automatically)
+        if (!user) {
+            toast.error("Invalid or expired reset session. Please request a new link.");
+            navigate("/forgot-password");
+        }
+    }, [user, loading, navigate]);
 
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
