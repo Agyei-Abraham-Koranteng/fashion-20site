@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
 
 export default function Login() {
   const { login, user, loading: authLoading } = useAuth();
@@ -90,9 +90,9 @@ export default function Login() {
         className="w-full max-w-[450px] bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden"
       >
         <div className="p-8 sm:p-10">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign in</h2>
-            <p className="text-gray-500 text-sm">Access your exclusive fashion profile</p>
+          <div className="mb-10 text-center">
+            <h2 className="text-4xl font-serif font-bold text-gray-900 mb-3 tracking-tight">Welcome Back</h2>
+            <p className="text-gray-400 text-xs font-medium tracking-wide uppercase">Sign in to your fashion profile</p>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-6">
@@ -111,7 +111,7 @@ export default function Login() {
                     if (errors.email) setErrors({ ...errors, email: undefined });
                   }}
                   placeholder="you@example.com"
-                  className={`pl-10 h-12 bg-gray-50/50 border-gray-200 focus:bg-white transition-all ${errors.email ? "border-red-500 ring-red-100" : ""}`}
+                  className={`pl-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl ${errors.email ? "border-red-500 ring-red-100" : ""}`}
                 />
               </div>
               {errors.email && <p className="text-xs text-red-500 mt-1 font-medium">{errors.email}</p>}
@@ -137,7 +137,7 @@ export default function Login() {
                     if (errors.password) setErrors({ ...errors, password: undefined });
                   }}
                   placeholder="••••••••"
-                  className={`pl-10 pr-10 h-12 bg-gray-50/50 border-gray-200 focus:bg-white transition-all ${errors.password ? "border-red-500 ring-red-100" : ""}`}
+                  className={`pl-10 pr-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl ${errors.password ? "border-red-500 ring-red-100" : ""}`}
                 />
                 <button
                   type="button"
@@ -164,17 +164,39 @@ export default function Login() {
 
             <Button
               type="submit"
-              className="w-full h-12 text-sm font-bold bg-gray-900 hover:bg-black text-white rounded-xl transition-all active:scale-[0.98]"
+              className="w-full h-12 text-sm font-bold bg-gray-900 hover:bg-black text-white rounded-xl transition-all relative overflow-hidden group active:scale-[0.98]"
               disabled={isSubmitting}
             >
-              {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Continue"}
+              <AnimatePresence mode="wait">
+                {isSubmitting ? (
+                  <motion.div
+                    key="loader"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="flex justify-center"
+                  >
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="content"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    Sign In <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </Button>
           </form>
 
-          <div className="mt-8 pt-8 border-t border-gray-100 text-center">
-            <p className="text-sm text-gray-500">
+          <div className="mt-8 pt-8 border-t border-gray-100/50 text-center">
+            <p className="text-sm text-gray-400 font-medium">
               New to MadeInFashion?{" "}
-              <Link to="/signup" className="font-bold text-gray-900 hover:underline">
+              <Link to="/signup" className="text-gray-900 font-bold hover:underline transition-all">
                 Create an account
               </Link>
             </p>
@@ -182,9 +204,11 @@ export default function Login() {
         </div>
 
         {/* Footer info in card */}
-        <div className="bg-gray-50 p-6 border-t border-gray-100 flex items-center justify-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-          <ShieldCheck className="h-3 w-3" />
-          Secure Fashion Checkout
+        <div className="bg-gray-50/50 p-6 border-t border-gray-100 flex items-center justify-center gap-2">
+          <Sparkles className="h-3 w-3 text-amber-400" />
+          <p className="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold">
+            The Premium Fashion Experience
+          </p>
         </div>
       </motion.div>
 

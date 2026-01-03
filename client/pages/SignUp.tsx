@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Eye, EyeOff, Loader2, Mail, Lock, User, ArrowRight, Check, X, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, User, ArrowRight, Check, X, ShieldCheck, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function SignUp() {
@@ -158,9 +158,9 @@ export default function SignUp() {
                 className="w-full max-w-[500px] bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden"
             >
                 <div className="p-8 sm:p-10">
-                    <div className="mb-8">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h2>
-                        <p className="text-gray-500 text-sm">Join the elite fashion community</p>
+                    <div className="mb-10 text-center">
+                        <h2 className="text-4xl font-serif font-bold text-gray-900 mb-3 tracking-tight">Join The Elite</h2>
+                        <p className="text-gray-400 text-xs font-medium tracking-wide uppercase">Register for exclusive fashion access</p>
                     </div>
 
                     <form onSubmit={onSubmit} className="space-y-5">
@@ -176,7 +176,7 @@ export default function SignUp() {
                                     value={formData.fullName}
                                     onChange={(e) => handleChange("fullName", e.target.value)}
                                     placeholder="John Doe"
-                                    className={cn("pl-10 h-11 bg-gray-50/50 border-gray-200 focus:bg-white transition-all", errors.fullName && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.fullName && "border-red-500 ring-red-100")}
                                 />
                             </div>
                             {errors.fullName && <p className="text-xs text-red-500 mt-1 font-medium">{errors.fullName}</p>}
@@ -194,7 +194,7 @@ export default function SignUp() {
                                     value={formData.email}
                                     onChange={(e) => handleChange("email", e.target.value)}
                                     placeholder="you@example.com"
-                                    className={cn("pl-10 h-11 bg-gray-50/50 border-gray-200 focus:bg-white transition-all", errors.email && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.email && "border-red-500 ring-red-100")}
                                 />
                             </div>
                             {errors.email && <p className="text-xs text-red-500 mt-1 font-medium">{errors.email}</p>}
@@ -212,7 +212,7 @@ export default function SignUp() {
                                     value={formData.password}
                                     onChange={(e) => handleChange("password", e.target.value)}
                                     placeholder="••••••••"
-                                    className={cn("pl-10 pr-10 h-11 bg-gray-50/50 border-gray-200 focus:bg-white transition-all", errors.password && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 pr-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.password && "border-red-500 ring-red-100")}
                                 />
                                 <button
                                     type="button"
@@ -264,7 +264,7 @@ export default function SignUp() {
                                     value={formData.confirmPassword}
                                     onChange={(e) => handleChange("confirmPassword", e.target.value)}
                                     placeholder="••••••••"
-                                    className={cn("pl-10 h-11 bg-gray-50/50 border-gray-200 focus:bg-white transition-all", errors.confirmPassword && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.confirmPassword && "border-red-500 ring-red-100")}
                                 />
                             </div>
                             {errors.confirmPassword && <p className="text-xs text-red-500 mt-1 font-medium">{errors.confirmPassword}</p>}
@@ -288,10 +288,32 @@ export default function SignUp() {
 
                         <Button
                             type="submit"
-                            className="w-full h-12 text-sm font-bold bg-gray-900 hover:bg-black text-white rounded-xl transition-all active:scale-[0.98] mt-4"
+                            className="w-full h-12 text-sm font-bold bg-gray-900 hover:bg-black text-white rounded-xl transition-all relative overflow-hidden group active:scale-[0.98] mt-4"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Create Account"}
+                            <AnimatePresence mode="wait">
+                                {isSubmitting ? (
+                                    <motion.div
+                                        key="loader"
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.8 }}
+                                        className="flex justify-center"
+                                    >
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="content"
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 10 }}
+                                        className="flex items-center justify-center gap-2"
+                                    >
+                                        Create Account <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </Button>
                     </form>
 
@@ -306,9 +328,11 @@ export default function SignUp() {
                 </div>
 
                 {/* Footer info in card */}
-                <div className="bg-gray-50 p-6 border-t border-gray-100 flex items-center justify-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                    <ShieldCheck className="h-3 w-3" />
-                    Secure Member Registration
+                <div className="bg-gray-50/50 p-6 border-t border-gray-100 flex items-center justify-center gap-2">
+                    <Sparkles className="h-3 w-3 text-amber-400" />
+                    <p className="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold">
+                        The Premium Fashion Experience
+                    </p>
                 </div>
             </motion.div>
 

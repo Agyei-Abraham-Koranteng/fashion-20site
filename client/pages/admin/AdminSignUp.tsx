@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Eye, EyeOff, Loader2, Mail, Lock, User, Check, X, ShieldCheck, Settings } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, User, Check, X, ShieldCheck, Settings, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function AdminSignUp() {
@@ -164,9 +164,9 @@ export default function AdminSignUp() {
                 className="w-full max-w-[500px] bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden"
             >
                 <div className="p-8 sm:p-10">
-                    <div className="mb-8">
-                        <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">System Registry</h2>
-                        <p className="text-slate-400 text-sm">Create new administrator credentials</p>
+                    <div className="mb-10 text-center">
+                        <h2 className="text-3xl font-serif font-bold text-white mb-2 tracking-tight">System Registry</h2>
+                        <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Create New Administrator Credentials</p>
                     </div>
 
                     <form onSubmit={onSubmit} className="space-y-5">
@@ -182,7 +182,7 @@ export default function AdminSignUp() {
                                     value={formData.fullName}
                                     onChange={(e) => handleChange("fullName", e.target.value)}
                                     placeholder="Admin Name"
-                                    className={cn("pl-10 h-11 bg-slate-950/50 border-slate-800 text-white placeholder-slate-600 focus:bg-slate-950 focus:border-indigo-500 transition-all", errors.fullName && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 h-12 bg-slate-950 border-slate-800 text-white placeholder-slate-700 focus:bg-slate-950 focus:border-indigo-500 focus:ring-0 transition-all rounded-xl", errors.fullName && "border-red-500 ring-red-100")}
                                 />
                             </div>
                             {errors.fullName && <p className="text-xs text-red-400 mt-1 font-medium">{errors.fullName}</p>}
@@ -200,7 +200,7 @@ export default function AdminSignUp() {
                                     value={formData.email}
                                     onChange={(e) => handleChange("email", e.target.value)}
                                     placeholder="admin@madeinfashion.com"
-                                    className={cn("pl-10 h-11 bg-slate-950/50 border-slate-800 text-white placeholder-slate-600 focus:bg-slate-950 focus:border-indigo-500 transition-all", errors.email && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 h-12 bg-slate-950 border-slate-800 text-white placeholder-slate-700 focus:bg-slate-950 focus:border-indigo-500 focus:ring-0 transition-all rounded-xl", errors.email && "border-red-500 ring-red-100")}
                                 />
                             </div>
                             {errors.email && <p className="text-xs text-red-400 mt-1 font-medium">{errors.email}</p>}
@@ -218,7 +218,7 @@ export default function AdminSignUp() {
                                     value={formData.password}
                                     onChange={(e) => handleChange("password", e.target.value)}
                                     placeholder="••••••••"
-                                    className={cn("pl-10 pr-10 h-11 bg-slate-950/50 border-slate-800 text-white placeholder-slate-600 focus:bg-slate-950 focus:border-indigo-500 transition-all", errors.password && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 pr-10 h-12 bg-slate-950 border-slate-800 text-white placeholder-slate-700 focus:bg-slate-950 focus:border-indigo-500 focus:ring-0 transition-all rounded-xl", errors.password && "border-red-500 ring-red-100")}
                                 />
                                 <button
                                     type="button"
@@ -267,7 +267,7 @@ export default function AdminSignUp() {
                                     value={formData.confirmPassword}
                                     onChange={(e) => handleChange("confirmPassword", e.target.value)}
                                     placeholder="••••••••"
-                                    className={cn("pl-10 h-11 bg-slate-950/50 border-slate-800 text-white placeholder-slate-600 focus:bg-slate-950 focus:border-indigo-500 transition-all", errors.confirmPassword && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 h-12 bg-slate-950 border-slate-800 text-white placeholder-slate-700 focus:bg-slate-950 focus:border-indigo-500 focus:ring-0 transition-all rounded-xl", errors.confirmPassword && "border-red-500 ring-red-100")}
                                 />
                             </div>
                             {errors.confirmPassword && <p className="text-xs text-red-400 mt-1 font-medium">{errors.confirmPassword}</p>}
@@ -294,7 +294,29 @@ export default function AdminSignUp() {
                             className="w-full h-12 text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all shadow-lg shadow-indigo-900/20 active:scale-[0.98] mt-4"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Initialize Admin Profile"}
+                            <AnimatePresence mode="wait">
+                                {isSubmitting ? (
+                                    <motion.div
+                                        key="loader"
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.8 }}
+                                        className="flex justify-center"
+                                    >
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="content"
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 10 }}
+                                        className="flex items-center justify-center gap-2"
+                                    >
+                                        Initialize Admin Profile <ArrowRight className="h-4 w-4" />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </Button>
                     </form>
 
