@@ -462,23 +462,30 @@ export default function ProductDetail() {
       {/* Reviews section */}
       <section className="py-12">
         <div className="container-wide">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold">Customer Reviews</h2>
-            <div className="flex items-center gap-4">
-              <select
-                value={reviewSort}
-                onChange={(e) => setReviewSort(e.target.value as any)}
-                className="text-sm bg-transparent border-none focus:ring-0 cursor-pointer font-medium"
-              >
-                <option value="newest">Newest First</option>
-                <option value="highest">Highest Rating</option>
-                <option value="lowest">Lowest Rating</option>
-              </select>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Customer Reviews</h2>
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <div className="relative">
+                <select
+                  value={reviewSort}
+                  onChange={(e) => setReviewSort(e.target.value as any)}
+                  className="text-sm bg-secondary/50 hover:bg-secondary border-none rounded-md px-3 py-2 focus:ring-1 focus:ring-primary cursor-pointer font-medium appearance-none pr-8"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="highest">Highest Rating</option>
+                  <option value="lowest">Lowest Rating</option>
+                </select>
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg className="w-4 h-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
               <button
                 onClick={() => setShowReviewForm(!showReviewForm)}
-                className="btn-outline text-sm"
+                className="btn-outline text-sm whitespace-nowrap px-6 py-2 h-10 flex items-center justify-center min-w-[140px]"
               >
-                Write a Review
+                {showReviewForm ? "Cancel Review" : "Write a Review"}
               </button>
             </div>
           </div>
@@ -627,7 +634,7 @@ export default function ProductDetail() {
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="font-bold text-sm text-gray-900">{review.user_name || "Anonymous"}</h4>
+                            <h4 className="font-bold text-sm text-gray-900 dark:text-gray-100">{review.user_name || "Anonymous"}</h4>
                             <span className="text-xs text-green-600 flex items-center gap-0.5 mt-0.5 font-medium">
                               <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
                               Verified Buyer
@@ -647,7 +654,7 @@ export default function ProductDetail() {
                           ))}
                           <span className="text-xs font-semibold ml-2">{review.title}</span>
                         </div>
-                        <p className="text-sm text-gray-600 leading-relaxed group-hover:text-gray-900 transition-colors">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors">
                           {review.comment}
                         </p>
                       </div>

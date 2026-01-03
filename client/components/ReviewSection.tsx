@@ -49,8 +49,8 @@ export default function ReviewSection() {
                     />
                     <Star className="w-16 h-16 text-yellow-400 fill-yellow-400 relative z-10" />
                 </div>
-                <h3 className="text-2xl font-bold text-primary-foreground mb-3">You're Amazing!</h3>
-                <p className="text-primary-foreground/80 leading-relaxed">
+                <h3 className="text-2xl font-bold text-white mb-3">You're Amazing!</h3>
+                <p className="text-white/80 leading-relaxed">
                     Your feedback means the world to us. It's how we keep making this experience better for everyone.
                 </p>
                 <motion.button
@@ -58,7 +58,7 @@ export default function ReviewSection() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
                     onClick={() => setSubmitted(false)}
-                    className="mt-6 text-xs text-primary-foreground/50 hover:text-primary-foreground underline underline-offset-4"
+                    className="mt-6 text-xs text-white/50 hover:text-white underline underline-offset-4"
                 >
                     Submit another feedback
                 </motion.button>

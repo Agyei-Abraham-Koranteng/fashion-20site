@@ -85,7 +85,7 @@ export default function NewsletterAdmin() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Newsletter Subscribers</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Newsletter Subscribers</h1>
                     <p className="text-muted-foreground mt-2">
                         Manage your newsletter subscriptions. Total: {subscribers.length}
                     </p>
@@ -103,13 +103,13 @@ export default function NewsletterAdmin() {
                 </Button>
             </div>
 
-            <div className="rounded-md border bg-white shadow-sm">
+            <div className="rounded-md border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
                 <Table>
                     <TableHeader>
-                        <TableRow>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Subscribed At</TableHead>
-                            <TableHead className="w-[100px]">Actions</TableHead>
+                        <TableRow className="border-gray-200 dark:border-slate-800">
+                            <TableHead className="text-gray-900 dark:text-gray-300">Email</TableHead>
+                            <TableHead className="text-gray-900 dark:text-gray-300">Subscribed At</TableHead>
+                            <TableHead className="w-[100px] text-gray-900 dark:text-gray-300">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -121,9 +121,9 @@ export default function NewsletterAdmin() {
                             </TableRow>
                         ) : (
                             subscribers.map((subscriber) => (
-                                <TableRow key={subscriber.id}>
-                                    <TableCell className="font-medium">{subscriber.email}</TableCell>
-                                    <TableCell>
+                                <TableRow key={subscriber.id} className="border-gray-200 dark:border-slate-800">
+                                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">{subscriber.email}</TableCell>
+                                    <TableCell className="text-gray-600 dark:text-gray-400">
                                         {format(new Date(subscriber.subscribed_at), "PPP p")}
                                     </TableCell>
                                     <TableCell>
