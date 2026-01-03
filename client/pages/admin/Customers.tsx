@@ -115,7 +115,7 @@ export default function CustomersAdmin() {
         </p>
       </div>
 
-      <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg w-fit">
+      <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-slate-800 rounded-lg w-fit">
         <Button
           variant={!activeFilter ? "secondary" : "ghost"}
           size="sm"
@@ -127,7 +127,7 @@ export default function CustomersAdmin() {
         <Button
           variant={activeFilter ? "secondary" : "ghost"}
           size="sm"
-          className={cn("h-8 text-xs", activeFilter ? "bg-white shadow-sm" : "")}
+          className={cn("h-8 text-xs", activeFilter ? "bg-white dark:bg-slate-700 shadow-sm dark:shadow-none" : "")}
           onClick={() => setSearchParams({ filter: "active" })}
         >
           Active Only
@@ -135,7 +135,7 @@ export default function CustomersAdmin() {
         </Button>
       </div>
 
-      <Card>
+      <Card className="bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800">
         <CardHeader>
           <CardTitle>All Customers ({customers.length})</CardTitle>
         </CardHeader>
@@ -171,14 +171,14 @@ export default function CustomersAdmin() {
                               {customer.full_name?.charAt(0) || customer.username?.charAt(0) || "U"}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="font-medium">
+                          <span className="font-medium text-gray-900 dark:text-gray-100">
                             {customer.full_name || "N/A"}
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell>{customer.username || "N/A"}</TableCell>
+                      <TableCell className="text-gray-600 dark:text-gray-400">{customer.username || "N/A"}</TableCell>
                       <TableCell>
-                        <Badge variant={customer.is_admin ? "default" : "secondary"}>
+                        <Badge variant={customer.is_admin ? "default" : "secondary"} className={cn(customer.is_admin ? "" : "bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 border-none")}>
                           {customer.is_admin ? "Admin" : "Customer"}
                         </Badge>
                       </TableCell>
@@ -187,7 +187,7 @@ export default function CustomersAdmin() {
                           {isActive(customer.last_login) && (
                             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="Active in last 30 days" />
                           )}
-                          <span className="text-sm">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
                             {customer.last_login
                               ? format(new Date(customer.last_login), "MMM d, yyyy")
                               : "Never"}
@@ -204,7 +204,7 @@ export default function CustomersAdmin() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-red-400 hover:text-red-600 hover:bg-red-50"
+                            className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                             onClick={() => handleDelete(customer.id, customer.full_name || customer.username)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -225,7 +225,7 @@ export default function CustomersAdmin() {
           </div>
 
           {/* Mobile Card View */}
-          <div className="md:hidden divide-y divide-gray-200">
+          <div className="md:hidden divide-y divide-gray-200 dark:divide-slate-800">
             {loading ? (
               <div className="p-8 text-center text-muted-foreground">Loading customers...</div>
             ) : filteredCustomers.length > 0 ? (
@@ -239,14 +239,14 @@ export default function CustomersAdmin() {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start">
-                      <h4 className="font-bold text-gray-900 truncate pr-2">
+                      <h4 className="font-bold text-gray-900 dark:text-gray-100 truncate pr-2">
                         {customer.full_name || "N/A"}
                       </h4>
                       <Badge variant={customer.is_admin ? "default" : "secondary"} className="scale-90 origin-right">
                         {customer.is_admin ? "Admin" : "User"}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-500 truncate mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">
                       {customer.username || "No Email"}
                     </p>
                     <div className="flex items-center justify-between mt-2">

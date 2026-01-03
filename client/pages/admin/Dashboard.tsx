@@ -232,7 +232,7 @@ export default function AdminDashboard() {
           },
         ].map((stat) => (
           <Link key={stat.name} to={stat.href || "#"}>
-            <Card className="border-none shadow-sm hover:shadow-md transition-all hover:-translate-y-1 bg-white/50 backdrop-blur-sm">
+            <Card className="border-none shadow-sm hover:shadow-md transition-all hover:-translate-y-1 bg-white dark:bg-slate-900 shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between space-y-0 pb-2">
                   <p className="text-sm font-medium text-muted-foreground">{stat.name}</p>
@@ -254,7 +254,7 @@ export default function AdminDashboard() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         {/* Revenue Chart */}
-        <Card className="col-span-full lg:col-span-4 border-none shadow-sm bg-white/50 backdrop-blur-sm">
+        <Card className="col-span-full lg:col-span-4 border-none shadow-sm bg-white dark:bg-slate-900 shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800">
           <CardHeader>
             <CardTitle>Revenue Overview</CardTitle>
             <p className="text-sm text-muted-foreground">Monthly revenue performance</p>
@@ -302,7 +302,7 @@ export default function AdminDashboard() {
         </Card>
 
         {/* Weekly Orders Chart */}
-        <Card className="col-span-full lg:col-span-3 border-none shadow-sm bg-white/50 backdrop-blur-sm">
+        <Card className="col-span-full lg:col-span-3 border-none shadow-sm bg-white dark:bg-slate-900 shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800">
           <CardHeader>
             <CardTitle>Weekly Orders</CardTitle>
             <p className="text-sm text-muted-foreground">Orders activity past 7 days</p>
@@ -336,7 +336,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Orders - Mini Table */}
-      <Card className="border-none shadow-sm bg-white/50 backdrop-blur-sm">
+      <Card className="border-none shadow-sm bg-white dark:bg-slate-900 shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800">
         <CardHeader>
           <CardTitle>Recent Orders</CardTitle>
           <p className="text-sm text-muted-foreground">Latest transactions from your store</p>
@@ -347,18 +347,18 @@ export default function AdminDashboard() {
               <p className="text-center text-muted-foreground py-8">No recent orders found.</p>
             ) : (
               recentOrders.map((order, i) => (
-                <div key={order.id} className="flex items-center justify-between p-4 rounded-lg bg-white/60 border border-gray-100 hover:bg-white transition-colors">
+                <div key={order.id} className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 transition-colors">
                   <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold">
                       {i + 1}
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">Order #{order.id}</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">Order #{order.id}</p>
                       <p className="text-sm text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-gray-900">₵{Number(order.total_price).toFixed(2)}</p>
+                    <p className="font-bold text-gray-900 dark:text-gray-100">₵{Number(order.total_price).toFixed(2)}</p>
                     <span className={`text-xs px-2 py-1 rounded-full ${order.status === 'completed' ? 'bg-green-100 text-green-700' :
                       order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
                         order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
@@ -375,7 +375,7 @@ export default function AdminDashboard() {
       </Card>
 
       {/* Recent Feedback - Mini Table */}
-      <Card className="border-none shadow-sm bg-white/50 backdrop-blur-sm mt-6">
+      <Card className="border-none shadow-sm bg-white dark:bg-slate-900 shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800 mt-6">
         <CardHeader>
           <CardTitle>Recent System Feedback</CardTitle>
           <p className="text-sm text-muted-foreground">What users are saying about the site</p>
@@ -419,17 +419,17 @@ function SystemFeedbackList() {
   return (
     <div className="space-y-4">
       {feedback.map((item, i) => (
-        <div key={item.id || i} className="flex items-start gap-4 p-4 rounded-lg bg-white/60 border border-gray-100">
+        <div key={item.id || i} className="flex items-start gap-4 p-4 rounded-lg bg-gray-50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-700/50">
           <div className="flex gap-1 mt-1">
             {[...Array(5)].map((_, j) => (
               <Star
                 key={j}
-                className={`w-4 h-4 ${j < item.rating ? "fill-yellow-500 text-yellow-500" : "text-gray-300"}`}
+                className={`w-4 h-4 ${j < item.rating ? "fill-yellow-500 text-yellow-500" : "text-gray-300 dark:text-gray-600"}`}
               />
             ))}
           </div>
           <div>
-            <p className="text-sm text-gray-800">{item.feedback}</p>
+            <p className="text-sm text-gray-800 dark:text-gray-200">{item.feedback}</p>
             <p className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()}</p>
           </div>
         </div>

@@ -130,7 +130,7 @@ export default function OrdersListAdmin() {
         </p>
       </div>
 
-      <Card className="border-0 sm:border shadow-none sm:shadow-sm">
+      <Card className="border-0 sm:border shadow-none sm:shadow-sm bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800">
         <CardHeader className="px-4 sm:px-6 pb-3 sm:pb-6">
           <div className="flex flex-col gap-3 sm:gap-4">
             <CardTitle className="text-lg sm:text-xl">All Orders ({filteredOrders.length})</CardTitle>
@@ -150,13 +150,13 @@ export default function OrdersListAdmin() {
                 <SelectTrigger className="w-full sm:w-40 h-10">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
-                <SelectContent className="z-[100] bg-white shadow-lg border border-gray-200" position="popper" sideOffset={4}>
-                  <SelectItem value="all" className="cursor-pointer hover:bg-gray-50 focus:bg-gray-50">All Status</SelectItem>
-                  <SelectItem value="pending" className="cursor-pointer hover:bg-amber-50 focus:bg-amber-50">Pending</SelectItem>
-                  <SelectItem value="processing" className="cursor-pointer hover:bg-blue-50 focus:bg-blue-50">Processing</SelectItem>
-                  <SelectItem value="shipped" className="cursor-pointer hover:bg-blue-50 focus:bg-blue-50">Shipped</SelectItem>
-                  <SelectItem value="delivered" className="cursor-pointer hover:bg-emerald-50 focus:bg-emerald-50">Delivered</SelectItem>
-                  <SelectItem value="cancelled" className="cursor-pointer hover:bg-red-50 focus:bg-red-50">Cancelled</SelectItem>
+                <SelectContent className="z-[100] bg-white dark:bg-slate-950 shadow-lg border border-gray-200 dark:border-slate-800" position="popper" sideOffset={4}>
+                  <SelectItem value="all" className="cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800 focus:bg-gray-50 dark:focus:bg-slate-800">All Status</SelectItem>
+                  <SelectItem value="pending" className="cursor-pointer hover:bg-amber-50 dark:hover:bg-amber-900/10 focus:bg-amber-50 dark:focus:bg-amber-900/10">Pending</SelectItem>
+                  <SelectItem value="processing" className="cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/10 focus:bg-blue-50 dark:focus:bg-blue-900/10">Processing</SelectItem>
+                  <SelectItem value="shipped" className="cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/10 focus:bg-blue-50 dark:focus:bg-blue-900/10">Shipped</SelectItem>
+                  <SelectItem value="delivered" className="cursor-pointer hover:bg-emerald-50 dark:hover:bg-emerald-900/10 focus:bg-emerald-50 dark:focus:bg-emerald-900/10">Delivered</SelectItem>
+                  <SelectItem value="cancelled" className="cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/10 focus:bg-red-50 dark:focus:bg-red-900/10">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -172,8 +172,8 @@ export default function OrdersListAdmin() {
                   key={status}
                   onClick={() => setStatusFilter(status)}
                   className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${statusFilter === status
-                    ? 'bg-gray-900 text-white shadow-md'
-                    : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
+                    ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md'
+                    : 'bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 active:bg-gray-100'
                     }`}
                 >
                   {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -183,9 +183,9 @@ export default function OrdersListAdmin() {
           </div>
 
           {/* Desktop Table View */}
-          <div className="hidden md:block rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+          <div className="hidden md:block rounded-xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
             <Table>
-              <TableHeader className="bg-gray-50/50">
+              <TableHeader className="bg-gray-50/50 dark:bg-slate-800/50">
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="py-4">Order Info</TableHead>
                   <TableHead>Date</TableHead>
@@ -212,27 +212,27 @@ export default function OrdersListAdmin() {
                     </TableCell>
                   </TableRow>
                 ) : filteredOrders.map((order) => (
-                  <TableRow key={order.id} className="hover:bg-gray-50/50 transition-colors">
+                  <TableRow key={order.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors">
                     <TableCell className="py-4 font-medium">
-                      <span className="text-gray-900">#{order.id}</span>
+                      <span className="text-gray-900 dark:text-gray-100">#{order.id}</span>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col text-sm">
-                        <span className="text-gray-900 font-medium">{new Date(order.created_at).toLocaleDateString()}</span>
-                        <span className="text-gray-500 text-xs">{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="text-gray-900 dark:text-gray-100 font-medium">{new Date(order.created_at).toLocaleDateString()}</span>
+                        <span className="text-gray-500 dark:text-gray-400 text-xs">{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                        <div className="h-8 w-8 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs font-bold">
                           {order.user_id.substring(0, 2).toUpperCase()}
                         </div>
-                        <span className="text-sm text-gray-600 font-medium" title={order.user_id}>
+                        <span className="text-sm text-gray-600 dark:text-gray-400 font-medium" title={order.user_id}>
                           Customer...{order.user_id.substring(0, 4)}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-bold text-gray-900">
+                    <TableCell className="font-bold text-gray-900 dark:text-gray-100">
                       ₵{Number(order.total_price).toFixed(2)}
                     </TableCell>
                     <TableCell>
@@ -242,10 +242,10 @@ export default function OrdersListAdmin() {
                           handleStatusUpdate(String(order.id), value)
                         }
                       >
-                        <SelectTrigger className={`w-36 border-0 h-8 text-xs font-medium shadow-none focus:ring-0 ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-50 text-emerald-700' :
-                          order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-50 text-blue-700' :
-                            order.status === 'cancelled' ? 'bg-red-50 text-red-700' :
-                              'bg-amber-50 text-amber-700'
+                        <SelectTrigger className={`w-36 border-0 h-8 text-xs font-medium shadow-none focus:ring-0 ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400' :
+                          order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400' :
+                            order.status === 'cancelled' ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400' :
+                              'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
                           }`}>
                           <div className="flex items-center gap-2">
                             <div className={`h-1.5 w-1.5 rounded-full ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-500' :
@@ -256,8 +256,8 @@ export default function OrdersListAdmin() {
                             <SelectValue />
                           </div>
                         </SelectTrigger>
-                        <SelectContent className="min-w-[180px] z-[100] bg-white shadow-lg border border-gray-200" position="popper" sideOffset={4}>
-                          <SelectItem value="pending" className="cursor-pointer hover:bg-amber-50 focus:bg-amber-50">
+                        <SelectContent className="min-w-[180px] z-[100] bg-white dark:bg-slate-950 shadow-lg border border-gray-200 dark:border-slate-800" position="popper" sideOffset={4}>
+                          <SelectItem value="pending" className="cursor-pointer hover:bg-amber-50 dark:hover:bg-amber-900/10 focus:bg-amber-50 dark:focus:bg-amber-900/10">
                             <div className="flex items-center gap-2">
                               <div className="h-2 w-2 rounded-full bg-amber-500" />
                               <span>Pending</span>
@@ -294,7 +294,7 @@ export default function OrdersListAdmin() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="bg-gray-50 hover:bg-gray-100 text-gray-600"
+                        className="bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300"
                         onClick={() => setSelectedOrder(order)}
                       >
                         <Eye className="h-4 w-4 mr-2" /> Details
@@ -322,13 +322,13 @@ export default function OrdersListAdmin() {
             ) : filteredOrders.map((order) => (
               <div
                 key={order.id}
-                className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
               >
                 {/* Order Header */}
-                <div className="p-4 pb-3 border-b border-gray-100">
+                <div className="p-4 pb-3 border-b border-gray-100 dark:border-slate-800">
                   <div className="flex justify-between items-start gap-3">
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-gray-900 text-base truncate">Order #{order.id}</h4>
+                      <h4 className="font-bold text-gray-900 dark:text-gray-100 text-base truncate">Order #{order.id}</h4>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {new Date(order.created_at).toLocaleDateString()} at {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
@@ -343,20 +343,20 @@ export default function OrdersListAdmin() {
                 </div>
 
                 {/* Order Details Grid */}
-                <div className="grid grid-cols-2 gap-3 p-4 bg-gray-50/50">
+                <div className="grid grid-cols-2 gap-3 p-4 bg-gray-50/50 dark:bg-slate-800/50">
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Total Price</p>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mb-1">Total Price</p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
                       ₵{Number(order.total_price).toFixed(2)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">Customer</p>
+                    <p className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mb-1">Customer</p>
                     <div className="flex items-center gap-2">
-                      <div className="h-6 w-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                      <div className="h-6 w-6 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
                         {order.user_id.substring(0, 2).toUpperCase()}
                       </div>
-                      <p className="text-xs font-medium text-gray-700 truncate">
+                      <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
                         ...{order.user_id.substring(0, 8)}
                       </p>
                     </div>
@@ -364,7 +364,7 @@ export default function OrdersListAdmin() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="p-3 flex gap-2 bg-white border-t border-gray-100">
+                <div className="p-3 flex gap-2 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800">
                   <Button
                     variant="outline"
                     size="sm"
@@ -380,10 +380,10 @@ export default function OrdersListAdmin() {
                         handleStatusUpdate(String(order.id), value)
                       }
                     >
-                      <SelectTrigger className={`w-full h-9 text-xs font-medium border-0 shadow-none ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-50 text-emerald-700' :
-                        order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-50 text-blue-700' :
-                          order.status === 'cancelled' ? 'bg-red-50 text-red-700' :
-                            'bg-amber-50 text-amber-700'
+                      <SelectTrigger className={`w-full h-9 text-xs font-medium border-0 shadow-none ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400' :
+                        order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400' :
+                          order.status === 'cancelled' ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400' :
+                            'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
                         }`}>
                         <div className="flex items-center gap-1.5 whitespace-nowrap">
                           <div className={`h-1.5 w-1.5 rounded-full ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-500' :
@@ -394,7 +394,7 @@ export default function OrdersListAdmin() {
                           <SelectValue />
                         </div>
                       </SelectTrigger>
-                      <SelectContent className="min-w-[180px] z-[100] bg-white shadow-lg border border-gray-200" position="popper" sideOffset={4}>
+                      <SelectContent className="min-w-[180px] z-[100] bg-white dark:bg-slate-950 shadow-lg border border-gray-200 dark:border-slate-800" position="popper" sideOffset={4}>
                         <SelectItem value="pending" className="cursor-pointer hover:bg-amber-50 focus:bg-amber-50">
                           <div className="flex items-center gap-2">
                             <div className="h-2 w-2 rounded-full bg-amber-500" />
@@ -439,8 +439,8 @@ export default function OrdersListAdmin() {
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="w-[calc(100vw-2rem)] max-w-2xl max-h-[85vh] sm:max-h-[80vh] overflow-y-auto mx-4">
           <DialogHeader className="pb-4">
-            <DialogTitle className="text-lg sm:text-xl">Order Details - #{selectedOrder?.id}</DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm">
+            <DialogTitle className="text-lg sm:text-xl text-gray-900 dark:text-gray-100">Order Details - #{selectedOrder?.id}</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               Order placed on {selectedOrder && new Date(selectedOrder.created_at).toLocaleString()}
             </DialogDescription>
           </DialogHeader>
@@ -448,21 +448,21 @@ export default function OrdersListAdmin() {
             <div className="space-y-5">
               {/* Address and Status Grid */}
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="mb-3 font-semibold text-sm sm:text-base flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-gray-900"></span>
+                <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-4 border border-gray-100 dark:border-slate-700">
+                  <h4 className="mb-3 font-semibold text-sm sm:text-base flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                    <span className="h-1.5 w-1.5 rounded-full bg-gray-900 dark:bg-gray-100"></span>
                     Shipping Address
                   </h4>
                   <div className="text-xs sm:text-sm text-muted-foreground space-y-1">
-                    <p className="font-medium text-gray-900">{selectedOrder.shipping_address?.full_name}</p>
+                    <p className="font-medium text-gray-900 dark:text-gray-100">{selectedOrder.shipping_address?.full_name}</p>
                     <p>{selectedOrder.shipping_address?.street}</p>
                     <p>{selectedOrder.shipping_address?.city}, {selectedOrder.shipping_address?.state} {selectedOrder.shipping_address?.postal_code}</p>
                     <p>{selectedOrder.shipping_address?.country}</p>
                   </div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="mb-3 font-semibold text-sm sm:text-base flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-gray-900"></span>
+                <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-4 border border-gray-100 dark:border-slate-700">
+                  <h4 className="mb-3 font-semibold text-sm sm:text-base flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                    <span className="h-1.5 w-1.5 rounded-full bg-gray-900 dark:bg-gray-100"></span>
                     Order Status
                   </h4>
                   <Badge
@@ -475,16 +475,16 @@ export default function OrdersListAdmin() {
               </div>
 
               {/* Order Items */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="mb-3 font-semibold text-sm sm:text-base flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-gray-900"></span>
+              <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-4 border border-gray-100 dark:border-slate-700">
+                <h4 className="mb-3 font-semibold text-sm sm:text-base flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                  <span className="h-1.5 w-1.5 rounded-full bg-gray-900 dark:bg-gray-100"></span>
                   Order Summary
                 </h4>
                 <div className="space-y-3">
                   {selectedOrder.items && selectedOrder.items.length > 0 ? (
                     <>
                       {selectedOrder.items.map((item: any) => (
-                        <div key={item.id} className="flex justify-between items-center gap-3 py-3 border-b border-gray-200 last:border-0">
+                        <div key={item.id} className="flex justify-between items-center gap-3 py-3 border-b border-gray-200 dark:border-slate-700 last:border-0">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
                             {item.product?.image && (
                               <img
@@ -502,14 +502,14 @@ export default function OrdersListAdmin() {
                               </p>
                             </div>
                           </div>
-                          <span className="font-semibold text-sm sm:text-base text-gray-900 flex-shrink-0">
+                          <span className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100 flex-shrink-0">
                             ₵{(item.price * item.quantity).toFixed(2)}
                           </span>
                         </div>
                       ))}
-                      <div className="flex justify-between items-center pt-4 mt-2 border-t-2 border-gray-300">
-                        <span className="font-bold text-base sm:text-lg text-gray-900">Total</span>
-                        <span className="font-bold text-lg sm:text-xl text-gray-900">
+                      <div className="flex justify-between items-center pt-4 mt-2 border-t-2 border-gray-300 dark:border-slate-600">
+                        <span className="font-bold text-base sm:text-lg text-gray-900 dark:text-gray-100">Total</span>
+                        <span className="font-bold text-lg sm:text-xl text-gray-900 dark:text-gray-100">
                           ₵{Number(selectedOrder.total_price).toFixed(2)}
                         </span>
                       </div>

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "./ThemeToggle";
 
 console.log("!!! ADMIN_LAYOUT_LOADED_V3 !!!");
 
@@ -141,6 +142,7 @@ export default function AdminLayout() {
 
   const NotificationButton = () => (
     <div className="flex items-center gap-2">
+      <ThemeToggle />
       <Link
         to="/admin/messages"
         className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group"
