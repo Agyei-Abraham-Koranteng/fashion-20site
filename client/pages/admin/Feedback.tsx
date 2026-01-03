@@ -129,8 +129,8 @@ export default function Feedback() {
     return (
         <div className="flex flex-col gap-6 max-w-7xl mx-auto">
             <header>
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900">System Feedback</h1>
-                <p className="text-muted-foreground mt-1">Monitor and analyze customer experience ratings.</p>
+                <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">System Feedback</h1>
+                <p className="text-muted-foreground mt-1 text-sm md:text-base">Monitor and analyze customer experience ratings.</p>
             </header>
 
             {/* Stats Overview */}
@@ -144,8 +144,8 @@ export default function Feedback() {
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-bold text-gray-900">{stats.average}</span>
-                            <span className="text-lg text-gray-400">/ 5.0</span>
+                            <span className="text-4xl font-bold text-gray-900 dark:text-gray-100">{stats.average}</span>
+                            <span className="text-lg text-gray-400 dark:text-gray-500">/ 5.0</span>
                         </div>
                         <div className="mt-2 flex items-center gap-1 text-yellow-500">
                             {renderStars(Math.round(Number(stats.average)))}
@@ -165,9 +165,9 @@ export default function Feedback() {
                                 const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
                                 return (
                                     <div key={starLevel} className="flex items-center gap-3">
-                                        <span className="text-xs font-medium w-3 text-gray-600">{starLevel}</span>
+                                        <span className="text-xs font-medium w-3 text-gray-600 dark:text-gray-400">{starLevel}</span>
                                         <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                                        <Progress value={percentage} className="h-1.5 flex-1 bg-gray-100" />
+                                        <Progress value={percentage} className="h-1.5 flex-1 bg-gray-100 dark:bg-slate-800" />
                                         <span className="text-xs text-muted-foreground w-8 text-right">{count}</span>
                                     </div>
                                 );
@@ -189,7 +189,7 @@ export default function Feedback() {
                             </CardTitle>
                             <button
                                 onClick={() => setSortOrder(prev => prev === "newest" ? "oldest" : "newest")}
-                                className="h-9 px-3 flex items-center gap-2 border border-gray-200 rounded-lg text-[11px] font-semibold bg-white hover:bg-gray-50 transition-colors shadow-sm"
+                                className="h-9 px-3 flex items-center gap-2 border border-gray-200 dark:border-slate-800 rounded-lg text-[11px] font-semibold bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors shadow-sm text-gray-900 dark:text-gray-100"
                             >
                                 <ArrowUpDown className="w-3.5 h-3.5" />
                                 {sortOrder === "newest" ? "Newest" : "Oldest"}
@@ -207,12 +207,12 @@ export default function Feedback() {
                                 />
                             </div>
 
-                            <div className="flex overflow-x-auto pb-1 sm:pb-0 hide-scrollbar gap-2 p-1 bg-gray-100/80 rounded-xl border border-gray-200/50">
+                            <div className="flex overflow-x-auto pb-1 sm:pb-0 hide-scrollbar gap-2 p-1 bg-gray-100/80 dark:bg-slate-800 rounded-xl border border-gray-200/50 dark:border-slate-700">
                                 <button
                                     onClick={() => setFilterRating("all")}
                                     className={cn(
                                         "px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all whitespace-nowrap",
-                                        filterRating === "all" ? "bg-white shadow-md text-indigo-600 scale-105" : "text-muted-foreground hover:text-gray-900"
+                                        filterRating === "all" ? "bg-white dark:bg-slate-700 shadow-md text-indigo-600 dark:text-indigo-400 scale-105" : "text-muted-foreground hover:text-gray-900 dark:hover:text-gray-100"
                                     )}
                                 >
                                     All
@@ -223,7 +223,7 @@ export default function Feedback() {
                                         onClick={() => setFilterRating(r)}
                                         className={cn(
                                             "px-3 py-1.5 text-[11px] font-bold rounded-lg flex items-center gap-1 transition-all whitespace-nowrap",
-                                            filterRating === r ? "bg-white shadow-md text-indigo-600 scale-105" : "text-muted-foreground hover:text-gray-900"
+                                            filterRating === r ? "bg-white dark:bg-slate-700 shadow-md text-indigo-600 dark:text-indigo-400 scale-105" : "text-muted-foreground hover:text-gray-900 dark:hover:text-gray-100"
                                         )}
                                     >
                                         {r} <Star className={cn("w-3 h-3", filterRating === r ? "fill-yellow-400 text-yellow-400" : "fill-none")} />
@@ -254,7 +254,7 @@ export default function Feedback() {
                                 </div>
                             ) : (
                                 filteredFeedback.map((f) => (
-                                    <div key={f.id} className="p-6 hover:bg-gray-50/50 transition-colors group">
+                                    <div key={f.id} className="p-6 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition-colors group">
                                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-3">
                                             <div className="flex items-center gap-3">
                                                 <div className={cn(
@@ -292,8 +292,8 @@ export default function Feedback() {
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
-                                        <div className="bg-white border border-gray-100 p-4 rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
-                                            <p className="text-gray-800 text-sm leading-relaxed italic">
+                                        <div className="bg-white dark:bg-slate-900/50 border border-gray-100 dark:border-slate-800 p-4 rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+                                            <p className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed italic">
                                                 "{f.feedback || "No comment provided"}"
                                             </p>
                                         </div>

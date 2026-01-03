@@ -84,7 +84,7 @@ export default function Messages() {
             {/* Header - Always visible */}
             <div className="flex items-center justify-between mb-4 md:mb-6">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Messages</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Messages</h1>
                     <p className="text-sm md:text-base text-muted-foreground">Manage client inquiries</p>
                 </div>
             </div>
@@ -96,7 +96,7 @@ export default function Messages() {
 
                     {/* Message List - Hidden on mobile when viewing a message */}
                     <Card className={cn(
-                        "lg:col-span-1 flex flex-col bg-white/50 backdrop-blur-sm border-gray-200 shadow-sm overflow-hidden",
+                        "lg:col-span-1 flex flex-col bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden",
                         selectedMessage ? "hidden lg:flex" : "flex",
                         "h-[calc(100vh-220px)] md:h-[500px] lg:h-[calc(100vh-200px)]"
                     )}>
@@ -106,12 +106,12 @@ export default function Messages() {
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                     <Input
                                         placeholder="Search messages..."
-                                        className="pl-9 bg-gray-50 border-gray-200 h-10"
+                                        className="pl-9 bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 h-10"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
                                 </div>
-                                <div className="flex gap-1 p-1 bg-gray-100 rounded-lg overflow-x-auto">
+                                <div className="flex gap-1 p-1 bg-gray-100 dark:bg-slate-800 rounded-lg overflow-x-auto">
                                     {["all", "unread", "read", "replied"].map((status) => (
                                         <button
                                             key={status}
@@ -119,8 +119,8 @@ export default function Messages() {
                                             className={cn(
                                                 "flex-1 min-w-[60px] px-2 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap",
                                                 filterStatus === status
-                                                    ? "bg-white shadow-sm text-primary"
-                                                    : "text-muted-foreground hover:text-primary"
+                                                    ? "bg-white dark:bg-slate-700 shadow-sm text-primary"
+                                                    : "text-muted-foreground hover:text-primary dark:hover:text-gray-100"
                                             )}
                                         >
                                             {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -149,13 +149,13 @@ export default function Messages() {
                                                     "p-3 md:p-4 rounded-xl cursor-pointer transition-all border relative",
                                                     selectedMessage?.id === msg.id
                                                         ? "bg-primary text-primary-foreground border-primary shadow-md"
-                                                        : "bg-white hover:bg-gray-50 border-gray-100 shadow-sm",
+                                                        : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 border-gray-100 dark:border-slate-800 shadow-sm",
                                                     msg.status === "unread" && selectedMessage?.id !== msg.id && "border-l-4 border-l-red-500"
                                                 )}
                                             >
                                                 <div className="flex justify-between items-start mb-1">
                                                     <span className={cn("font-semibold text-sm truncate max-w-[140px] md:max-w-[120px]",
-                                                        selectedMessage?.id === msg.id ? "text-white" : "text-gray-900")}>
+                                                        selectedMessage?.id === msg.id ? "text-white" : "text-gray-900 dark:text-gray-100")}>
                                                         {msg.name}
                                                     </span>
                                                     <span className={cn("text-[10px] flex-shrink-0 ml-2",
@@ -164,7 +164,7 @@ export default function Messages() {
                                                     </span>
                                                 </div>
                                                 <p className={cn("text-xs truncate mb-2",
-                                                    selectedMessage?.id === msg.id ? "text-primary-foreground/90" : "text-gray-600")}>
+                                                    selectedMessage?.id === msg.id ? "text-primary-foreground/90" : "text-gray-600 dark:text-gray-400")}>
                                                     {msg.subject}
                                                 </p>
                                                 {selectedMessage?.id !== msg.id && getStatusBadge(msg.status)}
@@ -177,19 +177,19 @@ export default function Messages() {
                     </Card>
 
                     {/* Message Detail - Full screen on mobile when selected */}
-                    <Card className={cn(
-                        "lg:col-span-2 bg-white border-gray-200 shadow-sm overflow-hidden",
+                    < Card className={cn(
+                        "lg:col-span-2 bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden",
                         selectedMessage ? "flex" : "hidden lg:flex",
                         "h-[calc(100vh-220px)] md:h-[500px] lg:h-[calc(100vh-200px)]"
-                    )}>
+                    )} >
                         <CardContent className="p-0 h-full flex flex-col w-full">
                             {selectedMessage ? (
                                 <div className="flex flex-col h-full">
                                     {/* Message Header */}
-                                    <div className="p-4 md:p-6 border-b bg-gray-50/50">
+                                    <div className="p-4 md:p-6 border-b dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50">
                                         {/* Mobile Back Button */}
                                         <div className="flex items-center gap-2 mb-3 lg:hidden">
-                                            <Button variant="ghost" size="sm" onClick={handleBack} className="h-8 px-2">
+                                            <Button variant="ghost" size="sm" onClick={handleBack} className="h-8 px-2 dark:hover:bg-slate-800">
                                                 <ArrowLeft className="h-4 w-4 mr-1" /> Back
                                             </Button>
                                         </div>
@@ -200,8 +200,8 @@ export default function Messages() {
                                                     <User className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <h2 className="text-lg md:text-xl font-bold text-gray-900 truncate">{selectedMessage.name}</h2>
-                                                    <p className="text-xs md:text-sm text-gray-500 flex items-center gap-1 truncate">
+                                                    <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 truncate">{selectedMessage.name}</h2>
+                                                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 truncate">
                                                         <Mail className="h-3 w-3 flex-shrink-0" />
                                                         <span className="truncate">{selectedMessage.email}</span>
                                                     </p>
@@ -232,11 +232,11 @@ export default function Messages() {
                                     </div>
 
                                     {/* Message Meta */}
-                                    <div className="px-4 md:px-6 py-3 bg-white border-b">
+                                    <div className="px-4 md:px-6 py-3 bg-white dark:bg-slate-900 border-b dark:border-slate-800">
                                         <div className="flex flex-col sm:flex-row sm:justify-between gap-2 text-xs md:text-sm text-muted-foreground">
                                             <div className="flex items-center gap-1.5 min-w-0">
                                                 <MessageSquare className="h-4 w-4 flex-shrink-0" />
-                                                <span className="font-medium text-gray-700">Subject:</span>
+                                                <span className="font-medium text-gray-700 dark:text-gray-300">Subject:</span>
                                                 <span className="truncate">{selectedMessage.subject}</span>
                                             </div>
                                             <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -255,7 +255,7 @@ export default function Messages() {
                                     <ScrollArea className="flex-1">
                                         <div className="p-4 md:p-8">
                                             <div className="max-w-2xl mx-auto">
-                                                <div className="bg-gray-50 p-4 md:p-8 rounded-xl md:rounded-2xl border border-gray-100 min-h-[150px] whitespace-pre-wrap leading-relaxed text-gray-800 text-sm md:text-base">
+                                                <div className="bg-gray-50 dark:bg-slate-800/50 p-4 md:p-8 rounded-xl md:rounded-2xl border border-gray-100 dark:border-slate-800 min-h-[150px] whitespace-pre-wrap leading-relaxed text-gray-800 dark:text-gray-200 text-sm md:text-base">
                                                     {selectedMessage.message}
                                                 </div>
                                             </div>
@@ -264,10 +264,10 @@ export default function Messages() {
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-center p-8">
-                                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-50 flex items-center justify-center mb-4">
+                                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center mb-4">
                                         <MailOpen className="h-8 w-8 md:h-10 md:w-10 opacity-20" />
                                     </div>
-                                    <h3 className="text-lg font-medium text-gray-900">Select a message</h3>
+                                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Select a message</h3>
                                     <p className="max-w-xs mt-1 text-sm">Choose a message from the list to view details.</p>
                                 </div>
                             )}

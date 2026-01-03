@@ -135,15 +135,15 @@ export default function VisitorAnalytics() {
             <header className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-2 sm:gap-3">
-                            <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
+                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 flex items-center gap-2 sm:gap-3">
+                            <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600 dark:text-indigo-400" />
                             Visitors
                         </h1>
-                        <p className="text-xs sm:text-sm text-muted-foreground mt-1">Real-time traffic and flow.</p>
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Real-time traffic and flow.</p>
                     </div>
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-100 shadow-sm">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-full border border-emerald-100 dark:border-emerald-800/30 shadow-sm">
                         <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] sm:text-xs font-bold text-emerald-700 uppercase tracking-widest">Live</span>
+                        <span className="text-[10px] sm:text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Live</span>
                     </div>
                 </div>
             </header>
@@ -156,7 +156,7 @@ export default function VisitorAnalytics() {
                     { label: "7 Days", value: stats.last7Days, icon: Calendar, color: "blue" },
                     { label: "Growth", value: `${stats.growth > 0 ? "+" : ""}${stats.growth}%`, icon: ArrowUpRight, color: "orange" },
                 ].map((item, i) => (
-                    <Card key={i} className="border-none shadow-sm bg-white border border-gray-100/50">
+                    <Card key={i} className="border-none shadow-sm bg-white dark:bg-slate-900 border border-gray-100/50 dark:border-slate-800">
                         <CardContent className="p-4 sm:p-6">
                             <div className="flex justify-between items-start mb-2 sm:mb-4">
                                 <div className={cn("p-1.5 sm:p-2 rounded-lg sm:rounded-xl", `bg-${item.color}-500/10`)}>
@@ -165,7 +165,7 @@ export default function VisitorAnalytics() {
                             </div>
                             <div className="space-y-0.5">
                                 <p className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest truncate">{item.label}</p>
-                                <h3 className="text-lg sm:text-2xl font-black text-gray-900">{item.value}</h3>
+                                <h3 className="text-lg sm:text-2xl font-black text-gray-900 dark:text-gray-100">{item.value}</h3>
                             </div>
                         </CardContent>
                     </Card>
@@ -238,8 +238,8 @@ export default function VisitorAnalytics() {
                 </Card>
 
                 {/* Recent Visits Activity */}
-                <Card className="border-none shadow-md bg-white overflow-hidden">
-                    <CardHeader className="border-b bg-gray-50/50">
+                <Card className="border-none shadow-md bg-white dark:bg-slate-900 overflow-hidden">
+                    <CardHeader className="border-b dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50">
                         <div className="flex items-center justify-between">
                             <div>
                                 <CardTitle className="text-lg">Live Activity</CardTitle>
@@ -257,7 +257,7 @@ export default function VisitorAnalytics() {
                                     </div>
                                 ) : (
                                     filteredVisits.map((visit, i) => (
-                                        <div key={visit.id} className="p-4 hover:bg-gray-50 transition-colors group">
+                                        <div key={visit.id} className="p-4 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors group">
                                             <div className="flex items-start justify-between">
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-2">
@@ -268,7 +268,7 @@ export default function VisitorAnalytics() {
                                                             {format(new Date(visit.visited_at), "h:mm a")}
                                                         </span>
                                                     </div>
-                                                    <p className="text-[11px] text-gray-500 truncate max-w-[180px]">
+                                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate max-w-[180px]">
                                                         {visit.user_agent}
                                                     </p>
                                                 </div>
@@ -289,7 +289,7 @@ export default function VisitorAnalytics() {
             </div>
 
             {/* Detailed Log Card */}
-            <Card className="border-none shadow-md bg-white">
+            <Card className="border-none shadow-md bg-white dark:bg-slate-900">
                 <CardHeader>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <CardTitle>Detailed Visit Logs</CardTitle>

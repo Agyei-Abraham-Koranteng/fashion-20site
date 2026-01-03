@@ -136,8 +136,8 @@ export default function ProductReviews() {
         <div className="flex flex-col gap-6 max-w-7xl mx-auto">
             <header className="flex justify-between items-start">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">Product Reviews</h1>
-                    <p className="text-muted-foreground mt-1">Manage and moderate customer product reviews.</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Product Reviews</h1>
+                    <p className="text-muted-foreground mt-1 text-sm md:text-base">Manage and moderate customer product reviews.</p>
                 </div>
             </header>
 
@@ -152,8 +152,8 @@ export default function ProductReviews() {
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-bold text-gray-900">{stats.average}</span>
-                            <span className="text-lg text-gray-400">/ 5.0</span>
+                            <span className="text-4xl font-bold text-gray-900 dark:text-gray-100">{stats.average}</span>
+                            <span className="text-lg text-gray-400 dark:text-gray-500">/ 5.0</span>
                         </div>
                         <div className="mt-2 flex items-center gap-1 text-yellow-500">
                             {renderStars(Math.round(Number(stats.average)))}
@@ -173,9 +173,9 @@ export default function ProductReviews() {
                                 const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
                                 return (
                                     <div key={starLevel} className="flex items-center gap-3">
-                                        <span className="text-xs font-medium w-3 text-gray-600">{starLevel}</span>
+                                        <span className="text-xs font-medium w-3 text-gray-600 dark:text-gray-400">{starLevel}</span>
                                         <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                                        <Progress value={percentage} className="h-1.5 flex-1 bg-gray-100" />
+                                        <Progress value={percentage} className="h-1.5 flex-1 bg-gray-100 dark:bg-slate-800" />
                                         <span className="text-xs text-muted-foreground w-8 text-right">{count}</span>
                                     </div>
                                 );
@@ -203,12 +203,12 @@ export default function ProductReviews() {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
-                            <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-lg">
+                            <div className="flex items-center gap-2 p-1 bg-gray-100 dark:bg-slate-800 rounded-lg">
                                 <button
                                     onClick={() => setFilterRating("all")}
                                     className={cn(
                                         "px-3 py-1 text-xs font-medium rounded-md transition-all",
-                                        filterRating === "all" ? "bg-white shadow-sm text-indigo-600" : "text-muted-foreground hover:text-gray-900"
+                                        filterRating === "all" ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400" : "text-muted-foreground hover:text-gray-900 dark:hover:text-gray-100"
                                     )}
                                 >
                                     All
@@ -219,7 +219,7 @@ export default function ProductReviews() {
                                         onClick={() => setFilterRating(r)}
                                         className={cn(
                                             "px-2 py-1 text-xs font-medium rounded-md flex items-center gap-1 transition-all",
-                                            filterRating === r ? "bg-white shadow-sm text-indigo-600" : "text-muted-foreground hover:text-gray-900"
+                                            filterRating === r ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400" : "text-muted-foreground hover:text-gray-900 dark:hover:text-gray-100"
                                         )}
                                     >
                                         {r} <Star className={cn("w-3 h-3", filterRating === r ? "fill-yellow-400 text-yellow-400" : "fill-none")} />
@@ -272,7 +272,7 @@ export default function ProductReviews() {
                                                 </div>
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        <span className="font-bold text-gray-900">{f.user_name || "Anonymous"}</span>
+                                                        <span className="font-bold text-gray-900 dark:text-gray-100">{f.user_name || "Anonymous"}</span>
                                                         <Badge variant="outline" className={cn(
                                                             "text-[10px] px-1.5 py-0 uppercase tracking-tight",
                                                             f.rating >= 4 ? "text-green-600 border-green-100 bg-green-50/50" :
@@ -305,9 +305,9 @@ export default function ProductReviews() {
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
-                                        <div className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm group-hover:shadow-md transition-all ml-16">
-                                            {f.title && <h4 className="font-bold text-gray-900 mb-1">{f.title}</h4>}
-                                            <p className="text-gray-700 text-sm leading-relaxed italic">
+                                        <div className="bg-white dark:bg-slate-900/50 border border-gray-100 dark:border-slate-800 p-5 rounded-2xl shadow-sm group-hover:shadow-md transition-all ml-16">
+                                            {f.title && <h4 className="font-bold text-gray-900 dark:text-gray-100 mb-1">{f.title}</h4>}
+                                            <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed italic">
                                                 "{f.comment || "No comment provided"}"
                                             </p>
                                         </div>

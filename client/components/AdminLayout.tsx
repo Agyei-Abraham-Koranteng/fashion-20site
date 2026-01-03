@@ -201,7 +201,7 @@ export default function AdminLayout() {
             <Button
               variant="outline"
               size="icon"
-              className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl border-gray-200 bg-white shadow-sm hover:bg-gray-50 text-gray-900 focus-visible:ring-indigo-500 transition-all active:scale-95"
+              className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-900 dark:text-gray-100 focus-visible:ring-indigo-500 transition-all active:scale-95"
             >
               <Menu className="h-6 w-6 stroke-[2.5]" />
               <span className="sr-only">Open Menu</span>
@@ -216,7 +216,7 @@ export default function AdminLayout() {
           </SheetContent>
         </Sheet>
         <div className="ml-4 flex-1">
-          <span className="text-lg font-semibold tracking-tight text-gray-900">
+          <span className="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100">
             {navigation.find((item) => item.href === location.pathname)?.name || "Dashboard"}
           </span>
         </div>
