@@ -159,19 +159,19 @@ export default function AdminLayout() {
   );
 
   const SidebarContent = () => (
-    <div className="flex h-full flex-col bg-primary text-slate-300 border-r border-slate-800 shadow-xl">
-      <div className="flex h-20 items-center px-8 border-b border-slate-800/60 bg-primary/50 backdrop-blur-xl">
+    <div className="flex h-full flex-col bg-slate-950 text-slate-300 border-r border-slate-800 shadow-xl">
+      <div className="flex h-20 items-center px-8 border-b border-slate-800/60 bg-slate-950/50 backdrop-blur-xl">
         <h1 className="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent tracking-tight">
           MadeInFashion
           <span className="ml-2 inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="V2 Deployment Active"></span>
         </h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-6 px-4">
+      <div className="flex-1 overflow-y-auto py-6 px-4 scrollbar-hide">
         <NavLinks onClick={() => setOpen(false)} />
       </div>
 
-      <div className="p-4 border-t border-slate-800/60 bg-primary/50">
+      <div className="p-4 border-t border-slate-800/60 bg-slate-950/50">
         <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 mb-3">
           <div className="h-8 w-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold border border-indigo-500/30">
             {user?.email?.charAt(0).toUpperCase()}
@@ -194,8 +194,8 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Mobile Header */}
-      <div className="sticky top-0 z-40 flex h-16 items-center border-b border-border bg-background/80 backdrop-blur-md px-4 lg:hidden">
+      {/* Mobile Header - Fixed */}
+      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 items-center border-b border-border bg-background/80 backdrop-blur-md px-4 lg:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button
@@ -207,7 +207,7 @@ export default function AdminLayout() {
               <span className="sr-only">Open Menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-72 border-r-0 bg-primary">
+          <SheetContent side="left" className="p-0 w-72 border-r-0 bg-slate-950">
             <div className="sr-only">
               <SheetTitle>Admin Menu</SheetTitle>
               <SheetDescription>Navigation links for the admin panel</SheetDescription>
@@ -243,7 +243,7 @@ export default function AdminLayout() {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-72 lg:pt-20">
+      <div className="lg:pl-72 lg:pt-20 pt-16">
         <main className="min-h-[calc(100vh-80px)] p-6 md:p-10 animate-fade-in">
           <Outlet />
         </main>

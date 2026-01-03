@@ -359,10 +359,10 @@ export default function AdminDashboard() {
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-gray-900 dark:text-gray-100">₵{Number(order.total_price).toFixed(2)}</p>
-                    <span className={`text-xs px-2 py-1 rounded-full ${order.status === 'completed' ? 'bg-green-100 text-green-700' :
-                      order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
-                        order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                          'bg-gray-100 text-gray-700'
+                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${order.status === 'completed' || order.status === 'delivered' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
+                      order.status === 'processing' || order.status === 'shipped' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
+                        order.status === 'cancelled' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
+                          'bg-amber-500/10 text-amber-500 border border-amber-500/20'
                       }`}>
                       {order.status}
                     </span>

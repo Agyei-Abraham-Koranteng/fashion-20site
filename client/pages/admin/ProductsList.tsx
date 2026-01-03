@@ -185,11 +185,11 @@ export default function ProductsListAdmin() {
                   <TableHeader className="bg-gray-50/50 dark:bg-slate-800/50">
                     <TableRow className="hover:bg-transparent">
                       <TableHead className="min-w-[300px] py-5">Product Details</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Inventory</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead className="min-w-[150px] whitespace-nowrap">Category</TableHead>
+                      <TableHead className="min-w-[140px] whitespace-nowrap">Price</TableHead>
+                      <TableHead className="min-w-[160px] whitespace-nowrap">Inventory</TableHead>
+                      <TableHead className="min-w-[120px] whitespace-nowrap">Status</TableHead>
+                      <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -218,14 +218,14 @@ export default function ProductsListAdmin() {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="whitespace-nowrap">
                           <Badge variant="outline" className="font-normal bg-gray-50/50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300">
                             {product.category?.name || "Uncategorized"}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="whitespace-nowrap">
                           <div className="flex flex-col">
-                            <span className="font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                            <span className="font-bold text-gray-900 dark:text-gray-100">
                               ₵{product.sale_price || product.price}
                             </span>
                             {product.sale_price && (
@@ -235,14 +235,16 @@ export default function ProductsListAdmin() {
                             )}
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <div className={`h-2 w-2 rounded-full ${product.stock > 10 ? 'bg-emerald-500' : product.stock > 0 ? 'bg-amber-500' : 'bg-red-500'}`} />
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{product.stock} in stock</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {product.stock} {product.stock === 1 ? 'item' : 'items'} in stock
+                            </span>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.stock > 0
+                        <TableCell className="whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${product.stock > 0
                             ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/30"
                             : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-800/30"
                             }`}>

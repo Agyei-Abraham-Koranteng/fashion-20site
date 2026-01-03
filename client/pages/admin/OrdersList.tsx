@@ -187,12 +187,12 @@ export default function OrdersListAdmin() {
             <Table>
               <TableHeader className="bg-gray-50/50 dark:bg-slate-800/50">
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="py-4">Order Info</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="py-4 whitespace-nowrap">Order Info</TableHead>
+                  <TableHead className="whitespace-nowrap">Date</TableHead>
+                  <TableHead className="whitespace-nowrap">Customer</TableHead>
+                  <TableHead className="whitespace-nowrap">Total</TableHead>
+                  <TableHead className="whitespace-nowrap min-w-[160px]">Status</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -216,23 +216,23 @@ export default function OrdersListAdmin() {
                     <TableCell className="py-4 font-medium">
                       <span className="text-gray-900 dark:text-gray-100">#{order.id}</span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <div className="flex flex-col text-sm">
                         <span className="text-gray-900 dark:text-gray-100 font-medium">{new Date(order.created_at).toLocaleDateString()}</span>
                         <span className="text-gray-500 dark:text-gray-400 text-xs">{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <div className="h-8 w-8 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs font-bold">
                           {order.user_id.substring(0, 2).toUpperCase()}
                         </div>
                         <span className="text-sm text-gray-600 dark:text-gray-400 font-medium" title={order.user_id}>
-                          Customer...{order.user_id.substring(0, 4)}
+                          ...{order.user_id.substring(0, 8)}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-bold text-gray-900 dark:text-gray-100">
+                    <TableCell className="font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                       ₵{Number(order.total_price).toFixed(2)}
                     </TableCell>
                     <TableCell>
