@@ -6,12 +6,12 @@ import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Heart, User, Settings, Package, ChevronRight, Star, Store } from "lucide-react";
+import { ShoppingBag, Heart, User, Settings, Package, ChevronRight, Star, Store, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function UserDashboard() {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const { items: wishlistItems } = useWishlist();
 
     const { data: orders, isLoading: ordersLoading } = useQuery({
@@ -166,6 +166,15 @@ export default function UserDashboard() {
                                             <ChevronRight className="h-4 w-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
                                         </Link>
                                     ))}
+                                    <button
+                                        onClick={() => {
+                                            logout();
+                                        }}
+                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-600 hover:bg-rose-50 transition-all group"
+                                    >
+                                        <LogOut className="h-5 w-5" />
+                                        <span className="font-medium">Sign Out</span>
+                                    </button>
                                 </CardContent>
                             </Card>
 

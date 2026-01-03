@@ -17,7 +17,8 @@ import {
   Ruler,
   ChevronRight,
   Sparkles,
-  Store
+  Store,
+  LogOut
 } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
@@ -60,7 +61,7 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const { itemCount } = useCart();
   const { items: wishlistItems } = useWishlist();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -234,6 +235,17 @@ export default function Navbar() {
               <User size={20} />
             </button>
 
+            {/* Logout button - Desktop only */}
+            {user && (
+              <button
+                onClick={logout}
+                className="hidden md:flex items-center gap-2 p-2 hover:bg-secondary rounded-sm transition-colors text-rose-500"
+                aria-label="Logout"
+              >
+                <LogOut size={20} />
+              </button>
+            )}
+
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -319,6 +331,20 @@ export default function Navbar() {
                   </div>
                   <span className="text-xs font-bold uppercase tracking-wider">Wishlist</span>
                 </Link>
+
+                {/* Mobile Logout Button */}
+                {user && (
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex flex-col items-center justify-center p-4 bg-secondary/50 rounded-lg text-rose-500"
+                  >
+                    <LogOut size={24} className="mb-2" />
+                    <span className="text-xs font-bold uppercase tracking-wider">Logout</span>
+                  </button>
+                )}
               </div>
 
               {/* Shop Section */}
