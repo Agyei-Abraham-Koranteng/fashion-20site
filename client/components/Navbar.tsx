@@ -80,8 +80,8 @@ export default function Navbar() {
       <div className="container-wide">
         <div className="flex items-center justify-between h-14 md:h-16">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 mr-2 md:mr-0 lg:mr-8">
-            <div className="text-lg md:text-xl font-bold tracking-wider text-primary truncate max-w-[140px] md:max-w-none">
+          <Link to="/" className="flex-shrink-0 mr-1 md:mr-0 lg:mr-8">
+            <div className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-primary whitespace-nowrap">
               MadeInFashion
             </div>
           </Link>
