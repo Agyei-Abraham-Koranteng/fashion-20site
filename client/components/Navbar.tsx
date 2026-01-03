@@ -286,7 +286,7 @@ export default function Navbar() {
             className="md:hidden border-t border-border bg-background fixed inset-0 top-16 z-50 overflow-y-auto"
           >
             <div className="container-wide py-6 pb-20 space-y-8">
-              <div className="grid grid-cols-3 gap-4 pb-6 border-b border-border">
+              <div className="grid grid-cols-3 gap-2 pb-6 border-b border-border">
                 <div className="flex flex-col items-center justify-center p-4 bg-secondary/50 rounded-lg">
                   <div className="scale-110">
                     <ThemeToggle />

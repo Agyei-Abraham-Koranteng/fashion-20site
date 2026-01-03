@@ -75,7 +75,7 @@ export default function Home() {
     <Layout>
       <div className="min-h-screen">
         {/* Hero Section - Slideshow */}
-        <section className="relative h-[80vh] min-h-[600px] md:h-[90vh] bg-zinc-900 overflow-hidden">
+        <section className="relative h-[80vh] min-h-[400px] md:h-[90vh] bg-zinc-900 overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -203,7 +203,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="group relative h-[400px] md:h-[500px] overflow-hidden rounded-sm cursor-pointer shadow-md"
+                className="group relative h-[300px] md:h-[500px] overflow-hidden rounded-sm cursor-pointer shadow-md"
               >
                 <Link to={cat.link}>
                   <img
@@ -227,7 +227,7 @@ export default function Home() {
         {/* New Arrivals */}
         <section className="py-16 md:py-24 bg-secondary/20">
           <div className="container-wide">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-10 md:mb-12 px-4 md:px-0">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-10 md:mb-12 md:px-0">
               <div>
                 <h2 className="text-3xl md:text-4xl font-serif mb-2">New Arrivals</h2>
                 <p className="text-sm md:text-base text-muted-foreground">Fresh styles just landed in our store</p>
@@ -237,7 +237,7 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 px-4 md:px-0">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 md:px-0">
               {featuredProducts.length > 0 ? (
                 featuredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
