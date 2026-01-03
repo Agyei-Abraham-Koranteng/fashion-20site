@@ -52,6 +52,7 @@ import VisitorAnalyticsAdmin from "./pages/admin/VisitorAnalytics";
 const Login = lazy(() => import("./pages/Login"));
 const SignUp = lazy(() => import("./pages/SignUp"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 import { ThemeProvider } from "next-themes";
 
@@ -87,6 +88,7 @@ const App = () => {
                       <Route path="/login" element={<Login />} />
                       <Route path="/signup" element={<SignUp />} />
                       <Route path="/forgot-password" element={<ForgotPassword />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
 
                       {/* Admin Auth */}
                       <Route path="/admin/login" element={<AdminLogin />} />

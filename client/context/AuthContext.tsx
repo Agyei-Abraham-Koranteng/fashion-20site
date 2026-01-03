@@ -31,6 +31,7 @@ type AuthContextType = {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, fullName?: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -197,8 +198,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const resetPassword = async (email: string) => {
     if (supabaseConfigured) {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/login`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
+      if (error) throw error;
+    }
+  };
+
+  const updatePassword = async (password: string) => {
+    if (supabaseConfigured) {
+      const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
     }
   };
@@ -216,7 +224,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const value = useMemo(() => ({ user, loading, login, register, resetPassword, logout }), [user, loading]);
+  const value = useMemo(() => ({ user, loading, login, register, resetPassword, updatePassword, logout }), [user, loading]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
