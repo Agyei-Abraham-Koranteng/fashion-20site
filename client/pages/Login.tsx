@@ -122,7 +122,7 @@ export default function Login() {
                     if (errors.email) setErrors({ ...errors, email: undefined });
                   }}
                   placeholder="you@example.com"
-                  className={`pl-10 h-13 bg-gray-50/50 border-gray-100/80 focus:bg-white focus:ring-1 focus:ring-gray-900/5 focus:border-gray-900 transition-all rounded-2xl ${errors.email ? "border-red-500 ring-red-100" : ""}`}
+                  className={`pl-10 h-13 bg-gray-50/50 border-gray-100/80 text-gray-900 focus:bg-white focus:ring-1 focus:ring-gray-900/5 focus:border-gray-900 transition-all rounded-2xl ${errors.email ? "border-red-500 ring-red-100" : ""}`}
                 />
               </div>
               {errors.email && <p className="text-xs text-red-500 mt-1 font-medium">{errors.email}</p>}
@@ -148,7 +148,7 @@ export default function Login() {
                     if (errors.password) setErrors({ ...errors, password: undefined });
                   }}
                   placeholder="••••••••"
-                  className={`pl-10 pr-10 h-13 bg-gray-50/50 border-gray-100/80 focus:bg-white focus:ring-1 focus:ring-gray-900/5 focus:border-gray-900 transition-all rounded-2xl ${errors.password ? "border-red-500 ring-red-100" : ""}`}
+                  className={`pl-10 pr-10 h-13 bg-gray-50/50 border-gray-100/80 text-gray-900 focus:bg-white focus:ring-1 focus:ring-gray-900/5 focus:border-gray-900 transition-all rounded-2xl ${errors.password ? "border-red-500 ring-red-100" : ""}`}
                 />
                 <button
                   type="button"

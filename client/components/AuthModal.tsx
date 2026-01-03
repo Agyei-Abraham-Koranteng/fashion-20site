@@ -106,7 +106,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "login" }: Au
                                                     placeholder="John Doe"
                                                     value={name}
                                                     onChange={(e) => setName(e.target.value)}
-                                                    className="pl-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl"
+                                                    className="pl-10 h-12 bg-gray-50 border-gray-100 text-gray-900 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl"
                                                     required={view === "signup"}
                                                 />
                                             </div>
@@ -123,7 +123,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "login" }: Au
                                                 placeholder="name@example.com"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
-                                                className="pl-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl"
+                                                className="pl-10 h-12 bg-gray-50 border-gray-100 text-gray-900 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl"
                                                 required
                                             />
                                         </div>
@@ -139,7 +139,7 @@ export default function AuthModal({ isOpen, onClose, initialView = "login" }: Au
                                                 placeholder="••••••••"
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
-                                                className="pl-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl"
+                                                className="pl-10 h-12 bg-gray-50 border-gray-100 text-gray-900 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl"
                                                 required
                                             />
                                         </div>

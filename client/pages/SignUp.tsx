@@ -176,7 +176,7 @@ export default function SignUp() {
                                     value={formData.fullName}
                                     onChange={(e) => handleChange("fullName", e.target.value)}
                                     placeholder="John Doe"
-                                    className={cn("pl-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.fullName && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 h-12 bg-gray-50 border-gray-100 text-gray-900 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.fullName && "border-red-500 ring-red-100")}
                                 />
                             </div>
                             {errors.fullName && <p className="text-xs text-red-500 mt-1 font-medium">{errors.fullName}</p>}
@@ -194,7 +194,7 @@ export default function SignUp() {
                                     value={formData.email}
                                     onChange={(e) => handleChange("email", e.target.value)}
                                     placeholder="you@example.com"
-                                    className={cn("pl-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.email && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 h-12 bg-gray-50 border-gray-100 text-gray-900 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.email && "border-red-500 ring-red-100")}
                                 />
                             </div>
                             {errors.email && <p className="text-xs text-red-500 mt-1 font-medium">{errors.email}</p>}
@@ -212,7 +212,7 @@ export default function SignUp() {
                                     value={formData.password}
                                     onChange={(e) => handleChange("password", e.target.value)}
                                     placeholder="••••••••"
-                                    className={cn("pl-10 pr-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.password && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 pr-10 h-12 bg-gray-50 border-gray-100 text-gray-900 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.password && "border-red-500 ring-red-100")}
                                 />
                                 <button
                                     type="button"
@@ -264,7 +264,7 @@ export default function SignUp() {
                                     value={formData.confirmPassword}
                                     onChange={(e) => handleChange("confirmPassword", e.target.value)}
                                     placeholder="••••••••"
-                                    className={cn("pl-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.confirmPassword && "border-red-500 ring-red-100")}
+                                    className={cn("pl-10 h-12 bg-gray-50 border-gray-100 text-gray-900 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl", errors.confirmPassword && "border-red-500 ring-red-100")}
                                 />
                             </div>
                             {errors.confirmPassword && <p className="text-xs text-red-500 mt-1 font-medium">{errors.confirmPassword}</p>}
