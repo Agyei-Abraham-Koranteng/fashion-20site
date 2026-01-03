@@ -78,7 +78,7 @@ export default function Footer() {
     <footer className="bg-[#0f172a] text-slate-100 border-t border-slate-800 dark:bg-[#0f172a] dark:border-slate-800">
       <div className="container-wide py-8 md:py-16">
         {/* Footer sections */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12 text-center md:text-left">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12 text-center md:text-left">
           {footerSections.map((section) => (
             <div key={section.title}>
               <h3 className="text-sm font-semibold tracking-wider mb-4 uppercase text-white">
