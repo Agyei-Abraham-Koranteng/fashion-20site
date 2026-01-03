@@ -302,7 +302,7 @@ export default function Navbar() {
                   className="flex flex-col items-center justify-center p-4 bg-secondary/50 rounded-lg"
                 >
                   <User size={24} className="mb-2" />
-                  <span className="text-xs font-bold uppercase tracking-wider">{user ? "Dashboard" : "Login"}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wide whitespace-nowrap">{user ? "Dashboard" : "Login"}</span>
                 </button>
                 <Link
                   to="/wishlist"
