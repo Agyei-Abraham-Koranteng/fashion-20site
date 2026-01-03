@@ -180,10 +180,8 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Theme Toggle - Hidden on mobile, available in menu */}
-            <div className="hidden sm:block">
-              <ThemeToggle />
-            </div>
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {/* Search icon */}
             <button
