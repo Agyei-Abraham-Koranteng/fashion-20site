@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight, ShieldCheck, Sparkles, ChevronLeft } from "lucide-react";
 
 export default function Login() {
   const { login, user, loading: authLoading } = useAuth();
@@ -70,29 +70,40 @@ export default function Login() {
   }, [user, authLoading, navigate, params]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 sm:p-12">
-      {/* Brand Logo */}
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-gray-100 via-white to-gray-50 flex flex-col items-center justify-center p-6 sm:p-12 relative overflow-hidden">
+      {/* Back Button */}
+      <motion.button
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        onClick={() => navigate(-1)}
+        className="absolute top-8 left-8 p-3 bg-white/40 backdrop-blur-md border border-white/40 rounded-full shadow-lg shadow-gray-200/20 hover:bg-white/60 transition-all group active:scale-95 z-50"
+        title="Go Back"
+      >
+        <ChevronLeft className="h-5 w-5 text-gray-900 group-hover:-translate-x-0.5 transition-transform" />
+      </motion.button>
+
+      {/* Brand Logo - Minimalist */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="mb-6"
       >
-        <Link to="/" className="text-3xl font-serif font-bold tracking-tight text-gray-900 hover:opacity-80 transition-opacity">
+        <Link to="/" className="text-2xl font-serif font-semibold tracking-tighter text-gray-900 hover:opacity-70 transition-opacity">
           MadeInFashion
         </Link>
       </motion.div>
 
       {/* Login Card */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-[450px] bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden"
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full max-w-[440px] bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100/50 overflow-hidden"
       >
-        <div className="p-8 sm:p-10">
-          <div className="mb-10 text-center">
-            <h2 className="text-4xl font-serif font-bold text-gray-900 mb-3 tracking-tight">Welcome Back</h2>
-            <p className="text-gray-400 text-xs font-medium tracking-wide uppercase">Sign in to your fashion profile</p>
+        <div className="p-10 sm:p-12">
+          <div className="mb-10">
+            <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">Sign In</h2>
+            <p className="text-gray-400 text-sm">Welcome back to your fashion space</p>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-6">
@@ -111,7 +122,7 @@ export default function Login() {
                     if (errors.email) setErrors({ ...errors, email: undefined });
                   }}
                   placeholder="you@example.com"
-                  className={`pl-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl ${errors.email ? "border-red-500 ring-red-100" : ""}`}
+                  className={`pl-10 h-13 bg-gray-50/50 border-gray-100/80 focus:bg-white focus:ring-1 focus:ring-gray-900/5 focus:border-gray-900 transition-all rounded-2xl ${errors.email ? "border-red-500 ring-red-100" : ""}`}
                 />
               </div>
               {errors.email && <p className="text-xs text-red-500 mt-1 font-medium">{errors.email}</p>}
@@ -137,7 +148,7 @@ export default function Login() {
                     if (errors.password) setErrors({ ...errors, password: undefined });
                   }}
                   placeholder="••••••••"
-                  className={`pl-10 pr-10 h-12 bg-gray-50 border-gray-100 focus:bg-white focus:ring-0 focus:border-gray-900 transition-all rounded-xl ${errors.password ? "border-red-500 ring-red-100" : ""}`}
+                  className={`pl-10 pr-10 h-13 bg-gray-50/50 border-gray-100/80 focus:bg-white focus:ring-1 focus:ring-gray-900/5 focus:border-gray-900 transition-all rounded-2xl ${errors.password ? "border-red-500 ring-red-100" : ""}`}
                 />
                 <button
                   type="button"
@@ -164,7 +175,7 @@ export default function Login() {
 
             <Button
               type="submit"
-              className="w-full h-12 text-sm font-bold bg-gray-900 hover:bg-black text-white rounded-xl transition-all relative overflow-hidden group active:scale-[0.98]"
+              className="w-full h-13 text-sm font-semibold bg-gray-900 hover:bg-black text-white rounded-2xl shadow-lg shadow-gray-900/10 transition-all relative overflow-hidden group active:scale-[0.99]"
               disabled={isSubmitting}
             >
               <AnimatePresence mode="wait">
