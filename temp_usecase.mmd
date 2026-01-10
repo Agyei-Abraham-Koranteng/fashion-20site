@@ -1,0 +1,23 @@
+usecaseDiagram
+    actor Customer
+    actor Admin
+
+    package "Fashion Store System" {
+        usecase "Browse Products" as UC1
+        usecase "Add to Cart" as UC2
+        usecase "Checkout" as UC3
+        usecase "View Order History" as UC4
+        
+        usecase "Manage Products" as UC5
+        usecase "Manage Orders" as UC6
+        usecase "View Dashboard" as UC7
+    }
+
+    Customer --> UC1
+    Customer --> UC2
+    Customer --> UC3
+    Customer --> UC4
+
+    Admin --> UC5
+    Admin --> UC6
+    Admin --> UC7
