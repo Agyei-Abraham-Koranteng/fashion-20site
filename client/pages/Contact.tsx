@@ -23,9 +23,9 @@ export default function Contact() {
     const contact = {
         title: (cmsData as any)?.title || "Get in Touch",
         subtitle: (cmsData as any)?.subtitle || "Have a question or just want to say hello? We'd love to hear from you.",
-        address: (cmsData as any)?.address || "123 Fashion Avenue\nNew York, NY 10012",
-        email: (cmsData as any)?.email || "hello@fashionbrand.com",
-        phone: (cmsData as any)?.phone || "+1 (555) 123-4567"
+        address: (cmsData as any)?.address || "123 Fashion Street, Design District\nNew York, NY 10012",
+        email: (cmsData as any)?.email || "contact@fashionbrand.com",
+        phone: (cmsData as any)?.phone || "+1 (555) 000-0000"
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
